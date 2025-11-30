@@ -1,0 +1,141 @@
+import { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabaseClient";
+import { motion } from "framer-motion";
+
+// Updated Interface to match Supabase Table
+interface CaseStudy {
+  id: number;
+  title: string;
+  client_name: string; // Changed from 'client' to match DB
+  industry: string;
+  challenge: string;
+  solution: string;
+  results: string[];
+  tags: string[];
+}
+
+const CaseStudiesPage = () => {
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCaseStudies = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('case_studies')
+        .select('*')
+        .order('created_at', { ascending: true }); // Preserves the order from your brief
+
+      if (error) {
+        console.error("Error fetching case studies:", error);
+      } else if (data) {
+        setCaseStudies(data);
+      }
+      setIsLoading(false);
+    };
+
+    fetchCaseStudies();
+  }, []);
+
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      <main className="pt-20">
+        {/* Header Section */}
+        <section className="py-24 pt-48 text-center bg-gradient-to-br from-primary/5 via-background to-accent/5">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto animate-fade-in">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Impact & Case Studies
+              </h1>
+              <p className="text-xl md:text-2xl text-muted-foreground animate-fade-in-up">
+                Real-world success stories demonstrating our impact on GTM Velocity, NRR, and Retention.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Content Section */}
+        <section className="py-24 bg-background">
+          <div className="container mx-auto px-4">
+            {isLoading ? (
+               <div className="text-center py-20">
+                 <p className="text-muted-foreground text-lg">Loading case studies...</p>
+               </div>
+            ) : (
+              <div className="space-y-8">
+                {caseStudies.map((study, index) => (
+                  <motion.div
+                    key={study.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Card 
+                      className="group border-border/50 overflow-hidden bg-card transition-all duration-300 hover:shadow-elegant hover:-translate-y-1"
+                    >
+                      <div className="grid md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                          <CardHeader>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {study.tags?.map((tag) => (
+                                <Badge key={tag} variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                            <CardTitle className="text-2xl mb-2 group-hover:text-primary transition-colors">
+                              {study.title}
+                            </CardTitle>
+                            <CardDescription className="text-base">
+                              {/* Using client_name from DB */}
+                              <span className="font-semibold text-foreground">{study.client_name}</span> • {study.industry}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div>
+                              <h4 className="font-semibold text-foreground mb-2">Challenge</h4>
+                              <p className="text-muted-foreground">{study.challenge}</p>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-foreground mb-2">Solution</h4>
+                              <p className="text-muted-foreground">{study.solution}</p>
+                            </div>
+                          </CardContent>
+                        </div>
+                        <div className="bg-muted/50 p-6 flex flex-col justify-center">
+                          <h4 className="font-semibold text-foreground mb-4 text-lg">Key Results</h4>
+                          <ul className="space-y-3 mb-6">
+                            {study.results?.map((result, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <ArrowRight className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                                <span className="text-foreground font-medium">{result}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                            Read Full Story
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default CaseStudiesPage;
