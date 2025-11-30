@@ -4,10 +4,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Linkedin } from "lucide-react";
+import { ArrowRight, Linkedin, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import defaultArticleImage from "@/assets/whitepaper-articles.jpeg";
+
+// --- 1. Placeholder Image (Use your local asset or this URL as backup) ---
+// If you have the file locally, uncomment the line below and comment out the const string
+// import defaultArticleImage from "@/assets/whitepaper-articles.jpeg";
+const defaultArticleImage = "https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=2574&auto=format&fit=crop";
 
 interface Blog {
   id: number;
@@ -110,17 +114,26 @@ const Blogs = () => {
                                    bg-card transition-all duration-300
                                    hover:shadow-elegant hover:-translate-y-1"
                       >
-                        {/* Blog Post Image */}
-                        <div className="aspect-video overflow-hidden bg-muted">
+                        {/* --- FIX: ALWAYS RENDER THE IMAGE DIV --- 
+                            We use the `||` operator to provide a fallback image.
+                            We also add onError to handle broken links.
+                        */}
+                        <div className="aspect-video overflow-hidden bg-muted relative group-hover:opacity-90 transition-opacity">
                           <img
                             src={blog.image_url || defaultArticleImage}
                             alt={blog.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            referrerPolicy="no-referrer"
                             onError={(e) => {
+                              // If the Supabase URL is broken, fallback to default
                               e.currentTarget.src = defaultArticleImage;
                             }}
-                            referrerPolicy="no-referrer"
                           />
+                          {!blog.image_url && (
+                             <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                                <ImageOff className="text-white/50 h-12 w-12" />
+                             </div>
+                          )}
                         </div>
 
                         <div className="flex flex-col justify-between flex-grow">
@@ -132,10 +145,10 @@ const Blogs = () => {
                               {blog.description}
                             </CardDescription>
                           </CardHeader>
-                          <CardContent className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-primary">
+                          <CardContent className="flex items-center justify-between mt-auto">
+                            <span className="text-sm font-medium text-primary flex items-center gap-1">
                               Read Article
-                              <ArrowRight className="inline-block ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                              <ArrowRight className="inline-block h-4 w-4 group-hover:translate-x-1 transition-transform" />
                             </span>
                             {blog.publish_date && (
                               <Badge variant="secondary" className="font-normal">

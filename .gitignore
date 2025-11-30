@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 web_dev/
 admin-panel/
+.env
