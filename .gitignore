@@ -25,3 +25,7 @@ dist-ssr
 web_dev/
 admin-panel/
 .env
+*.jpg
+*.png
+*.jpeg
+
