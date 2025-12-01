@@ -1,5 +1,6 @@
 import { Target, TrendingUp, Users, Zap, Heart } from "lucide-react";
 import { useContent } from "@/hooks/useContent";
+import { Link } from "react-router-dom";
 
 const GrowthEngine = () => {
   const { getText } = useContent('home');
@@ -8,27 +9,32 @@ const GrowthEngine = () => {
     {
       icon: <Target className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion1.title', 'Pre-Sales Transformation'),
-      description: getText('growth_engine.motion1.desc', 'Aligning brand purpose with market needs.')
+      description: getText('growth_engine.motion1.desc', 'Aligning brand purpose with market needs.'),
+      link: "/solutions/pre-sales"
     },
     {
       icon: <TrendingUp className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion2.title', 'Sales Velocity'),
-      description: getText('growth_engine.motion2.desc', 'Accelerating acquisition and conversion.')
+      description: getText('growth_engine.motion2.desc', 'Accelerating acquisition and conversion.'),
+      link: "/solutions/sales-velocity"
     },
     {
       icon: <Users className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion3.title', 'Customer Success'),
-      description: getText('growth_engine.motion3.desc', 'Driving retention and expansion.')
+      description: getText('growth_engine.motion3.desc', 'Driving retention and expansion.'),
+      link: "/solutions/customer-success"
     },
     {
       icon: <Zap className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion4.title', 'Digital & AI Enablement'),
-      description: getText('growth_engine.motion4.desc', 'Empowering teams with unified data.')
+      description: getText('growth_engine.motion4.desc', 'Empowering teams with unified data.'),
+      link: "/solutions/digital-ai"
     },
     {
       icon: <Heart className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion5.title', 'Culture Transformation'),
-      description: getText('growth_engine.motion5.desc', 'Building a customer-centric DNA.')
+      description: getText('growth_engine.motion5.desc', 'Building a customer-centric DNA.'),
+      link: "/solutions/culture-transformation"
     }
   ];
 
@@ -46,13 +52,17 @@ const GrowthEngine = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {motions.map((motion, index) => (
-            <div key={index} className="bg-card p-6 rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 text-center group">
+            <Link 
+              key={index} 
+              to={motion.link}
+              className="bg-card p-6 rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 text-center group block h-full"
+            >
               <div className="mb-4 inline-flex p-3 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors">
                 {motion.icon}
               </div>
-              <h3 className="font-semibold text-primary mb-2">{motion.title}</h3>
+              <h3 className="font-semibold text-primary mb-2 group-hover:text-secondary transition-colors">{motion.title}</h3>
               <p className="text-sm text-muted-foreground">{motion.description}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
