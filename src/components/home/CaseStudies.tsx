@@ -63,32 +63,34 @@ const CaseStudies = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cases.map((item) => (
-              <Card key={item.id} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50 hover:border-secondary/50 h-full flex flex-col">
-                <CardHeader className="pb-2">
-                  <div className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
-                    {item.industry}
-                  </div>
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
-                    {item.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow flex flex-col">
-                  {/* Display the first result as the main metric */}
-                  <div className="text-2xl font-bold text-primary mb-2">
-                    {item.results && item.results.length > 0 ? item.results[0] : ""}
-                  </div>
-                  <CardDescription className="line-clamp-3 mb-4 flex-grow">
-                    {item.challenge}
-                  </CardDescription>
-                  <div className="mt-auto pt-4 border-t border-border/50 flex flex-wrap gap-2">
-                    {item.tags && item.tags.slice(0, 2).map((tag, i) => (
-                      <span key={i} className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <Link key={item.id} to={`/case-studies#case-study-${item.id}`} className="block h-full">
+                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50 hover:border-secondary/50 h-full flex flex-col">
+                  <CardHeader className="pb-2">
+                    <div className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
+                      {item.industry}
+                    </div>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
+                      {item.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow flex flex-col">
+                    {/* Display the first result as the main metric */}
+                    <div className="text-2xl font-bold text-primary mb-2">
+                      {item.results && item.results.length > 0 ? item.results[0] : ""}
+                    </div>
+                    <CardDescription className="line-clamp-3 mb-4 flex-grow">
+                      {item.challenge}
+                    </CardDescription>
+                    <div className="mt-auto pt-4 border-t border-border/50 flex flex-wrap gap-2">
+                      {item.tags && item.tags.slice(0, 2).map((tag, i) => (
+                        <span key={i} className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         )}

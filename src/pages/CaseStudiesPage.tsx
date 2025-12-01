@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 // Updated Interface to match Supabase Table
 interface CaseStudy {
@@ -23,6 +24,7 @@ interface CaseStudy {
 const CaseStudiesPage = () => {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchCaseStudies = async () => {
@@ -42,6 +44,19 @@ const CaseStudiesPage = () => {
 
     fetchCaseStudies();
   }, []);
+
+  // Scroll to hash after data loads
+  useEffect(() => {
+    if (!isLoading && location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100); // Small delay to ensure rendering
+      }
+    }
+  }, [isLoading, location.hash]);
 
   return (
     <div className="min-h-screen">
@@ -73,6 +88,7 @@ const CaseStudiesPage = () => {
                 {caseStudies.map((study, index) => (
                   <motion.div
                     key={study.id}
+                    id={`case-study-${study.id}`} // Add ID for deep linking
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
