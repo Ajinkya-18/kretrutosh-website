@@ -40,6 +40,13 @@ const Navbar = () => {
     }
   };
 
+  const handleLinkClick = (path: string) => {
+    setIsOpen(false);
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const navItems = [
     {
       name: "Solutions",
@@ -120,6 +127,7 @@ const Navbar = () => {
           <Link 
             to="/" 
             className="flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight text-primary transition-transform hover:scale-[1.02] z-50"
+            onClick={() => handleLinkClick("/")}
           >
             <img src={logo} alt="KretruTosh Consulting" className="h-10 w-auto" />
           </Link>
@@ -129,7 +137,7 @@ const Navbar = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <Link to="/">
+                  <Link to="/" onClick={() => handleLinkClick("/")}>
                     <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground")}>
                       Home
                     </NavigationMenuLink>
@@ -154,6 +162,7 @@ const Navbar = () => {
                                   <Link
                                     to={child.path}
                                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                    onClick={() => handleLinkClick(child.path)}
                                   >
                                     <div className="text-sm font-medium leading-none">{child.name}</div>
                                   </Link>
@@ -164,7 +173,7 @@ const Navbar = () => {
                         </NavigationMenuContent>
                       </>
                     ) : (
-                      <Link to={item.path}>
+                      <Link to={item.path} onClick={() => handleLinkClick(item.path)}>
                         <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground")}>
                           {item.name}
                         </NavigationMenuLink>
@@ -203,7 +212,7 @@ const Navbar = () => {
               <Link
                 to="/"
                 className="px-4 py-3 text-base font-medium rounded-md hover:bg-primary/5 text-muted-foreground hover:text-primary"
-                onClick={() => setIsOpen(false)}
+                onClick={() => handleLinkClick("/")}
               >
                 Home
               </Link>
@@ -214,16 +223,26 @@ const Navbar = () => {
                     {item.name}
                   </div>
                   <div className="pl-4 space-y-1 border-l-2 border-primary/10 ml-4">
-                    {item.children.map((child) => (
+                    {item.children.length > 0 ? (
+                      item.children.map((child) => (
+                        <Link
+                          key={child.name}
+                          to={child.path}
+                          className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                          onClick={() => handleLinkClick(child.path)}
+                        >
+                          {child.name}
+                        </Link>
+                      ))
+                    ) : (
                       <Link
-                        key={child.name}
-                        to={child.path}
+                        to={item.path}
                         className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => handleLinkClick(item.path)}
                       >
-                        {child.name}
+                        {item.name}
                       </Link>
-                    ))}
+                    )}
                   </div>
                 </div>
               ))}

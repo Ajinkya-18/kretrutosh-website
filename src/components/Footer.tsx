@@ -1,10 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
 import logo from "@/assets/kretrutosh-logo.png";
 import { useContent } from "@/hooks/useContent"; // 1. Import the hook
 
 const Footer = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const currentYear = new Date().getFullYear();
   
   // 2. Fetch global content for footer text
@@ -16,6 +17,12 @@ const Footer = () => {
       document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
     } else {
       navigate("/", { state: { scrollTo: "contact" } });
+    }
+  };
+
+  const handleLinkClick = (path: string) => {
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -68,7 +75,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-16">
         {/* Top Section: Brand & Socials */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3" onClick={() => handleLinkClick("/")}>
             <img src={logo} alt="Kretrutosh Consulting" className="h-12 w-auto bg-white/10 p-1 rounded-md backdrop-blur-sm" />
             <div className="flex flex-col">
               <h3 className="text-2xl font-bold leading-none">
@@ -97,7 +104,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.solutions.map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
                     {link.name}
                   </Link>
                 </li>
@@ -113,7 +120,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.industries.map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
                     {link.name}
                   </Link>
                 </li>
@@ -129,7 +136,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.frameworks.map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
                     {link.name}
                   </Link>
                 </li>
@@ -145,7 +152,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
                     {link.name}
                   </Link>
                 </li>
@@ -166,7 +173,7 @@ const Footer = () => {
                       {link.name}
                     </a>
                   ) : (
-                    <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                    <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
                       {link.name}
                     </Link>
                   )}
@@ -201,8 +208,8 @@ const Footer = () => {
             {getText('footer.copyright', `© ${currentYear} KretruTosh Consulting. All rights reserved.`)}
           </p>
           <div className="flex gap-6 text-sm text-primary-foreground/50">
-            <Link to="/privacy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-secondary transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-secondary transition-colors" onClick={() => handleLinkClick("/privacy")}>Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-secondary transition-colors" onClick={() => handleLinkClick("/terms")}>Terms of Service</Link>
           </div>
         </div>
       </div>
