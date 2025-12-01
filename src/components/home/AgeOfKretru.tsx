@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import bookCover from "@/assets/3d-book-cover.jpeg";
+import { useContent } from "@/hooks/useContent";
 
 const AgeOfKretru = () => {
+  const { getText } = useContent('home');
+
   return (
     <section className="py-24 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4">
@@ -11,34 +14,29 @@ const AgeOfKretru = () => {
           <div className="flex-1 space-y-8 z-10">
             <div className="inline-block px-4 py-1.5 rounded-full border border-primary/10 bg-primary/5 mb-4">
               <span className="text-primary font-medium text-sm tracking-wide uppercase">
-                New Release
+                {getText('age_of_kretru.badge', 'New Release')}
               </span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-primary leading-tight">
-              Beyond Customer Satisfaction: <br />
-              <span className="text-secondary">The Age of Kretru</span>
+              {getText('age_of_kretru.title', 'Beyond Customer Satisfaction:')} <br />
+              <span className="text-secondary">{getText('age_of_kretru.subtitle', 'The Age of Kretru')}</span>
             </h2>
             
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p className="font-medium text-primary/80 italic border-l-4 border-secondary pl-4">
-                “Customer satisfaction is not the goal. <br />
-                Expectation Fulfilment is. <br />
-                And expectation fulfilment is what unlocks retention, revenue, trust, and advocacy.”
+                {getText('age_of_kretru.quote', '“Customer satisfaction is not the goal. Expectation Fulfilment is. And expectation fulfilment is what unlocks retention, revenue, trust, and advocacy.”')}
               </p>
-              <p>
-                <span className="font-bold text-primary">Kretru (Customer) + Tosh (Delight) =</span> <br />
-                A philosophy where expectation, experience & economics converge.
-              </p>
+              <p dangerouslySetInnerHTML={{ __html: getText('age_of_kretru.description', '<span class="font-bold text-primary">Kretru (Customer) + Tosh (Delight) =</span> <br /> A philosophy where expectation, experience & economics converge.') }} />
             </div>
 
             <div className="pt-4">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <a 
-                  href="https://www.amazon.in/dp/B0D17W5B1B" 
+                  href={getText('age_of_kretru.book_link', 'https://www.amazon.in/dp/B0D17W5B1B')}
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  Read the Book → Amazon
+                  {getText('age_of_kretru.cta_text', 'Read the Book → Amazon')}
                   <ExternalLink className="ml-2 h-5 w-5" />
                 </a>
               </Button>

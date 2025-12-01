@@ -77,7 +77,7 @@ const Navbar = () => {
         { name: "SaaS & B2B Tech", path: "/industries/saas" },
         { name: "Insurance (Life & General)", path: "/industries/insurance" },
         { name: "Banking & Financial Services", path: "/industries/bfsi" },
-        { name: "Manufacturing / Healthcare / EdTech", path: "/industries/manufacturing" },
+        { name: "Manufacturing", path: "/industries/manufacturing" },
       ],
     },
     {
@@ -101,7 +101,6 @@ const Navbar = () => {
       path: "/about",
       children: [
         { name: "Founder", path: "/about/founder" },
-        { name: "Clients & Partners (Coming Soon)", path: "/about/clients" },
       ],
     },
   ];

@@ -16,6 +16,7 @@ import Frameworks from "@/components/home/Frameworks";
 import ClientLogos from "@/components/home/ClientLogos";
 import CaseStudies from "@/components/home/CaseStudies";
 import ThoughtLeadership from "@/components/home/ThoughtLeadership";
+import FinalCTA from "@/components/home/FinalCTA";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -61,14 +62,7 @@ const Index = () => {
           videoUrl={heroData?.hero_video_url}
         />
         
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <AgeOfKretru />
-        </motion.div>
+
 
         <WhatKretrutoshMeans />
         
@@ -103,7 +97,25 @@ const Index = () => {
           <CaseStudies />
         </motion.div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <AgeOfKretru />
+        </motion.div>
+
         <ThoughtLeadership />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <FinalCTA />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}

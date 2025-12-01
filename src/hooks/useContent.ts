@@ -14,10 +14,9 @@ export const useContent = (pageName: string) => {
         .or(`page_name.eq.${pageName},page_name.eq.global`);
 
       if (!error && data) {
-        // Convert the database rows into a simple dictionary
-        // Example: content['hero.title'] = "New Headline"
         const contentMap: Record<string, string> = {};
         data.forEach((item) => {
+          // Creates keys like "hero.title" or "navbar.cta"
           const key = `${item.section_name}.${item.element_key}`;
           contentMap[key] = item.content_text;
         });
@@ -29,9 +28,7 @@ export const useContent = (pageName: string) => {
     fetchContent();
   }, [pageName]);
 
-  // This is the function you will use in your components
-  // key: The identifier in the DB (e.g., 'hero.title')
-  // defaultText: What to show if the DB is empty or loading
+  // Helper to get text safely with a default fallback
   const getText = (key: string, defaultText: string) => {
     return content[key] || defaultText;
   };

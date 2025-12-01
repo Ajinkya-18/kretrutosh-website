@@ -1,31 +1,34 @@
 import { Target, TrendingUp, Users, Zap, Heart } from "lucide-react";
+import { useContent } from "@/hooks/useContent";
 
 const GrowthEngine = () => {
+  const { getText } = useContent('home');
+
   const motions = [
     {
       icon: <Target className="h-8 w-8 text-secondary" />,
-      title: "Pre-Sales Transformation",
-      description: "Aligning brand purpose with market needs."
+      title: getText('growth_engine.motion1.title', 'Pre-Sales Transformation'),
+      description: getText('growth_engine.motion1.desc', 'Aligning brand purpose with market needs.')
     },
     {
       icon: <TrendingUp className="h-8 w-8 text-secondary" />,
-      title: "Sales Velocity",
-      description: "Accelerating acquisition and conversion."
+      title: getText('growth_engine.motion2.title', 'Sales Velocity'),
+      description: getText('growth_engine.motion2.desc', 'Accelerating acquisition and conversion.')
     },
     {
       icon: <Users className="h-8 w-8 text-secondary" />,
-      title: "Customer Success",
-      description: "Driving retention and expansion."
+      title: getText('growth_engine.motion3.title', 'Customer Success'),
+      description: getText('growth_engine.motion3.desc', 'Driving retention and expansion.')
     },
     {
       icon: <Zap className="h-8 w-8 text-secondary" />,
-      title: "Digital & AI Enablement",
-      description: "Empowering teams with unified data."
+      title: getText('growth_engine.motion4.title', 'Digital & AI Enablement'),
+      description: getText('growth_engine.motion4.desc', 'Empowering teams with unified data.')
     },
     {
       icon: <Heart className="h-8 w-8 text-secondary" />,
-      title: "Culture Transformation",
-      description: "Building a customer-centric DNA."
+      title: getText('growth_engine.motion5.title', 'Culture Transformation'),
+      description: getText('growth_engine.motion5.desc', 'Building a customer-centric DNA.')
     }
   ];
 
@@ -34,10 +37,10 @@ const GrowthEngine = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold text-primary">
-            One Engine. Five Motions. Infinite Growth.
+            {getText('growth_engine.title', 'One Engine. Five Motions. Infinite Growth.')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Your GTM Velocity model has three lifecycle pillars (Pre-Sales, Sales, Post-Sales) and two enabling horizontals (Digital Enablement and Culture Transformation). All five together create sustainable, scalable growth.
+            {getText('growth_engine.description', 'Your GTM Velocity model has three lifecycle pillars (Pre-Sales, Sales, Post-Sales) and two enabling horizontals (Digital Enablement and Culture Transformation). All five together create sustainable, scalable growth.')}
           </p>
         </div>
 
