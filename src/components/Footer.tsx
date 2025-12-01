@@ -1,9 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
 import logo from "@/assets/kretrutosh-logo.png";
+import { useContent } from "@/hooks/useContent"; // 1. Import the hook
 
 const Footer = () => {
   const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
+  
+  // 2. Fetch global content for footer text
+  const { getText } = useContent('global'); 
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -14,6 +19,7 @@ const Footer = () => {
     }
   };
 
+  // Keep your detailed link structure (Structure usually stays static, labels can be dynamic)
   const footerLinks = {
     solutions: [
       { name: "Pre-Sales Transformation", path: "/solutions/pre-sales" },
@@ -85,7 +91,9 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
           {/* Column 1: Solutions */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">Solutions</h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">
+              {getText('footer.col_1_title', 'Solutions')}
+            </h4>
             <ul className="space-y-3">
               {footerLinks.solutions.map((link) => (
                 <li key={link.name}>
@@ -99,7 +107,9 @@ const Footer = () => {
 
           {/* Column 2: Industries */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">Industries</h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">
+              {getText('footer.col_2_title', 'Industries')}
+            </h4>
             <ul className="space-y-3">
               {footerLinks.industries.map((link) => (
                 <li key={link.name}>
@@ -113,7 +123,9 @@ const Footer = () => {
 
           {/* Column 3: Frameworks */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">Frameworks</h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">
+              {getText('footer.col_3_title', 'Frameworks')}
+            </h4>
             <ul className="space-y-3">
               {footerLinks.frameworks.map((link) => (
                 <li key={link.name}>
@@ -127,7 +139,9 @@ const Footer = () => {
 
           {/* Column 4: Resources */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">Resources</h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">
+              {getText('footer.col_4_title', 'Resources')}
+            </h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
@@ -141,7 +155,9 @@ const Footer = () => {
 
           {/* Column 5: Company */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">Company</h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">
+              {getText('footer.col_5_title', 'Company')}
+            </h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -157,18 +173,24 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
+            
+            {/* Dynamic Contact Details */}
             <div className="mt-6 space-y-3">
               <div className="flex items-start gap-3 text-primary-foreground/70 text-sm">
                 <MapPin className="mt-1 shrink-0 text-secondary" size={16} />
-                <span>Mumbai, Maharashtra, India</span>
+                <span>{getText('footer.address_city', 'Mumbai, Maharashtra, India')}</span>
               </div>
               <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
                 <Phone className="shrink-0 text-secondary" size={16} />
-                <a href="tel:+919591387838" className="hover:text-white transition-colors">+91 95913 87838</a>
+                <a href="tel:+919591387838" className="hover:text-white transition-colors">
+                  {getText('footer.phone', '+91 95913 87838')}
+                </a>
               </div>
               <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
                 <Mail className="shrink-0 text-secondary" size={16} />
-                <a href="mailto:consult.ashutosh@kretru.com" className="hover:text-white transition-colors">consult.ashutosh@kretru.com</a>
+                <a href="mailto:consult.ashutosh@kretru.com" className="hover:text-white transition-colors">
+                  {getText('footer.email', 'consult.ashutosh@kretru.com')}
+                </a>
               </div>
             </div>
           </div>
@@ -176,7 +198,7 @@ const Footer = () => {
 
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/50 text-sm">
-            &copy; {new Date().getFullYear()} KretruTosh Consulting. All rights reserved.
+            {getText('footer.copyright', `© ${currentYear} KretruTosh Consulting. All rights reserved.`)}
           </p>
           <div className="flex gap-6 text-sm text-primary-foreground/50">
             <Link to="/privacy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
