@@ -1,15 +1,18 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft, CheckCircle2, Server, ShoppingBag, ShoppingCart, Shield, Landmark, Factory, Stethoscope, GraduationCap, Building2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Server, ShoppingBag, ShoppingCart, Shield, Landmark, Factory, Stethoscope, GraduationCap, Building2, Layers } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import NotFound from "./NotFound";
+import SEO from "@/components/SEO";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 
 const iconMap: Record<string, any> = {
-  Server, ShoppingBag, ShoppingCart, Shield, Landmark, Factory, Stethoscope, GraduationCap
+  Server, ShoppingBag, ShoppingCart, Shield, Landmark, Factory, Stethoscope, GraduationCap, Layers
 };
 
 interface Industry {
@@ -22,14 +25,23 @@ interface Industry {
   approach: string;
   outcomes: string[];
   icon_name: string;
+  meta_title?: string;
+  meta_description?: string;
+  framework_slugs?: string[];
+}
+
+interface RelatedFramework {
+  id: number;
+  title: string;
+  slug: string;
+  icon_name: string;
 }
 
 const IndustryDetail = () => {
-  // We use 'id' here because the Route definition is likely path="/industries/:id" 
-  // even though the value passed is a slug like 'saas'.
   const { id: slug } = useParams(); 
   const navigate = useNavigate();
   const [industry, setIndustry] = useState<Industry | null>(null);
+  const [relatedFrameworks, setRelatedFrameworks] = useState<RelatedFramework[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +49,6 @@ const IndustryDetail = () => {
       if (!slug) return;
       setIsLoading(true);
 
-      // Query Supabase by the 'slug' column
       const { data, error } = await supabase
         .from('industries')
         .select('*')
@@ -46,8 +57,21 @@ const IndustryDetail = () => {
 
       if (error) {
         console.error("Error fetching industry:", error);
+        setIndustry(null);
       } else {
         setIndustry(data);
+        
+        // Fetch related frameworks if any
+        if (data.framework_slugs && data.framework_slugs.length > 0) {
+          const { data: frameworksData, error: frameworksError } = await supabase
+            .from('frameworks')
+            .select('id, title, slug, icon_name')
+            .in('slug', data.framework_slugs);
+            
+          if (!frameworksError && frameworksData) {
+            setRelatedFrameworks(frameworksData);
+          }
+        }
       }
       setIsLoading(false);
     };
@@ -57,8 +81,35 @@ const IndustryDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading industry details...</p>
+      <div className="min-h-screen bg-background font-sans">
+        <Navbar />
+        <section className="relative pt-32 pb-20 bg-gradient-hero overflow-hidden">
+           <div className="container mx-auto px-4 relative z-10">
+             <Skeleton className="h-10 w-40 mb-8 bg-white/10" />
+             <div className="flex flex-col md:flex-row gap-8 items-start">
+               <Skeleton className="h-24 w-24 rounded-2xl bg-white/10" />
+               <div className="space-y-4 w-full max-w-3xl">
+                 <Skeleton className="h-6 w-32 bg-white/10" />
+                 <Skeleton className="h-16 w-3/4 bg-white/10" />
+                 <Skeleton className="h-24 w-full bg-white/10" />
+               </div>
+             </div>
+           </div>
+        </section>
+        <section className="py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+               <div className="space-y-4">
+                 <Skeleton className="h-10 w-1/2" />
+                 <Skeleton className="h-64 w-full" />
+               </div>
+               <div className="space-y-4">
+                 <Skeleton className="h-10 w-1/2" />
+                 <Skeleton className="h-64 w-full" />
+               </div>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
@@ -67,11 +118,14 @@ const IndustryDetail = () => {
     return <NotFound />;
   }
 
-  // Fallback to 'Building2' icon if the specific one isn't found or defined
   const Icon = iconMap[industry.icon_name] || Building2;
 
   return (
     <div className="min-h-screen bg-background font-sans">
+      <SEO 
+        title={industry.meta_title || industry.title}
+        description={industry.meta_description || industry.description}
+      />
       <Navbar />
       
       {/* Hero Section */}
@@ -142,6 +196,35 @@ const IndustryDetail = () => {
                   {industry.approach}
                 </p>
               </div>
+
+              {/* RELATED FRAMEWORKS */}
+              {relatedFrameworks.length > 0 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-primary mb-6">Recommended Frameworks</h2>
+                  <div className="grid gap-4">
+                    {relatedFrameworks.map((framework) => {
+                       const FrameworkIcon = iconMap[framework.icon_name] || Layers;
+                       return (
+                        <Link key={framework.id} to={`/frameworks/${framework.slug}`}>
+                          <Card className="hover:shadow-md transition-all duration-300 border-border/50 hover:border-secondary/50 group">
+                            <CardContent className="p-6 flex items-center gap-4">
+                              <div className="h-12 w-12 rounded-lg bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-secondary/10 transition-colors">
+                                <FrameworkIcon className="h-6 w-6 text-primary group-hover:text-secondary transition-colors" />
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-lg text-primary group-hover:text-secondary transition-colors">
+                                  {framework.title}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">View Framework &rarr;</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                       );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Outcomes & CTA */}

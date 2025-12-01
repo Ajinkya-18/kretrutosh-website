@@ -1,15 +1,53 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { Linkedin, Mail, MapPin, Phone, Youtube, Loader2 } from "lucide-react";
 import logo from "@/assets/kretrutosh-logo.png";
-import { useContent } from "@/hooks/useContent"; // 1. Import the hook
+import { useContent } from "@/hooks/useContent";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabaseClient";
+import { useState } from "react";
 
 const Footer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentYear = new Date().getFullYear();
-  
-  // 2. Fetch global content for footer text
-  const { getText } = useContent('global'); 
+  const { getText } = useContent('global');
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setIsSubscribing(true);
+
+    const { error } = await supabase
+      .from('subscribers')
+      .insert([{ email }]);
+
+    if (error) {
+        if (error.code === '23505') {
+             toast({
+                title: "Already Subscribed",
+                description: "This email is already on our list.",
+             });
+        } else {
+            toast({
+                title: "Error",
+                description: "Could not subscribe. Please try again.",
+                variant: "destructive",
+            });
+        }
+    } else {
+      toast({
+        title: "Success!",
+        description: "You have been subscribed to our newsletter.",
+      });
+      setEmail("");
+    }
+    setIsSubscribing(false);
+  };
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,7 +64,6 @@ const Footer = () => {
     }
   };
 
-  // Keep your detailed link structure (Structure usually stays static, labels can be dynamic)
   const footerLinks = {
     solutions: [
       { name: "Pre-Sales Transformation", path: "/solutions/pre-sales" },
@@ -73,24 +110,45 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground border-t border-primary/20">
       <div className="container mx-auto px-4 py-16">
-        {/* Top Section: Brand & Socials */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <Link to="/" className="flex items-center gap-3" onClick={() => handleLinkClick("/")}>
-            <img src={logo} alt="Kretrutosh Consulting" className="h-12 w-auto bg-white/10 p-1 rounded-md backdrop-blur-sm" />
-            <div className="flex flex-col">
-              <h3 className="text-2xl font-bold leading-none">
-                <span className="text-primary-foreground">Kretrutosh</span>
-                <span className="text-secondary"> Consulting</span>
-              </h3>
-            </div>
-          </Link>
-          <div className="flex gap-4">
-            <a href="https://www.linkedin.com/in/ashutosh-karandikar-ccxp/" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
-              <Linkedin size={20} />
-            </a>
-            <a href="https://www.youtube.com/@theXTPodcast" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
-              <Youtube size={20} />
-            </a>
+        {/* Top Section: Brand & Socials & Newsletter */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8">
+          <div className="flex flex-col gap-4">
+              <Link to="/" className="flex items-center gap-3" onClick={() => handleLinkClick("/")}>
+                <img src={logo} alt="Kretrutosh Consulting" className="h-12 w-auto bg-white/10 p-1 rounded-md backdrop-blur-sm" />
+                <div className="flex flex-col">
+                  <h3 className="text-2xl font-bold leading-none">
+                    <span className="text-primary-foreground">Kretrutosh</span>
+                    <span className="text-secondary"> Consulting</span>
+                  </h3>
+                </div>
+              </Link>
+              <div className="flex gap-4">
+                <a href="https://www.linkedin.com/in/ashutosh-karandikar-ccxp/" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
+                  <Linkedin size={20} />
+                </a>
+                <a href="https://www.youtube.com/@theXTPodcast" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
+                  <Youtube size={20} />
+                </a>
+              </div>
+          </div>
+
+          {/* Newsletter */}
+          <div className="w-full max-w-md bg-primary-foreground/5 p-6 rounded-xl border border-primary-foreground/10">
+            <h4 className="text-lg font-semibold text-secondary mb-2">Stay Updated</h4>
+            <p className="text-sm text-primary-foreground/70 mb-4">Get the latest insights on GTM velocity and culture transformation.</p>
+            <form onSubmit={handleSubscribe} className="flex gap-2">
+                <Input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    className="bg-primary/50 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <Button type="submit" variant="secondary" disabled={isSubscribing}>
+                    {isSubscribing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe"}
+                </Button>
+            </form>
           </div>
         </div>
 

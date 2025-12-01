@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import SEO from "@/components/SEO";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Updated Interface to match Supabase Table
 interface CaseStudy {
@@ -24,11 +26,25 @@ interface CaseStudy {
 const CaseStudiesPage = () => {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [seoData, setSeoData] = useState<{meta_title: string, meta_description: string} | null>(null);
   const location = useLocation();
 
   useEffect(() => {
-    const fetchCaseStudies = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
+      
+      // Fetch Page SEO
+      const { data: pageData } = await supabase
+        .from('pages')
+        .select('meta_title, meta_description')
+        .eq('slug', 'case-studies')
+        .single();
+      
+      if (pageData) {
+        setSeoData(pageData);
+      }
+
+      // Fetch Case Studies
       const { data, error } = await supabase
         .from('case_studies')
         .select('*')
@@ -42,7 +58,7 @@ const CaseStudiesPage = () => {
       setIsLoading(false);
     };
 
-    fetchCaseStudies();
+    fetchData();
   }, []);
 
   // Scroll to hash after data loads
@@ -60,6 +76,10 @@ const CaseStudiesPage = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO 
+        title={seoData?.meta_title || "Impact & Case Studies"}
+        description={seoData?.meta_description || "Real-world success stories demonstrating our impact on GTM Velocity, NRR, and Retention."}
+      />
       <Navbar />
       <main className="pt-20">
         {/* Header Section */}
@@ -80,8 +100,23 @@ const CaseStudiesPage = () => {
         <section className="py-24 bg-background">
           <div className="container mx-auto px-4">
             {isLoading ? (
-               <div className="text-center py-20">
-                 <p className="text-muted-foreground text-lg">Loading case studies...</p>
+               <div className="space-y-8">
+                 {[1, 2, 3].map((i) => (
+                   <div key={i} className="border border-border/50 rounded-xl overflow-hidden bg-card h-[400px] p-6 flex gap-6">
+                      <div className="w-2/3 space-y-4">
+                        <Skeleton className="h-8 w-1/3" />
+                        <Skeleton className="h-6 w-1/4" />
+                        <Skeleton className="h-24 w-full" />
+                        <Skeleton className="h-24 w-full" />
+                      </div>
+                      <div className="w-1/3 bg-muted/50 rounded-lg p-6 space-y-4">
+                        <Skeleton className="h-6 w-1/2" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                      </div>
+                   </div>
+                 ))}
                </div>
             ) : (
               <div className="space-y-8">

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Linkedin, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // --- 1. Placeholder Image (Use your local asset or this URL as backup) ---
 // If you have the file locally, uncomment the line below and comment out the const string
@@ -92,7 +93,22 @@ const Blogs = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {isLoading ? (
-                <p className="text-muted-foreground">Loading posts...</p>
+                 <>
+                   {[1, 2, 3, 4, 5, 6].map((i) => (
+                     <div key={i} className="h-full flex flex-col border border-border/50 rounded-xl overflow-hidden bg-card">
+                        <Skeleton className="aspect-video w-full" />
+                        <div className="p-6 space-y-4">
+                           <Skeleton className="h-6 w-3/4" />
+                           <Skeleton className="h-4 w-full" />
+                           <Skeleton className="h-4 w-full" />
+                           <div className="flex justify-between pt-4">
+                              <Skeleton className="h-4 w-20" />
+                              <Skeleton className="h-6 w-24 rounded-full" />
+                           </div>
+                        </div>
+                     </div>
+                   ))}
+                 </>
               ) : (
                 blogs.map((blog, index) => (
                   <motion.div

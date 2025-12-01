@@ -6,6 +6,7 @@ import { Youtube } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Video {
   id: number;
@@ -16,9 +17,11 @@ interface Video {
 
 const Videos = () => {
   const [videos, setVideos] = useState<Video[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchVideos = async () => {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('videos')
         .select('*');
@@ -28,6 +31,7 @@ const Videos = () => {
       } else if (data) {
         setVideos(data);
       }
+      setIsLoading(false);
     };
 
     fetchVideos();
@@ -68,7 +72,16 @@ const Videos = () => {
         <section className="py-24">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {videos.map((video, index) => (
+              {isLoading ? (
+                  [1, 2, 3].map((i) => (
+                      <div key={i} className="border border-border/50 rounded-xl overflow-hidden bg-card p-6 space-y-4">
+                          <Skeleton className="aspect-video w-full rounded-lg" />
+                          <Skeleton className="h-6 w-3/4" />
+                          <Skeleton className="h-4 w-full" />
+                      </div>
+                  ))
+              ) : (
+                videos.map((video, index) => (
                 <motion.div
                   key={video.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -97,7 +110,8 @@ const Videos = () => {
                     </CardHeader>
                   </Card>
                 </motion.div>
-              ))}
+              ))
+              )}
             </div>
           </div>
         </section>

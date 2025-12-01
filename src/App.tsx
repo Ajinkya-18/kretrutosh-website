@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import ScrollToTop from "@/components/ScrollToTop";
 
 // --- Import your Page Components ---
@@ -56,68 +57,70 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          {/* --- Main Pages --- */}
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/book" element={<Book />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/blogs" element={<Blogs />} />
+    <HelmetProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            {/* --- Main Pages --- */}
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/book" element={<Book />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/blogs" element={<Blogs />} />
 
-          {/* --- Solutions Routes --- */}
-          <Route path="/solutions" element={<ComingSoon />} />
-          <Route path="/solutions/pre-sales" element={<PreSales />} />
-          <Route path="/solutions/sales-velocity" element={<SalesVelocity />} />
-          <Route path="/solutions/customer-success" element={<CustomerSuccess />} />
-          <Route path="/solutions/digital-ai" element={<DigitalAI />} />
-          <Route path="/solutions/culture-transformation" element={<CultureLeadership />} />
+            {/* --- Solutions Routes --- */}
+            <Route path="/solutions" element={<ComingSoon />} />
+            <Route path="/solutions/pre-sales" element={<PreSales />} />
+            <Route path="/solutions/sales-velocity" element={<SalesVelocity />} />
+            <Route path="/solutions/customer-success" element={<CustomerSuccess />} />
+            <Route path="/solutions/digital-ai" element={<DigitalAI />} />
+            <Route path="/solutions/culture-transformation" element={<CultureLeadership />} />
 
-          {/* --- Frameworks Routes --- */}
-          <Route path="/frameworks" element={<Frameworks />} />
-          <Route path="/frameworks/:id" element={<FrameworkDetail />} />
+            {/* --- Frameworks Routes --- */}
+            <Route path="/frameworks" element={<Frameworks />} />
+            <Route path="/frameworks/:id" element={<FrameworkDetail />} />
 
-          {/* --- Industries Routes --- */}
-          <Route path="/industries" element={<ComingSoon />} />
-          <Route path="/industries/:id" element={<IndustryDetail />} />
+            {/* --- Industries Routes --- */}
+            <Route path="/industries" element={<ComingSoon />} />
+            <Route path="/industries/:id" element={<IndustryDetail />} />
 
-          {/* --- Resources Routes --- */}
-          <Route path="/resources" element={<Resources />} />
-          <Route path="/resources/whitepapers" element={<Whitepapers />} />
-          <Route path="/resources/podcast" element={<Videos />} /> {/* Mapping to Videos page */}
-          <Route path="/resources/articles" element={<Blogs />} /> {/* Mapping to Blogs page */}
-          <Route path="/resources/book" element={<Book />} />
+            {/* --- Resources Routes --- */}
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/resources/whitepapers" element={<Whitepapers />} />
+            <Route path="/resources/podcast" element={<Videos />} /> {/* Mapping to Videos page */}
+            <Route path="/resources/articles" element={<Blogs />} /> {/* Mapping to Blogs page */}
+            <Route path="/resources/book" element={<Book />} />
 
-          {/* --- About Routes --- */}
-          <Route path="/about/founder" element={<About />} />
-          <Route path="/about/clients" element={<ComingSoon />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
+            {/* --- About Routes --- */}
+            <Route path="/about/founder" element={<About />} />
+            <Route path="/about/clients" element={<ComingSoon />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
 
-          {/* --- Legacy Routes (Kept for backward compatibility if needed) --- */}
-          <Route path="/services" element={<Services />} />
-          <Route path="/assessments" element={<Assessments />} />
-          <Route path="/case-studies" element={<CaseStudiesPage />} />
-          
-          <Route path="/services/pre-sales" element={<PreSalesLegacy />} />
-          <Route path="/services/sales" element={<SalesLegacy />} />
-          <Route path="/services/post-sales" element={<PostSalesLegacy />} />
-          <Route path="/services/digital-enablement" element={<DigitalEnablementLegacy />} />
-          <Route path="/services/culture-transformation" element={<CultureTransformationLegacy />} />
-          <Route path="/assessments/cx-maturity" element={<CXMaturity />} />
-          <Route path="/assessments/cs-maturity" element={<CSMaturity />} />
-          <Route path="/assessments/culture-maturity" element={<CultureMaturity />} />
+            {/* --- Legacy Routes (Kept for backward compatibility if needed) --- */}
+            <Route path="/services" element={<Services />} />
+            <Route path="/assessments" element={<Assessments />} />
+            <Route path="/case-studies" element={<CaseStudiesPage />} />
+            
+            <Route path="/services/pre-sales" element={<PreSalesLegacy />} />
+            <Route path="/services/sales" element={<SalesLegacy />} />
+            <Route path="/services/post-sales" element={<PostSalesLegacy />} />
+            <Route path="/services/digital-enablement" element={<DigitalEnablementLegacy />} />
+            <Route path="/services/culture-transformation" element={<CultureTransformationLegacy />} />
+            <Route path="/assessments/cx-maturity" element={<CXMaturity />} />
+            <Route path="/assessments/cs-maturity" element={<CSMaturity />} />
+            <Route path="/assessments/culture-maturity" element={<CultureMaturity />} />
 
-          {/* --- 404 Not Found Page --- */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            {/* --- 404 Not Found Page --- */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </HelmetProvider>
   </QueryClientProvider>
 );
 
