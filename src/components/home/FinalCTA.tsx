@@ -26,10 +26,22 @@ const FinalCTA = () => {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 py-6">
-            <Link to="/solutions">
+          <Button 
+            asChild 
+            variant="outline" 
+            size="lg" 
+            className="bg-white text-black border-white hover:bg-white/90 hover:text-black text-lg px-8 py-6"
+            onClick={(e) => {
+              e.preventDefault();
+              const element = document.getElementById('growth-engine');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            <a href="#growth-engine">
               {getText('final_cta.secondary_btn', 'Explore Solutions')}
-            </Link>
+            </a>
           </Button>
         </div>
       </div>
