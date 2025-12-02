@@ -3,10 +3,10 @@ import Footer from "@/components/Footer";
 import ContactForm from "@/components/ContactForm";
 import { Button } from "@/components/ui/button";
 import { Mail, MapPin, Phone, Calendar, Linkedin, Youtube } from "lucide-react";
-import { useContent } from "@/hooks/useContent"; // Import Hook
+import { useContent } from "@/hooks/useContent";
 
 const Contact = () => {
-  const { getText } = useContent('contact'); // Fetch 'contact' page content
+  const { getText } = useContent('contact');
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -78,7 +78,7 @@ const Contact = () => {
                 <Button asChild size="lg" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 gap-2">
                   <a href="https://calendly.com/consult-ashutosh/1-1-with-ashutosh" target="_blank" rel="noopener noreferrer">
                     <Calendar className="h-5 w-5" />
-                    {getText('strategy.cta', 'Schedule via Calendly')}
+                    {getText('strategy.btn', 'Schedule via Calendly')}
                   </a>
                 </Button>
               </div>
@@ -98,7 +98,6 @@ const Contact = () => {
 
             {/* Contact Form */}
             <div>
-              {/* Note: ContactForm itself could use 'useContent' for its internal labels if needed */}
               <ContactForm />
             </div>
 

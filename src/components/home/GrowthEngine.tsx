@@ -1,10 +1,13 @@
 import { Target, TrendingUp, Users, Zap, Heart } from "lucide-react";
-import { useContent } from "@/hooks/useContent";
 import { Link } from "react-router-dom";
 
-const GrowthEngine = () => {
-  const { getText } = useContent('home');
+interface GrowthEngineProps {
+  title: string;
+  subtitle: string;
+  getText: (key: string, defaultText: string) => string;
+}
 
+const GrowthEngine = ({ title, subtitle, getText }: GrowthEngineProps) => {
   const motions = [
     {
       icon: <Target className="h-8 w-8 text-secondary" />,
@@ -43,10 +46,10 @@ const GrowthEngine = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold text-primary">
-            {getText('growth_engine.title', 'One Engine. Five Motions. Infinite Growth.')}
+            {title}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {getText('growth_engine.description', 'Your GTM Velocity model has three lifecycle pillars (Pre-Sales, Sales, Post-Sales) and two enabling horizontals (Digital Enablement and Culture Transformation). All five together create sustainable, scalable growth.')}
+            {subtitle}
           </p>
         </div>
 

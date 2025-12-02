@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Send } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useContent } from "@/hooks/useContent";
 
 const ContactForm = () => {
+  const { getText } = useContent('contact');
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,10 +58,10 @@ const ContactForm = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16 animate-fade-in space-y-4">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-primary">
-            Get In Touch
+            {getText('form.title', 'Get In Touch')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
-            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            {getText('form.desc', "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.")}
           </p>
         </div>
 
@@ -120,7 +122,7 @@ const ContactForm = () => {
                 />
               </div>
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all" disabled={isSubmitting}>
-                {isSubmitting ? "Sending..." : "Send Message"}
+                {isSubmitting ? "Sending..." : getText('form.btn', 'Send Message')}
                 <Send className="ml-2 h-4 w-4" />
               </Button>
             </form>

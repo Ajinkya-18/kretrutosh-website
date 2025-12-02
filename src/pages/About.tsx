@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Award, Briefcase, TrendingUp, BookOpen, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import bookCover from "@/assets/book-cover.jpg";
-import { useContent } from "@/hooks/useContent"; // Import Hook
+import { useContent } from "@/hooks/useContent";
 
 const About = () => {
   const navigate = useNavigate();
-  const { getText } = useContent('about'); // Fetch 'about' page content
+  const { getText } = useContent('about');
 
   return (
     <div className="min-h-screen">

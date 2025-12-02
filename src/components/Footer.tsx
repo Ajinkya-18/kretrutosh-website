@@ -15,12 +15,12 @@ const Footer = () => {
   const { getText } = useContent('global');
   const { toast } = useToast();
   const [email, setEmail] = useState("");
-  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setIsSubscribing(true);
+    setIsSubmitting(true);
 
     const { error } = await supabase
       .from('subscribers')
@@ -46,7 +46,7 @@ const Footer = () => {
       });
       setEmail("");
     }
-    setIsSubscribing(false);
+    setIsSubmitting(false);
   };
 
   const handleContactClick = (e: React.MouseEvent) => {
@@ -120,6 +120,9 @@ const Footer = () => {
                     <span className="text-primary-foreground">Kretrutosh</span>
                     <span className="text-secondary"> Consulting</span>
                   </h3>
+                  <p className="text-sm text-primary-foreground/70 mt-2 max-w-xs">
+                    {getText('footer.brand_desc', 'Transforming businesses through Customer-Led Growth.')}
+                  </p>
                 </div>
               </Link>
               <div className="flex gap-4">
@@ -134,8 +137,8 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="w-full max-w-md bg-primary-foreground/5 p-6 rounded-xl border border-primary-foreground/10">
-            <h4 className="text-lg font-semibold text-secondary mb-2">Stay Updated</h4>
-            <p className="text-sm text-primary-foreground/70 mb-4">Get the latest insights on GTM velocity and culture transformation.</p>
+            <h4 className="text-lg font-semibold text-secondary mb-2">{getText('footer.newsletter_title', 'Stay Updated')}</h4>
+            <p className="text-sm text-primary-foreground/70 mb-4">{getText('footer.newsletter_desc', 'Get the latest insights on GTM velocity and culture transformation.')}</p>
             <form onSubmit={handleSubscribe} className="flex gap-2">
                 <Input 
                     type="email" 
@@ -145,8 +148,8 @@ const Footer = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <Button type="submit" variant="secondary" disabled={isSubscribing}>
-                    {isSubscribing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe"}
+                <Button type="submit" variant="secondary" disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : getText('footer.newsletter_cta', 'Subscribe')}
                 </Button>
             </form>
           </div>

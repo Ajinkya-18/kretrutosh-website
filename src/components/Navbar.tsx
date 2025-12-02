@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/kretrutosh-logo.png";
+import { useContent } from "@/hooks/useContent";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -18,7 +19,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
+  const { getText } = useContent('global');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,18 +28,6 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleContactClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsOpen(false);
-    
-    if (location.pathname === "/") {
-      const contactSection = document.getElementById("contact");
-      contactSection?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigate("/", { state: { scrollTo: "contact" } });
-    }
-  };
 
   const handleLinkClick = (path: string) => {
     setIsOpen(false);
@@ -123,7 +112,6 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
-          {/* Logo - Text Removed */}
           <Link 
             to="/" 
             className="flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight text-primary transition-transform hover:scale-[1.02] z-50"
@@ -188,9 +176,8 @@ const Navbar = () => {
               <Button 
                 asChild 
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
-                onClick={handleContactClick}
               >
-                <a href="/#contact">Book Strategy Review</a>
+                <Link to="/contact">{getText('navbar.cta', 'Book Strategy Review')}</Link>
               </Button>
             </div>
           </div>
@@ -248,10 +235,10 @@ const Navbar = () => {
               ))}
 
               <div className="pt-4 mt-2 border-t border-border">
-                <Button className="w-full bg-primary text-primary-foreground" asChild onClick={handleContactClick}>
-                  <a href="/#contact">
-                    Book Strategy Review
-                  </a>
+                <Button className="w-full bg-primary text-primary-foreground" asChild>
+                  <Link to="/contact">
+                    {getText('navbar.cta', 'Book Strategy Review')}
+                  </Link>
                 </Button>
               </div>
             </div>
