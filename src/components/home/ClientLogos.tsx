@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { Building2, Circle } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ClientLogo {
   id: number;
@@ -27,41 +29,85 @@ const ClientLogos = () => {
     fetchLogos();
   }, []);
 
-  // Fallback if no logos are uploaded yet
+  // Helper to render either Image or Text Fallback
+  const renderLogo = (client: ClientLogo) => {
+    // If we have a valid URL (longer than 5 chars), show image
+    if (client.logo_url && client.logo_url.length > 5) {
+      return (
+        <img 
+          src={client.logo_url} 
+          alt={client.client_name}
+          className="h-10 w-auto opacity-60 hover:opacity-100 transition-opacity cursor-pointer grayscale hover:grayscale-0 object-contain mx-4"
+        />
+      );
+    }
+
+    // Fallback: Show Text + Icon
+    return (
+      <div className="flex items-center gap-2 mx-4 opacity-60 hover:opacity-100 transition-opacity cursor-default group/item">
+        {/* Optional: Small icon next to text */}
+        <Building2 className="h-5 w-5 text-muted-foreground group-hover/item:text-secondary" />
+        <span className="text-xl font-bold text-muted-foreground whitespace-nowrap group-hover/item:text-secondary transition-colors">
+          {client.client_name}
+        </span>
+      </div>
+    );
+  };
+
   if (clients.length === 0) return null;
 
+  // Calculate duration based on list length to ensure consistent speed
+  // e.g. 2 seconds per item
+  const duration = clients.length * 2.5;
+
   return (
-    <section className="py-12 bg-muted/50 overflow-hidden border-y border-border/50">
-      <div className="container mx-auto px-4 mb-8 text-center">
-        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
+    <section className="py-10 bg-background/50 overflow-hidden border-y border-border/50 backdrop-blur-sm">
+      <div className="container mx-auto px-4 mb-6 text-center">
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">
           Trusted by Industry Leaders
         </p>
       </div>
       
-      <div className="relative flex overflow-x-hidden group">
-        <div className="animate-marquee whitespace-nowrap flex items-center gap-16 py-4 group-hover:pause">
-          {clients.map((client) => (
-            // Use image tag instead of text for the logos
-            <img 
-              key={client.id} 
-              src={client.logo_url} 
-              alt={client.client_name}
-              className="h-12 w-auto opacity-50 hover:opacity-100 transition-opacity cursor-default grayscale hover:grayscale-0"
-            />
-          ))}
-          {/* Duplicate for seamless loop */}
-          {clients.map((client) => (
-            <img 
-              key={`dup-${client.id}`} 
-              src={client.logo_url} 
-              alt={client.client_name}
-              className="h-12 w-auto opacity-50 hover:opacity-100 transition-opacity cursor-default grayscale hover:grayscale-0"
-            />
-          ))}
-        </div>
+      {/* Marquee Container */}
+      <div className="relative flex overflow-hidden mask-linear-fade">
         
-        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
+        {/* Framer Motion Loop */}
+        <motion.div 
+          className="flex items-center whitespace-nowrap"
+          animate={{ x: "-50%" }}
+          transition={{ 
+            repeat: Infinity, 
+            ease: "linear", 
+            duration: duration 
+          }}
+          style={{ width: "fit-content" }}
+        >
+          {/* First Copy of List */}
+          <div className="flex items-center">
+            {clients.map((client, index) => (
+              <div key={client.id} className="flex items-center">
+                {renderLogo(client)}
+                {/* Dot Separator (Show after every item) */}
+                <Circle className="h-1.5 w-1.5 fill-muted-foreground/30 text-transparent mx-4" />
+              </div>
+            ))}
+          </div>
+
+          {/* Second Copy of List (For seamless loop) */}
+          <div className="flex items-center">
+            {clients.map((client, index) => (
+              <div key={`dup-${client.id}`} className="flex items-center">
+                {renderLogo(client)}
+                {/* Dot Separator */}
+                <Circle className="h-1.5 w-1.5 fill-muted-foreground/30 text-transparent mx-4" />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Gradient Fades on Edges */}
+        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
       </div>
     </section>
   );
