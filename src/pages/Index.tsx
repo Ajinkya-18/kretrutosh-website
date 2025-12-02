@@ -70,6 +70,8 @@ const Index = () => {
           />
         </motion.div>
 
+        <ClientLogos />
+
         <Outcomes 
           title={getText('outcomes.title', 'Outcomes That Matter')}
           description={getText('outcomes.description', "We don't just deliver strategies; we deliver measurable business impact.")}
@@ -96,7 +98,7 @@ const Index = () => {
           <Frameworks />
         </motion.div>
 
-        <ClientLogos />
+
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -39,7 +39,7 @@ const ClientLogos = () => {
       </div>
       
       <div className="relative flex overflow-x-hidden group">
-        <div className="animate-marquee whitespace-nowrap flex items-center gap-16 py-4">
+        <div className="animate-marquee whitespace-nowrap flex items-center gap-16 py-4 group-hover:pause">
           {clients.map((client) => (
             // Use image tag instead of text for the logos
             <img 
