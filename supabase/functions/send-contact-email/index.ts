@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,9 +27,30 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, subject, message }: ContactEmailRequest = await req.json();
 
-    console.log("Sending contact email from:", email, "Name:", name);
+    // 1. Initialize Supabase Client
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Send email to KretruTosh Consulting using Resend API
+    // 2. Fetch the dynamic destination email from the database
+    let destinationEmail = 'ajinkya.tamhankar18@gmail.com'; // Default Fallback
+
+    const { data: configData, error: configError } = await supabase
+      .from('website_content')
+      .select('content_text')
+      .eq('page_name', 'global')
+      .eq('section_name', 'settings')
+      .eq('element_key', 'contact_notification_email')
+      .single();
+
+    if (!configError && configData?.content_text) {
+      destinationEmail = configData.content_text;
+      console.log("Fetched dynamic email:", destinationEmail);
+    } else {
+      console.warn("Could not fetch dynamic email, using fallback:", configError?.message);
+    }
+
+    console.log("Sending contact email from:", email, "To:", destinationEmail);
+
+    // 3. Send email using Resend
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -35,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: 'KretruTosh Consulting <onboarding@resend.dev>',
-        to: ['ajinkya.tamhankar18@gmail.com'],
+        to: [destinationEmail], // Use the dynamic email
         reply_to: email,
         subject: `Contact Form: ${subject}`,
         html: `
@@ -54,15 +78,11 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Resend API error: ${JSON.stringify(data)}`);
     }
 
-    console.log("Email sent successfully:", data);
-
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
+
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
     return new Response(
