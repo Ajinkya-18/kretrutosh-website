@@ -28,4 +28,4 @@ admin-panel/
 *.jpg
 *.png
 *.jpeg
-
+/new-google-oauth-credentials-for-nocturnal-content-automator.json

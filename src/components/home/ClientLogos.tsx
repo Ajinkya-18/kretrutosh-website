@@ -37,14 +37,14 @@ const ClientLogos = () => {
         <img 
           src={client.logo_url} 
           alt={client.client_name}
-          className="h-10 w-auto opacity-60 hover:opacity-100 transition-opacity cursor-pointer grayscale hover:grayscale-0 object-contain mx-4"
+          className="h-10 w-auto opacity-60 hover:opacity-100 transition-opacity cursor-pointer grayscale hover:grayscale-0 object-contain shrink-0"
         />
       );
     }
 
     // Fallback: Show Text + Icon
     return (
-      <div className="flex items-center gap-2 mx-4 opacity-60 hover:opacity-100 transition-opacity cursor-default group/item">
+      <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity cursor-default group/item shrink-0">
         {/* Optional: Small icon next to text */}
         <Building2 className="h-5 w-5 text-muted-foreground group-hover/item:text-secondary" />
         <span className="text-xl font-bold text-muted-foreground whitespace-nowrap group-hover/item:text-secondary transition-colors">
@@ -83,23 +83,23 @@ const ClientLogos = () => {
           style={{ width: "fit-content" }}
         >
           {/* First Copy of List */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-16 pr-16">
             {clients.map((client, index) => (
-              <div key={client.id} className="flex items-center">
+              <div key={client.id} className="flex items-center gap-16">
                 {renderLogo(client)}
                 {/* Dot Separator (Show after every item) */}
-                <Circle className="h-1.5 w-1.5 fill-muted-foreground/30 text-transparent mx-4" />
+                <Circle className="h-1.5 w-1.5 fill-muted-foreground/30 text-transparent shrink-0" />
               </div>
             ))}
           </div>
 
           {/* Second Copy of List (For seamless loop) */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-16 pr-16">
             {clients.map((client, index) => (
-              <div key={`dup-${client.id}`} className="flex items-center">
+              <div key={`dup-${client.id}`} className="flex items-center gap-16">
                 {renderLogo(client)}
                 {/* Dot Separator */}
-                <Circle className="h-1.5 w-1.5 fill-muted-foreground/30 text-transparent mx-4" />
+                <Circle className="h-1.5 w-1.5 fill-muted-foreground/30 text-transparent shrink-0" />
               </div>
             ))}
           </div>
