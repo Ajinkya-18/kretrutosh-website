@@ -132,26 +132,26 @@ const SalesVelocity = () => {
             <div className="flex-1 relative">
               <div className="relative z-10 bg-card p-8 rounded-2xl shadow-2xl border border-border/50 max-w-xs mx-auto">
                 <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Sales Velocity</p>
                       <p className="text-3xl font-bold text-primary">3.5x</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Increase</div>
+                    <div className="text-green-500 font-medium text-lg">Increase</div>
                   </div>
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Conversion Rate</p>
                       <p className="text-3xl font-bold text-primary">+28%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Uplift</div>
+                    <div className="text-green-500 font-medium text-lg">Uplift</div>
                   </div>
-                  <div className="flex justify-between items-end">
+                  <div className="flex flex-col items-start gap-1">
                     <div>
                       <p className="text-sm text-muted-foreground">Forecast Acc.</p>
                       <p className="text-3xl font-bold text-primary">92%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Precision</div>
+                    <div className="text-green-500 font-medium text-lg">Precision</div>
                   </div>
                 </div>
               </div>

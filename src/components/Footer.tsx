@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Linkedin, Mail, MapPin, Phone, Youtube, Loader2 } from "lucide-react";
+import { Linkedin, Mail, MapPin, Phone, Youtube, Loader2, Twitter } from "lucide-react";
 import logo from "@/assets/kretrutosh-logo.png";
 import { useContent } from "@/hooks/useContent";
 import { Input } from "@/components/ui/input";
@@ -132,6 +132,9 @@ const Footer = () => {
                 <a href="https://www.youtube.com/@theXTPodcast" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
                   <Youtube size={20} />
                 </a>
+                <a href="https://x.com/AshutoshCK" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
+                  <Twitter size={20} />
+                </a>
               </div>
           </div>
 
@@ -160,7 +163,7 @@ const Footer = () => {
           {/* Column 1: Solutions */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-secondary">
-              {getText('footer.col_1_title', 'Services')}
+              Services
             </h4>
             <ul className="space-y-3">
               {footerLinks.solutions.map((link) => (

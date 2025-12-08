@@ -132,26 +132,26 @@ const CultureLeadership = () => {
             <div className="flex-1 relative">
               <div className="relative z-10 bg-card p-8 rounded-2xl shadow-2xl border border-border/50 max-w-xs mx-auto">
                 <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">eNPS Score</p>
                       <p className="text-3xl font-bold text-primary">+15</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Points</div>
+                    <div className="text-green-500 font-medium text-lg">Points</div>
                   </div>
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Attrition Rate</p>
                       <p className="text-3xl font-bold text-primary">-18%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Reduction</div>
+                    <div className="text-green-500 font-medium text-lg">Reduction</div>
                   </div>
-                  <div className="flex justify-between items-end">
+                  <div className="flex flex-col items-start gap-1">
                     <div>
                       <p className="text-sm text-muted-foreground">Innovation</p>
                       <p className="text-3xl font-bold text-primary">2x</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Faster Cycles</div>
+                    <div className="text-green-500 font-medium text-lg">Faster Cycles</div>
                   </div>
                 </div>
               </div>

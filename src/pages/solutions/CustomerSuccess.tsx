@@ -132,26 +132,26 @@ const CustomerSuccess = () => {
             <div className="flex-1 relative">
               <div className="relative z-10 bg-card p-8 rounded-2xl shadow-2xl border border-border/50 max-w-xs mx-auto">
                 <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Net Revenue Retention</p>
                       <p className="text-3xl font-bold text-primary">125%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Best-in-Class</div>
+                    <div className="text-green-500 font-medium text-lg">Best-in-Class</div>
                   </div>
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Churn Rate</p>
                       <p className="text-3xl font-bold text-primary">&lt;5%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Significant Drop</div>
+                    <div className="text-green-500 font-medium text-lg">Significant Drop</div>
                   </div>
-                  <div className="flex justify-between items-end">
+                  <div className="flex flex-col items-start gap-1">
                     <div>
                       <p className="text-sm text-muted-foreground">Expansion Rev.</p>
                       <p className="text-3xl font-bold text-primary">+40%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Growth</div>
+                    <div className="text-green-500 font-medium text-lg">Growth</div>
                   </div>
                 </div>
               </div>

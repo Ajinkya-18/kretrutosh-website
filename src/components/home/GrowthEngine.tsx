@@ -13,31 +13,31 @@ const GrowthEngine = ({ title, subtitle, getText }: GrowthEngineProps) => {
       icon: <Target className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion1.title', 'Pre-Sales Transformation'),
       description: getText('growth_engine.motion1.desc', 'Aligning brand purpose with market needs.'),
-      link: "/solutions/pre-sales"
+      link: "/services/pre-sales"
     },
     {
       icon: <TrendingUp className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion2.title', 'Sales Velocity'),
       description: getText('growth_engine.motion2.desc', 'Accelerating acquisition and conversion.'),
-      link: "/solutions/sales-velocity"
+      link: "/services/sales-velocity"
     },
     {
       icon: <Users className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion3.title', 'Customer Success'),
       description: getText('growth_engine.motion3.desc', 'Driving retention and expansion.'),
-      link: "/solutions/customer-success"
+      link: "/services/customer-success"
     },
     {
       icon: <Zap className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion4.title', 'Digital & AI Enablement'),
       description: getText('growth_engine.motion4.desc', 'Empowering teams with unified data.'),
-      link: "/solutions/digital-ai"
+      link: "/services/digital-ai"
     },
     {
       icon: <Heart className="h-8 w-8 text-secondary" />,
       title: getText('growth_engine.motion5.title', 'Culture Transformation'),
       description: getText('growth_engine.motion5.desc', 'Building a customer-centric DNA.'),
-      link: "/solutions/culture-transformation"
+      link: "/services/culture-transformation"
     }
   ];
 

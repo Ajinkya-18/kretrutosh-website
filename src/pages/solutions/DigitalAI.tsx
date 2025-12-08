@@ -132,26 +132,26 @@ const DigitalAI = () => {
             <div className="flex-1 relative">
               <div className="relative z-10 bg-card p-8 rounded-2xl shadow-2xl border border-border/50 max-w-xs mx-auto">
                 <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Platform Adoption</p>
                       <p className="text-3xl font-bold text-primary">85%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">High Usage</div>
+                    <div className="text-green-500 font-medium text-lg">High Usage</div>
                   </div>
-                  <div className="flex justify-between items-end border-b border-border pb-4">
+                  <div className="flex flex-col items-start gap-1 border-b border-border pb-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Insight-to-Action</p>
                       <p className="text-3xl font-bold text-primary">3x</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Faster</div>
+                    <div className="text-green-500 font-medium text-lg">Faster</div>
                   </div>
-                  <div className="flex justify-between items-end">
+                  <div className="flex flex-col items-start gap-1">
                     <div>
                       <p className="text-sm text-muted-foreground">Data Accuracy</p>
                       <p className="text-3xl font-bold text-primary">99.9%</p>
                     </div>
-                    <div className="text-green-500 font-medium text-sm">Reliable</div>
+                    <div className="text-green-500 font-medium text-lg">Reliable</div>
                   </div>
                 </div>
               </div>

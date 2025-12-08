@@ -71,13 +71,13 @@ const Hero = ({
               className="border-white/20 text-white hover:bg-white/10 hover:text-white font-medium text-lg px-8 py-6 backdrop-blur-sm transition-all cursor-pointer"
               onClick={(e) => {
                 e.preventDefault();
-                const element = document.getElementById('frameworks');
+                const element = document.getElementById('growth-engine');
                 if (element) {
                   element.scrollIntoView({ behavior: 'smooth' });
                 }
               }}
             >
-              <a href="#frameworks">
+              <a href="#growth-engine">
                 {secondaryCta || 'Explore Transformation Programs'}
               </a>
             </Button>
