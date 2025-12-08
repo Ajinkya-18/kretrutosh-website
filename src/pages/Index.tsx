@@ -162,7 +162,19 @@ const Index = () => {
       default:
         // Handle global widgets that aren't strictly sections but currently in index
         if (section.section_key === 'client_logos') return <ClientLogos />;
-        if (section.section_key === 'frameworks') return <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}><Frameworks /></motion.div>;
+        if (section.section_key === 'frameworks') {
+          return (
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+               <Frameworks 
+                  title={section.title}
+                  description={section.description}
+                  ctaText={section.primary_cta_text}
+                  gridClass={gridClass}
+                  getText={getText}
+               />
+            </motion.div>
+          );
+        }
         if (section.section_key === 'case_studies') return <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}><CaseStudies /></motion.div>;
         if (section.section_key === 'thought_leadership') return <ThoughtLeadership />;
         

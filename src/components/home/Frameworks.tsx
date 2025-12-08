@@ -15,8 +15,18 @@ interface Framework {
   outcomes: string[];
 }
 
-const Frameworks = () => {
-  const { getText } = useContent('home');
+interface FrameworksProps {
+  title?: string;
+  description?: string;
+  ctaText?: string;
+  gridClass?: string;
+  getText?: (key: string, defaultText: string) => string;
+}
+
+const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetText }: FrameworksProps) => {
+  const { getText: hookGetText } = useContent('home');
+  const getText = propGetText || hookGetText;
+  
   const navigate = useNavigate();
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +36,7 @@ const Frameworks = () => {
       const { data, error } = await supabase
         .from('frameworks')
         .select('*')
+        .eq('is_visible', true) // Assuming we might want to filter, but keeping simple for now
         .limit(10)
         .order('id', { ascending: true });
       
@@ -43,15 +54,15 @@ const Frameworks = () => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              {getText('frameworks.title', 'Signature Proprietary Frameworks')}
+              {title || getText('frameworks.title', 'Signature Proprietary Frameworks')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              {getText('frameworks.description', 'Our battle-tested methodologies for driving predictable growth.')}
+              {description || getText('frameworks.description', 'Our battle-tested methodologies for driving predictable growth.')}
             </p>
           </div>
           <Button asChild variant="outline" className="shrink-0 border-primary/20 hover:bg-primary/5">
             <Link to="/frameworks">
-              {getText('frameworks.cta', 'View All Frameworks')}
+              {ctaText || getText('frameworks.cta', 'View All Frameworks')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -60,7 +71,7 @@ const Frameworks = () => {
         {loading ? (
            <div className="text-center py-10">Loading frameworks...</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className={`grid gap-4 ${gridClass || 'grid-cols-1 md:grid-cols-2 lg:grid-cols-5'}`}>
             {frameworks.map((fw) => {
               const Icon = getIcon(fw.icon_name);
               // Use the first outcome as the metric if available, or a default text
