@@ -37,7 +37,7 @@ const ClientLogos = () => {
         <img 
           src={client.logo_url} 
           alt={client.client_name}
-          className="h-32 w-auto hover:scale-110 transition-transform duration-300 cursor-pointer object-contain shrink-0"
+          className="h-40 w-auto hover:scale-125 transition-transform duration-300 cursor-pointer object-contain shrink-0"
         />
       );
     }
