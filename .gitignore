@@ -25,7 +25,4 @@ dist-ssr
 web_dev/
 admin-panel/
 .env
-*.jpg
-*.png
-*.jpeg
 /new-google-oauth-credentials-for-nocturnal-content-automator.json
