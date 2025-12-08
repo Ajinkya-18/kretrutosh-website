@@ -38,14 +38,14 @@ const Navbar = () => {
 
   const navItems = [
     {
-      name: "Solutions",
-      path: "/solutions",
+      name: "Services",
+      path: "/services",
       children: [
-        { name: "Pre-Sales Transformation", path: "/solutions/pre-sales" },
-        { name: "Sales Velocity Acceleration", path: "/solutions/sales-velocity" },
-        { name: "Customer Success & Post-Sales", path: "/solutions/customer-success" },
-        { name: "Digital & AI Enablement", path: "/solutions/digital-ai" },
-        { name: "Culture & Leadership", path: "/solutions/culture-transformation" },
+        { name: "Pre-Sales Transformation", path: "/services/pre-sales" },
+        { name: "Sales Velocity Acceleration", path: "/services/sales-velocity" },
+        { name: "Customer Success & Post-Sales", path: "/services/customer-success" },
+        { name: "Digital & AI Enablement", path: "/services/digital-ai" },
+        { name: "Culture & Leadership", path: "/services/culture-transformation" },
       ],
     },
     {
@@ -117,7 +117,7 @@ const Navbar = () => {
             className="flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight text-primary transition-transform hover:scale-[1.02] z-50"
             onClick={() => handleLinkClick("/")}
           >
-            <img src={logo} alt="KretruTosh Consulting" className="h-10 w-auto" />
+            <img src={logo} alt="KretruTosh Consulting" className="h-16 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}

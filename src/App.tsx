@@ -71,13 +71,13 @@ const App = () => (
             <Route path="/videos" element={<Videos />} />
             <Route path="/blogs" element={<Blogs />} />
 
-            {/* --- Solutions Routes --- */}
-            <Route path="/solutions" element={<ComingSoon />} />
-            <Route path="/solutions/pre-sales" element={<PreSales />} />
-            <Route path="/solutions/sales-velocity" element={<SalesVelocity />} />
-            <Route path="/solutions/customer-success" element={<CustomerSuccess />} />
-            <Route path="/solutions/digital-ai" element={<DigitalAI />} />
-            <Route path="/solutions/culture-transformation" element={<CultureLeadership />} />
+            {/* --- Services Routes --- */}
+            <Route path="/services" element={<ComingSoon />} />
+            <Route path="/services/pre-sales" element={<PreSales />} />
+            <Route path="/services/sales-velocity" element={<SalesVelocity />} />
+            <Route path="/services/customer-success" element={<CustomerSuccess />} />
+            <Route path="/services/digital-ai" element={<DigitalAI />} />
+            <Route path="/services/culture-transformation" element={<CultureLeadership />} />
 
             {/* --- Frameworks Routes --- */}
             <Route path="/frameworks" element={<Frameworks />} />

@@ -138,7 +138,7 @@ const Index = () => {
             title={getText('final_cta.title', 'Ready to Transform Your Growth Trajectory?')}
             subtitle={getText('final_cta.subtitle', "Let's build your customer-led growth engine together.")}
             primaryBtn={getText('final_cta.button', 'Schedule a Consultation')}
-            secondaryBtn={getText('final_cta.secondary_btn', 'Explore Solutions')}
+            secondaryBtn={getText('final_cta.secondary_btn', 'Explore Services')}
           />
         </motion.div>
 

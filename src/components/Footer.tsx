@@ -66,11 +66,11 @@ const Footer = () => {
 
   const footerLinks = {
     solutions: [
-      { name: "Pre-Sales Transformation", path: "/solutions/pre-sales" },
-      { name: "Sales Velocity", path: "/solutions/sales-velocity" },
-      { name: "Customer Success", path: "/solutions/customer-success" },
-      { name: "Digital & AI Enablement", path: "/solutions/digital-ai" },
-      { name: "Culture Transformation", path: "/solutions/culture-transformation" },
+      { name: "Pre-Sales Transformation", path: "/services/pre-sales" },
+      { name: "Sales Velocity", path: "/services/sales-velocity" },
+      { name: "Customer Success", path: "/services/customer-success" },
+      { name: "Digital & AI Enablement", path: "/services/digital-ai" },
+      { name: "Culture Transformation", path: "/services/culture-transformation" },
     ],
     industries: [
       { name: "Retail", path: "/industries/retail" },
@@ -114,7 +114,7 @@ const Footer = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8">
           <div className="flex flex-col gap-4">
               <Link to="/" className="flex items-center gap-3" onClick={() => handleLinkClick("/")}>
-                <img src={logo} alt="Kretrutosh Consulting" className="h-12 w-auto bg-white/10 p-1 rounded-md backdrop-blur-sm" />
+                <img src={logo} alt="Kretrutosh Consulting" className="h-20 w-auto bg-white/10 p-1 rounded-md backdrop-blur-sm" />
                 <div className="flex flex-col">
                   <h3 className="text-2xl font-bold leading-none">
                     <span className="text-primary-foreground">Kretrutosh</span>
@@ -160,7 +160,7 @@ const Footer = () => {
           {/* Column 1: Solutions */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-secondary">
-              {getText('footer.col_1_title', 'Solutions')}
+              {getText('footer.col_1_title', 'Services')}
             </h4>
             <ul className="space-y-3">
               {footerLinks.solutions.map((link) => (

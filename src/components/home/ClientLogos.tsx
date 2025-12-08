@@ -37,7 +37,7 @@ const ClientLogos = () => {
         <img 
           src={client.logo_url} 
           alt={client.client_name}
-          className="h-24 w-auto opacity-60 hover:opacity-100 transition-opacity cursor-pointer grayscale hover:grayscale-0 object-contain shrink-0"
+          className="h-24 w-auto hover:scale-110 transition-transform duration-300 cursor-pointer object-contain shrink-0"
         />
       );
     }
@@ -46,8 +46,8 @@ const ClientLogos = () => {
     return (
       <div className="flex items-center gap-4 opacity-60 hover:opacity-100 transition-opacity cursor-default group/item shrink-0">
         {/* Optional: Small icon next to text */}
-        <Building2 className="h-12 w-12 text-muted-foreground group-hover/item:text-secondary" />
-        <span className="text-4xl font-bold text-muted-foreground whitespace-nowrap group-hover/item:text-secondary transition-colors">
+        <Building2 className="h-12 w-12 text-black group-hover/item:text-secondary" />
+        <span className="text-4xl font-bold text-black whitespace-nowrap group-hover/item:text-secondary transition-colors">
           {client.client_name}
         </span>
       </div>
@@ -61,7 +61,7 @@ const ClientLogos = () => {
   const duration = clients.length * 2.5;
 
   return (
-    <section className="py-10 bg-background/50 overflow-hidden border-y border-border/50 backdrop-blur-sm">
+    <section className="py-10 bg-white overflow-hidden border-y border-border/50">
       <div className="container mx-auto px-4 mb-6 text-center">
         <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">
           Trusted by Industry Leaders
@@ -106,8 +106,8 @@ const ClientLogos = () => {
         </motion.div>
 
         {/* Gradient Fades on Edges */}
-        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
       </div>
     </section>
   );
