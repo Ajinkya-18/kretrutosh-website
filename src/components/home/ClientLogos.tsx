@@ -37,7 +37,7 @@ const ClientLogos = () => {
         <img 
           src={client.logo_url} 
           alt={client.client_name}
-          className="h-10 w-auto opacity-60 hover:opacity-100 transition-opacity cursor-pointer grayscale hover:grayscale-0 object-contain shrink-0"
+          className="h-16 w-auto opacity-60 hover:opacity-100 transition-opacity cursor-pointer grayscale hover:grayscale-0 object-contain shrink-0"
         />
       );
     }
@@ -46,8 +46,8 @@ const ClientLogos = () => {
     return (
       <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity cursor-default group/item shrink-0">
         {/* Optional: Small icon next to text */}
-        <Building2 className="h-5 w-5 text-muted-foreground group-hover/item:text-secondary" />
-        <span className="text-xl font-bold text-muted-foreground whitespace-nowrap group-hover/item:text-secondary transition-colors">
+        <Building2 className="h-8 w-8 text-muted-foreground group-hover/item:text-secondary" />
+        <span className="text-3xl font-bold text-muted-foreground whitespace-nowrap group-hover/item:text-secondary transition-colors">
           {client.client_name}
         </span>
       </div>
