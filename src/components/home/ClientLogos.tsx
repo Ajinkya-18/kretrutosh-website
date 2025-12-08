@@ -9,7 +9,11 @@ interface ClientLogo {
   logo_url: string;
 }
 
-const ClientLogos = () => {
+interface ClientLogosProps {
+  title?: string;
+}
+
+const ClientLogos = ({ title }: ClientLogosProps) => {
   const [clients, setClients] = useState<ClientLogo[]>([]);
 
   useEffect(() => {
@@ -64,7 +68,7 @@ const ClientLogos = () => {
     <section className="py-10 bg-white overflow-hidden border-y border-border/50">
       <div className="container mx-auto px-4 mb-6 text-center">
         <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">
-          Trusted by Industry Leaders
+          {title || "Trusted by Industry Leaders"}
         </p>
       </div>
       

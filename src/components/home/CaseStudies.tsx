@@ -17,18 +17,28 @@ interface CaseStudy {
   tags: string[];
 }
 
-const CaseStudies = () => {
-  const { getText } = useContent('home');
+interface CaseStudiesProps {
+  title?: string;
+  description?: string;
+  ctaText?: string;
+  getText?: (key: string, defaultText: string) => string;
+}
+
+const CaseStudies = ({ title, description, ctaText, getText: propGetText }: CaseStudiesProps) => {
+  const { getText: hookGetText } = useContent('home');
+  const getText = propGetText || hookGetText;
+  
   const [cases, setCases] = useState<CaseStudy[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ... same fetch logic
     const fetchCases = async () => {
       const { data, error } = await supabase
         .from('case_studies')
         .select('*')
-        .limit(3) // Fetch top 3
-        .order('id', { ascending: false }); // Assuming latest first
+        .limit(3)
+        .order('id', { ascending: false });
 
       if (data) {
         setCases(data);
@@ -44,15 +54,15 @@ const CaseStudies = () => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              {getText('case_studies.title', 'Real Impact, Real Growth')}
+              {title || getText('case_studies.title', 'Real Impact, Real Growth')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              {getText('case_studies.description', "See how we've helped organizations transform their trajectory.")}
+              {description || getText('case_studies.description', "See how we've helped organizations transform their trajectory.")}
             </p>
           </div>
           <Button asChild variant="outline" className="shrink-0 border-primary/20 hover:bg-primary/5">
             <Link to="/case-studies">
-              {getText('case_studies.cta', 'View All Case Studies')}
+              {ctaText || getText('case_studies.cta', 'View All Case Studies')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
