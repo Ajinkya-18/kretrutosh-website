@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useContent } from "@/hooks/useContent";
+import { supabase } from "@/lib/supabaseClient";
+import { Loader2 } from "lucide-react";
 
 // Homepage Sections
 import AgeOfKretru from "@/components/home/AgeOfKretru";
@@ -22,6 +24,8 @@ const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { getText } = useContent('home');
+  const [sections, setSections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if we were navigated here with a request to scroll
@@ -36,111 +40,165 @@ const Index = () => {
     }
   }, [location.state, navigate, location.pathname]);
 
+  // Fetch Page Config
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('sections_home')
+          .select('*')
+          .eq('is_visible', true)
+          .order('display_order', { ascending: true });
+
+        if (error) throw error;
+        setSections(data || []);
+      } catch (err) {
+        console.error('Error fetching page layout:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPage();
+  }, []);
+
+  // Section Renderer
+  const renderSection = (section: any) => {
+    // Map DB layout configs to Tailwind classes
+    const gridColsMap: any = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4', 5: 'grid-cols-5' };
+    const gridClass = `grid-cols-1 md:${gridColsMap[section.grid_columns] || 'grid-cols-3'}`; // fallback to 3 if missing
+
+    switch (section.section_key) {
+      case 'hero':
+        return (
+          <Hero 
+            badge={section.badge || getText('hero.badge', 'The Premier Growth Transformation Firm')}
+            title={section.title || getText('hero.title', 'Build a Customer-Led Growth Engine That Scales')}
+            subtitle={section.subtitle || getText('hero.subtitle', 'Integrated Go-To-Market and Customer Transformation.')}
+            primaryCta={section.primary_cta_text || getText('hero.primary_cta', 'Book a Growth Strategy Review')}
+            secondaryCta={section.secondary_cta_text || getText('hero.secondary_cta', 'Explore Transformation Programs')}
+          />
+        );
+      
+      case 'what_means':
+        const specific = section.specific_data || {};
+        return (
+          <WhatKretrutoshMeans 
+            titlePart1={specific.title_parts?.part1 || 'Kretru = '}
+            titlePart2={specific.title_parts?.part2 || 'Customer'}
+            titlePart3={specific.title_parts?.part3 || 'Tosh = '}
+            titlePart4={specific.title_parts?.part4 || 'Delight'}
+            description={section.description || getText('meaning.copy', 'KretruTosh represents an approach where organizations redesign their Go-To-Market...')}
+            highlight={specific.highlight || 'This is not CX as a function — this is customer-led business transformation.'}
+          />
+        );
+
+      case 'growth_engine':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <GrowthEngine 
+               title={section.title || 'One Engine. Five Motions. Infinite Growth.'}
+               subtitle={section.subtitle || 'Your GTM Velocity model...'}
+               motions={section.specific_data?.motions}
+               gridClass={gridClass}
+               getText={getText}
+            />
+          </motion.div>
+        );
+
+      case 'outcomes':
+        return (
+          <Outcomes 
+            title={section.title || 'Outcomes That Matter'}
+            description={section.description || "We don't just deliver strategies; we deliver measurable business impact."}
+            items={section.specific_data?.items || []}
+            gridClass={gridClass}
+          />
+        );
+
+      case 'age_of_kretru':
+        const bookSpecific = section.specific_data || {};
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <AgeOfKretru 
+              badge={section.badge || 'New Release'}
+              title={section.title || 'Beyond Customer Satisfaction:'}
+              subtitle={section.subtitle || 'The Age of Kretru'}
+              quote={bookSpecific.quote || ''}
+              description={section.description || ''}
+              bookLink={section.primary_cta_link || 'https://www.amazon.in/dp/B0D17W5B1B'}
+              ctaText={section.primary_cta_text || 'Read the Book → Amazon'}
+            />
+          </motion.div>
+        );
+
+      case 'final_cta':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <FinalCTA 
+              title={section.title || 'Ready to Transform Your Growth Trajectory?'}
+              subtitle={section.subtitle || "Let's build your customer-led growth engine together."}
+              primaryBtn={section.primary_cta_text || 'Schedule a Consultation'}
+              secondaryBtn={section.secondary_cta_text || 'Explore Services'}
+            />
+          </motion.div>
+        );
+
+      default:
+        // Handle global widgets that aren't strictly sections but currently in index
+        if (section.section_key === 'client_logos') return <ClientLogos />;
+        if (section.section_key === 'frameworks') return <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}><Frameworks /></motion.div>;
+        if (section.section_key === 'case_studies') return <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}><CaseStudies /></motion.div>;
+        if (section.section_key === 'thought_leadership') return <ThoughtLeadership />;
+        
+        return null;
+    }
+  };
+
+  if (loading) {
+     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  }
+
+  // If no sections found (migration not run?), fallback to static is not handled here to encourage migration
+  // but we can assume DB is populated as per task.
+  
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
       <Navbar />
       <main>
-        <Hero 
-          badge={getText('hero.badge', 'The Premier Growth Transformation Firm')}
-          title={getText('hero.title', 'Build a Customer-Led Growth Engine That Scales')}
-          subtitle={getText('hero.subtitle', 'Integrated Go-To-Market (GTM), Customer Experience, Customer Success, Digital, AI & Culture Transformation — driving predictable, scalable growth across the customer lifecycle.')}
-          primaryCta={getText('hero.primary_cta', 'Book a Growth Strategy Review')}
-          secondaryCta={getText('hero.secondary_cta', 'Explore Transformation Programs')}
-        />
-        
-        <WhatKretrutoshMeans 
-          titlePart1={getText('meaning.title_part1', 'Kretru = ')}
-          titlePart2={getText('meaning.title_part2', 'Customer')}
-          titlePart3={getText('meaning.title_part3', 'Tosh = ')}
-          titlePart4={getText('meaning.title_part4', 'Delight')}
-          description={getText('meaning.copy', 'KretruTosh represents an approach where organizations redesign their Go-To-Market, Customer Experience, Customer Success, Digital journeys and internal Culture so that customer expectations are understood, aligned, delivered, measured, and continuously enhanced.')}
-          highlight={getText('meaning.tagline', 'This is not CX as a function — this is customer-led business transformation.')}
-        />
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <GrowthEngine 
-             title={getText('pillars.title', 'One Engine. Five Motions. Infinite Growth.')}
-             subtitle={getText('pillars.subtitle', 'Your GTM Velocity model has three lifecycle pillars (Pre-Sales, Sales, Post-Sales) and two enabling horizontals (Digital Enablement and Culture Transformation). All five together create sustainable, scalable growth.')}
-             getText={getText}
-          />
-        </motion.div>
-
-        <ClientLogos />
-
-        <Outcomes 
-          title={getText('outcomes.title', 'Outcomes That Matter')}
-          description={getText('outcomes.description', "We don't just deliver strategies; we deliver measurable business impact.")}
-          items={[
-            getText('outcomes.item1', 'Revenue Expansion +20–40%'),
-            getText('outcomes.item2', 'Retention +12–25%'),
-            getText('outcomes.item3', 'Net Revenue Retention (NRR) +10–25%'),
-            getText('outcomes.item4', 'Annual Recurring Revenue (ARR) +20–45%'),
-            getText('outcomes.item5', 'Sales Velocity ×2–5'),
-            getText('outcomes.item6', 'Conversion Rate +15–30%'),
-            getText('outcomes.item7', 'Drop-Off Reduction 15–22%'),
-            getText('outcomes.item8', 'Customer Effort Score Reduction 20–30%'),
-            getText('outcomes.item9', 'Customer Satisfaction +18–33%'),
-            getText('outcomes.item10', 'Employee Engagement +12–18%')
-          ]}
-        />
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <Frameworks />
-        </motion.div>
-
-
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <CaseStudies />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <AgeOfKretru 
-            badge={getText('age_of_kretru.badge', 'New Release')}
-            title={getText('age_of_kretru.title', 'Beyond Customer Satisfaction:')}
-            subtitle={getText('age_of_kretru.subtitle', 'The Age of Kretru')}
-            quote={getText('age_of_kretru.quote', '“Customer satisfaction is not the goal. Expectation Fulfilment is. And expectation fulfilment is what unlocks retention, revenue, trust, and advocacy.”')}
-            description={getText('age_of_kretru.copy', '<span class="font-bold text-primary">Kretru (Customer) + Tosh (Delight) =</span> <br /> A philosophy where expectation, experience & economics converge.')}
-            bookLink={getText('age_of_kretru.book_link', 'https://www.amazon.in/dp/B0D17W5B1B')}
-            ctaText={getText('age_of_kretru.book_cta', 'Read the Book → Amazon')}
-          />
-        </motion.div>
-
-        <ThoughtLeadership />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <FinalCTA 
-            title={getText('final_cta.title', 'Ready to Transform Your Growth Trajectory?')}
-            subtitle={getText('final_cta.subtitle', "Let's build your customer-led growth engine together.")}
-            primaryBtn={getText('final_cta.button', 'Schedule a Consultation')}
-            secondaryBtn={getText('final_cta.secondary_btn', 'Explore Services')}
-          />
-        </motion.div>
+        {sections.length > 0 ? (
+          // Render Dynamic Sections
+          sections.map((section) => (
+            <div key={section.id} className={section.bg_theme === 'navy' ? "bg-[#0A192F]" : ""}>
+               {renderSection(section)}
+            </div>
+          ))
+        ) : (
+          // Fallback static Layout (Ghost of the past) - ONLY if DB empty
+          <>
+             {/* This part intentionally left empty as we expect DB to drive content now. 
+                 To see default content, DB must be populated. */}
+             <div className="py-20 text-center">
+                <h1 className="text-2xl font-bold">Welcome to the New Page Builder Experience</h1>
+                <p className="text-muted-foreground">Please run the migration script to see content.</p>
+             </div>
+          </>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}
