@@ -61,13 +61,40 @@ const Index = () => {
     };
 
     fetchPage();
+
+    // Real-time subscription for layout updates
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sections_home',
+        },
+        () => {
+          console.log('Real-time update received: sections_home');
+          fetchPage();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
+
+import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
+
+// ... imports
 
   // Section Renderer
   const renderSection = (section: any) => {
-    // Map DB layout configs to Tailwind classes
-    const gridColsMap: any = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4', 5: 'grid-cols-5' };
-    const gridClass = `grid-cols-1 md:${gridColsMap[section.grid_columns] || 'grid-cols-3'}`; // fallback to 3 if missing
+    // Map DB layout configs to Tailwind classes using Safe-List pattern
+    const gridClass = GRID_MAP[section.grid_columns] || GRID_MAP[3];
+    const alignClass = ALIGN_MAP[section.alignment] || ALIGN_MAP['left'];
+    // Theme is handled in the wrapper (parent div)
+
 
     switch (section.section_key) {
       case 'hero':
@@ -226,7 +253,7 @@ const Index = () => {
         {sections.length > 0 ? (
           // Render Dynamic Sections
           sections.map((section) => (
-            <div key={section.id} className={section.bg_theme === 'navy' ? "bg-[#0A192F]" : ""}>
+            <div key={section.id} className={THEME_MAP[section.bg_theme] || THEME_MAP['light']}>
                {renderSection(section)}
             </div>
           ))

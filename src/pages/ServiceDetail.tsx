@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Loader2 } from "lucide-react";
 import NotFound from "./NotFound";
 import RichText from "@/components/ui/RichText";
+import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
 
 // Fallback icon
 const DefaultIcon = Target;
@@ -32,6 +33,28 @@ const ServiceDetail = () => {
       setLoading(false);
     };
     fetchSections();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel(`services-${slug}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sections_services',
+          filter: `page_slug=eq.${slug}`,
+        },
+        () => {
+           console.log('Real-time update received: sections_services');
+           fetchSections();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [slug]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -40,6 +63,9 @@ const ServiceDetail = () => {
 
   const renderSection = (section: any) => {
     const specific = section.specific_data || {};
+    const gridClass = GRID_MAP[section.grid_columns] || GRID_MAP[3];
+    const themeClass = THEME_MAP[section.bg_theme] || THEME_MAP['light'];
+
 
     switch(section.section_key) {
       case 'hero':
@@ -108,7 +134,7 @@ const ServiceDetail = () => {
 
       case 'approach_steps':
         return (
-          <section key={section.id} className={`py-24 ${section.bg_theme === 'navy' ? 'bg-primary text-secondary' : 'bg-muted/30'}`}>
+          <section key={section.id} className={`py-24 ${themeClass}`}>
             <div className="container mx-auto px-4">
               <div className="text-center max-w-3xl mx-auto mb-16">
                 <h2 className="text-3xl font-bold text-primary mb-4">{section.title}</h2>
@@ -117,8 +143,8 @@ const ServiceDetail = () => {
                 </p>
               </div>
               
-              {/* Masonry Fix: h-full and flex-col */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
+              {/* Dynamic Grid */}
+              <div className={`grid gap-8 auto-rows-fr ${gridClass}`}>
                 {specific.steps?.map((item: any, index: number) => {
                    return (
                     <motion.div

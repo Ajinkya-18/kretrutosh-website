@@ -11,6 +11,7 @@ import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import RichText from "@/components/ui/RichText";
+import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
 
 // Icon mapping
 const iconMap: any = {
@@ -111,6 +112,28 @@ const IndustryDetail = () => {
     };
 
     fetchData();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel(`industry-${slug}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sections_industries',
+          filter: `page_slug=eq.${slug}`,
+        },
+        () => {
+           console.log('Real-time update received: sections_industries');
+           fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [slug]);
 
   if (isLoading) {
@@ -142,6 +165,15 @@ const IndustryDetail = () => {
 
   const renderSection = (section: Section) => {
     const { section_key, title, specific_data } = section;
+    const gridClass = GRID_MAP[section.specific_data?.grid_columns || 1] || GRID_MAP[1]; // Industry sections often default to 1, but let's check config if available.
+    // Actually, sections_industries table has grid_columns column? 
+    // The type definition above says specific_data: any, but doesn't list grid_columns on root Section interface in THIS file, let's fix that.
+    
+    // Correction: The Section interface in IndustryDetail lines 37-46 does NOT have grid_columns. 
+    // I need to update the interface first to be safe, or just cast it. 
+    const sectionAny = section as any; 
+    const dynamicGrid = GRID_MAP[sectionAny.grid_columns || 1] || GRID_MAP[1];
+    const themeClass = THEME_MAP[section.bg_theme] || THEME_MAP['light'];
 
     switch (section_key) {
         case 'hero':
@@ -220,9 +252,9 @@ const IndustryDetail = () => {
         case 'frameworks':
             if (!relatedFrameworks || relatedFrameworks.length === 0) return null;
             return (
-                <div key={section.id}>
+                <div key={section.id} className={themeClass}>
                     <h2 className="text-3xl font-bold text-primary mb-6">{title}</h2>
-                    <div className="grid gap-4">
+                    <div className={`grid gap-4 ${dynamicGrid}`}>
                     {relatedFrameworks.map((framework) => {
                         const FrameworkIcon = iconMap[framework.icon_name] || Layers;
                         return (
