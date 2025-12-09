@@ -7,7 +7,7 @@ import { useContent } from "@/hooks/useContent";
 import { getIcon } from "@/utils/iconMap";
 
 interface Framework {
-  id: number;
+  id: string; // UUID
   title: string;
   short_description: string;
   slug: string;
@@ -38,7 +38,7 @@ const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetTe
         .select('*')
         .eq('is_visible', true) // Assuming we might want to filter, but keeping simple for now
 
-        .order('id', { ascending: true });
+        .order('display_order', { ascending: true });
       
       if (data) {
         setFrameworks(data);
