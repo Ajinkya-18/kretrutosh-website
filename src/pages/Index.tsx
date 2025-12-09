@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useContent } from "@/hooks/useContent";
 import { supabase } from "@/lib/supabaseClient";
 import { Loader2 } from "lucide-react";
+import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
 
 // Homepage Sections
 import AgeOfKretru from "@/components/home/AgeOfKretru";
@@ -84,7 +85,7 @@ const Index = () => {
     };
   }, []);
 
-import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
+
 
 // ... imports
 
