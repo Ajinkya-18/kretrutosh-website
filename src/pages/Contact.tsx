@@ -1,27 +1,3 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import ContactForm from "@/components/ContactForm";
-import { Button } from "@/components/ui/button";
-import { Mail, MapPin, Phone, Calendar, Linkedin, Youtube } from "lucide-react";
-import { useContent } from "@/hooks/useContent";
-
-const Contact = () => {
-  const { getText } = useContent('contact');
-
-  return (
-    <div className="min-h-screen bg-background font-sans">
-      <Navbar />
-      
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-hero overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="inline-block px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/10 backdrop-blur-sm mb-6">
-            <span className="text-secondary font-medium text-sm tracking-wide uppercase">
-              {getText('hero.badge', 'Get in Touch')}
-            </span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             {getText('hero.title', "Let's Accelerate Your Growth")}
           </h1>
           <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-8">

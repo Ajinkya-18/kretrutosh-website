@@ -11,18 +11,6 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Book from "./pages/Book";
 import Videos from "./pages/Videos";
-import Blogs from "./pages/Blogs2";
-import NotFound from "./pages/NotFound";
-import ComingSoon from "./pages/ComingSoon";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-
-// --- Import the NEW Solutions Pages ---
-import PreSales from "./pages/solutions/PreSales";
-import SalesVelocity from "./pages/solutions/SalesVelocity";
-import CustomerSuccess from "./pages/solutions/CustomerSuccess";
-import DigitalAI from "./pages/solutions/DigitalAI";
-import CultureLeadership from "./pages/solutions/CultureLeadership";
 
 // --- Import the NEW Framework Pages ---
 import Frameworks from "./pages/Frameworks";

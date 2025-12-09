@@ -1,29 +1,3 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Award, Briefcase, TrendingUp, BookOpen, ExternalLink } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import bookCover from "@/assets/book-cover.jpg";
-import { useContent } from "@/hooks/useContent";
-
-const About = () => {
-  const navigate = useNavigate();
-  const { getText } = useContent('about');
-
-  return (
-    <div className="min-h-screen">
-      <Navbar />
-      <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-24 pt-48 text-center bg-gradient-to-br from-primary/5 via-background to-accent/5">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {getText('hero.title', 'About Ashutosh Karandikar')}
-              </h1>
-              <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-8 animate-fade-in-up">
-                <div className="flex items-center gap-2 px-4 py-2 bg-accent/10 rounded-lg backdrop-blur-sm border border-accent/20 transition-all hover:bg-accent/20">
                   <Award className="h-5 w-5 text-accent" />
                   <span className="text-foreground font-semibold">{getText('hero.badge_1', 'CCXP CERTIFIED')}</span>
                 </div>
