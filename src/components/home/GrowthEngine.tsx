@@ -17,48 +17,13 @@ interface GrowthEngineProps {
 }
 
 const GrowthEngine = ({ title, subtitle, motions: propMotions, gridClass, getText }: GrowthEngineProps) => {
-  // Fallback to hardcoded if no props provided (for safe transition)
-  const defaultMotions = [
-    {
-      icon: <Target className="h-8 w-8 text-secondary" />,
-      title: getText('growth_engine.motion1.title', 'Pre-Sales Transformation'),
-      description: getText('growth_engine.motion1.desc', 'Aligning brand purpose with market needs.'),
-      link: "/services/pre-sales"
-    },
-    {
-      icon: <TrendingUp className="h-8 w-8 text-secondary" />,
-      title: getText('growth_engine.motion2.title', 'Sales Velocity'),
-      description: getText('growth_engine.motion2.desc', 'Accelerating acquisition and conversion.'),
-      link: "/services/sales-velocity"
-    },
-    {
-      icon: <Users className="h-8 w-8 text-secondary" />,
-      title: getText('growth_engine.motion3.title', 'Customer Success'),
-      description: getText('growth_engine.motion3.desc', 'Driving retention and expansion.'),
-      link: "/services/customer-success"
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-secondary" />,
-      title: getText('growth_engine.motion4.title', 'Digital & AI Enablement'),
-      description: getText('growth_engine.motion4.desc', 'Empowering teams with unified data.'),
-      link: "/services/digital-ai"
-    },
-    {
-      icon: <Heart className="h-8 w-8 text-secondary" />,
-      title: getText('growth_engine.motion5.title', 'Culture Transformation'),
-      description: getText('growth_engine.motion5.desc', 'Building a customer-centric DNA.'),
-      link: "/services/culture-transformation"
-    }
-  ];
-
-  const motions = propMotions || defaultMotions;
-
   // Helper to get icon component if passed as string names from JSON
-  const getIcon = (icon: any) => {
-    if (typeof icon !== 'string') return icon;
+  const getIcon = (iconName: string) => {
     const icons: any = { Target: <Target className="h-8 w-8 text-secondary" />, TrendingUp: <TrendingUp className="h-8 w-8 text-secondary" />, Users: <Users className="h-8 w-8 text-secondary" />, Zap: <Zap className="h-8 w-8 text-secondary" />, Heart: <Heart className="h-8 w-8 text-secondary" /> };
-    return icons[icon] || <Target className="h-8 w-8 text-secondary" />;
+    return icons[iconName] || <Target className="h-8 w-8 text-secondary" />;
   };
+
+  const motions = propMotions || [];
 
   return (
     <section id="growth-engine" className="py-24 bg-muted/30">

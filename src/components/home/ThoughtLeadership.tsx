@@ -5,6 +5,8 @@ import podcastLogo from "@/assets/xt-podcast-logo.jpeg";
 import bookCover from "@/assets/3d-book-cover.jpeg";
 import whitepaperImage from "@/assets/whitepaper-articles.jpeg";
 import { useContent } from "@/hooks/useContent";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 interface CardData {
   id: string;
@@ -33,9 +35,11 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
   const { getText: hookGetText } = useContent('home');
   const getText = propGetText || hookGetText;
 
-  // Default cards if not provided (fallback or during migration)
-  const defaultCards: CardData[] = [
-    {
+  const [displayCards, setDisplayCards] = useState<CardData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Default Static Items
+  const podcastCard: CardData = {
       id: 'podcast',
       badge: getText('thought_leadership.podcast.badge', 'Podcast'),
       title: getText('thought_leadership.podcast.title', 'The XT Podcast'),
@@ -43,8 +47,9 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
       cta_text: getText('thought_leadership.podcast.cta', 'Listen Now'),
       link: '/resources/podcast',
       image_key: 'podcast'
-    },
-    {
+  };
+
+  const bookCard: CardData = {
       id: 'book',
       badge: getText('thought_leadership.book.badge', 'Book'),
       title: getText('thought_leadership.book.title', 'Beyond Customer Satisfaction'),
@@ -52,19 +57,41 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
       cta_text: getText('thought_leadership.book.cta', 'Read More'),
       link: '/book',
       image_key: 'book'
-    },
-    {
-      id: 'resources',
-      badge: getText('thought_leadership.resources.badge', 'Resources'),
-      title: getText('thought_leadership.resources.title', 'Whitepapers & Articles'),
-      description: getText('thought_leadership.resources.desc', 'Deep dives into GTM strategies, CS operations, and AI enablement.'),
-      cta_text: getText('thought_leadership.resources.cta', 'Explore Resources'),
-      link: '/resources',
-      image_key: 'whitepapers'
-    }
-  ];
+  };
 
-  const displayCards = cards && cards.length > 0 ? cards : defaultCards;
+  useEffect(() => {
+    const fetchData = async () => {
+       try {
+          // Fetch latest 2 whitepapers
+          const { data: whitepapers, error } = await supabase
+            .from('whitepapers') // Assuming table exists based on admin-panel
+            .select('*')
+            .order('created_at', { ascending: false }) // Latest first
+            .limit(2);
+
+          const whitepaperCards: CardData[] = (whitepapers || []).map((wp: any) => ({
+             id: wp.id || 'wp',
+             badge: 'Whitepaper',
+             title: wp.title,
+             description: wp.summary || wp.description || 'Download our latest insights.',
+             cta_text: 'Read Article',
+             link: `/resources/${wp.slug}`,
+             image_key: 'whitepapers' // Fallback image
+          }));
+
+          // Combine: Podcast, Book, WP1, WP2
+          setDisplayCards([podcastCard, bookCard, ...whitepaperCards]);
+       } catch (err) {
+          console.error("Error fetching thought leadership:", err);
+          // Fallback
+          setDisplayCards([podcastCard, bookCard]);
+       } finally {
+          setLoading(false);
+       }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <section className="py-24 bg-muted/30">
@@ -78,27 +105,27 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto items-stretch">
           {displayCards.map((card) => (
-            <div key={card.id} className="bg-card rounded-xl overflow-hidden border border-border/50 hover:shadow-lg transition-all group">
-              <div className={`h-48 flex items-center justify-center overflow-hidden ${card.id === 'book' ? 'bg-primary/5' : 'bg-black'}`}>
+            <div key={card.id} className="bg-card rounded-xl overflow-hidden border border-border/50 hover:shadow-lg transition-all group flex flex-col h-full">
+              <div className={`h-40 flex items-center justify-center overflow-hidden ${card.id === 'book' ? 'bg-primary/5' : 'bg-black'}`}>
                 <img 
                   src={imageMap[card.image_key] || whitepaperImage} 
                   alt={card.title} 
-                  className={`w-full h-full object-cover ${card.id === 'podcast' || card.id === 'resources' ? 'opacity-90 group-hover:opacity-100 transition-opacity' : 'group-hover:scale-105 transition-transform duration-300'}`}
+                  className={`w-full h-full object-cover ${card.id === 'podcast' ? 'opacity-90 group-hover:opacity-100' : 'group-hover:scale-105'} transition-all duration-300`}
                 />
               </div>
-              <div className="p-8">
-                <div className="text-sm font-semibold text-secondary uppercase tracking-wider mb-2">
+              <div className="p-6 flex flex-col flex-grow">
+                <div className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">
                   {card.badge}
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">
+                <h3 className="text-lg font-bold text-primary mb-3 leading-tight">
                   {card.title}
                 </h3>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-grow">
                   {card.description}
                 </p>
-                <Button asChild variant="link" className="p-0 h-auto text-primary group-hover:text-secondary">
+                <Button asChild variant="link" className="p-0 h-auto text-primary group-hover:text-secondary self-start mt-auto">
                   <Link to={card.link}>
                     {card.cta_text} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

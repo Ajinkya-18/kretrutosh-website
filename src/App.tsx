@@ -29,11 +29,7 @@ import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
 // --- Legacy Pages (Keeping only if strictly needed, but prefer new architecture) ---
-import Assessments from "./pages/Assessments";
 import CaseStudiesPage from "./pages/CaseStudiesPage";
-import CXMaturity from "./pages/assessments/CXMaturity";
-import CSMaturity from "./pages/assessments/CSMaturity";
-import CultureMaturity from "./pages/assessments/CultureMaturity";
 
 const queryClient = new QueryClient();
 
@@ -82,11 +78,7 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
 
             {/* --- Legacy/Other --- */}
-            <Route path="/assessments" element={<Assessments />} />
             <Route path="/case-studies" element={<CaseStudiesPage />} />
-            <Route path="/assessments/cx-maturity" element={<CXMaturity />} />
-            <Route path="/assessments/cs-maturity" element={<CSMaturity />} />
-            <Route path="/assessments/culture-maturity" element={<CultureMaturity />} />
 
             {/* --- 404 Not Found Page --- */}
             <Route path="*" element={<NotFound />} />

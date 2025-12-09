@@ -18,6 +18,7 @@ import Frameworks from "@/components/home/Frameworks";
 import ClientLogos from "@/components/home/ClientLogos";
 import CaseStudies from "@/components/home/CaseStudies";
 import ThoughtLeadership from "@/components/home/ThoughtLeadership";
+import Assessments from "@/components/home/Assessments";
 import FinalCTA from "@/components/home/FinalCTA";
 
 const Index = () => {
@@ -194,6 +195,15 @@ const Index = () => {
                     description={section.description}
                     cards={section.specific_data?.cards}
                     getText={getText}
+                />
+            );
+        }
+        if (section.section_key === 'assessments') {
+            return (
+                <Assessments 
+                    title={section.title}
+                    description={section.description}
+                    gridClass={gridClass}
                 />
             );
         }
