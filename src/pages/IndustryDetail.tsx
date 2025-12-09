@@ -84,7 +84,7 @@ const IndustryDetail = () => {
         const { data: sectionsData, error: sectionsError } = await supabase
             .from('sections_industries')
             .select('*')
-            .eq('industry_slug', slug)
+            .eq('page_slug', slug)
             .eq('is_visible', true)
             .order('display_order', { ascending: true });
         

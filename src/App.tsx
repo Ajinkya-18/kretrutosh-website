@@ -6,9 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import ScrollToTop from "@/components/ScrollToTop";
 
-// --- Components ---
-import ServiceBuilder from "@/components/ServiceBuilder";
-
 // --- Main Pages ---
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -21,6 +18,7 @@ import Contact from "./pages/Contact";
 import Frameworks from "./pages/Frameworks";
 import FrameworkDetail from "./pages/FrameworkDetail";
 import IndustryDetail from "./pages/IndustryDetail";
+import ServiceDetail from "./pages/ServiceDetail"; // New Dynamic Page
 
 // --- Resources & Legal ---
 import Resources from "./pages/Resources";
@@ -60,13 +58,9 @@ const App = () => (
             <Route path="/frameworks" element={<Frameworks />} />
             <Route path="/frameworks/:id" element={<FrameworkDetail />} />
 
-            {/* --- Services Routes (Powered by Page Builder) --- */}
+            {/* --- Services Routes (Dynamic Page Builder) --- */}
             <Route path="/services" element={<ComingSoon />} />
-            <Route path="/services/pre-sales" element={<ServiceBuilder slug="pre-sales" />} />
-            <Route path="/services/sales-velocity" element={<ServiceBuilder slug="sales-velocity" />} />
-            <Route path="/services/customer-success" element={<ServiceBuilder slug="customer-success" />} />
-            <Route path="/services/digital-ai" element={<ServiceBuilder slug="digital-ai" />} />
-            <Route path="/services/culture-transformation" element={<ServiceBuilder slug="culture-transformation" />} />
+            <Route path="/services/:slug" element={<ServiceDetail />} />
 
             {/* --- Industries Routes --- */}
             <Route path="/industries" element={<ComingSoon />} />
