@@ -37,7 +37,7 @@ const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetTe
         .from('frameworks')
         .select('*')
         .eq('is_visible', true) // Assuming we might want to filter, but keeping simple for now
-        .limit(10)
+
         .order('id', { ascending: true });
       
       if (data) {
@@ -60,13 +60,8 @@ const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetTe
               {description || getText('frameworks.description', 'Our battle-tested methodologies for driving predictable growth.')}
             </p>
           </div>
-          <Button asChild variant="outline" className="shrink-0 border-primary/20 hover:bg-primary/5">
-            <Link to="/frameworks">
-              {ctaText || getText('frameworks.cta', 'View All Frameworks')}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
         </div>
+
 
         {loading ? (
            <div className="text-center py-10">Loading frameworks...</div>
