@@ -10,12 +10,13 @@ import NotFound from "./NotFound";
 import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import RichText from "@/components/ui/RichText";
 
 // Icon mapping
 const iconMap: any = {
   Server, ShoppingBag, ShoppingCart, Shield, 
   Landmark, Factory, Stethoscope, GraduationCap, 
-  Building2
+  Building2, Layers
 };
 
 interface Industry {
@@ -169,7 +170,7 @@ const IndustryDetail = () => {
                             <div className="inline-block px-3 py-1 rounded-full border border-secondary/30 bg-secondary/10 backdrop-blur-sm mb-4">
                                 <span className="text-secondary font-medium text-xs tracking-wide uppercase">{specific_data?.subtitle}</span>
                             </div>
-                            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                                 {title}
                             </h1>
                             <p className="text-xl text-white/80 max-w-3xl leading-relaxed">
@@ -185,6 +186,9 @@ const IndustryDetail = () => {
             return (
                 <div key={section.id}>
                     <h2 className="text-3xl font-bold text-primary mb-6">{title}</h2>
+                    <div className="bg-muted/10 p-6 rounded-xl border border-border/50 mb-8 text-lg text-muted-foreground leading-relaxed">
+                        <RichText content={section.subtitle} />
+                    </div>
                     <div className="grid gap-4">
                         {specific_data?.list?.map((challenge: string, index: number) => (
                         <motion.div 
@@ -193,10 +197,10 @@ const IndustryDetail = () => {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border border-border/50"
+                            className="flex items-start gap-4 p-5 bg-card/50 hover:bg-card rounded-lg border border-border/50 hover:border-secondary/50 transition-colors"
                         >
-                            <div className="h-2 w-2 mt-2 rounded-full bg-red-400 shrink-0" />
-                            <span className="text-muted-foreground font-medium">{challenge}</span>
+                            <div className="h-2 w-2 mt-2.5 rounded-full bg-destructive shrink-0" />
+                            <span className="text-foreground/90 font-medium text-lg">{challenge}</span>
                         </motion.div>
                         ))}
                     </div>
@@ -207,9 +211,9 @@ const IndustryDetail = () => {
             return (
                 <div key={section.id}>
                     <h2 className="text-3xl font-bold text-primary mb-6">{title}</h2>
-                    <p className="text-lg text-muted-foreground leading-relaxed p-6 bg-secondary/5 border-l-4 border-secondary rounded-r-lg whitespace-pre-line">
-                        {section.description}
-                    </p>
+                    <div className="text-lg text-muted-foreground leading-relaxed p-8 bg-secondary/5 border-l-4 border-secondary rounded-r-xl">
+                        <RichText content={section.description} />
+                    </div>
                 </div>
             );
 
@@ -265,9 +269,15 @@ const IndustryDetail = () => {
                         ))}
                         </div>
                     </div>
+                </div>
+            );
+        
+        case 'cta':
+            return (
+                <div key={section.id}>
                     <div className="text-center lg:text-left">
                         <h3 className="text-xl font-bold text-primary mb-4">Ready to transform your {industryMeta.title} business?</h3>
-                        <Button asChild size="lg" className="w-full md:w-auto bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6">
+                        <Button asChild size="lg" className="w-full md:w-auto bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6 h-auto">
                         <Link to="/contact">
                             Schedule a Consultation
                             <ArrowRight className="ml-2 h-5 w-5" />

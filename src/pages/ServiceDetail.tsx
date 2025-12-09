@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Loader2 } from "lucide-react";
 import NotFound from "./NotFound";
+import RichText from "@/components/ui/RichText";
 
 // Fallback icon
 const DefaultIcon = Target;
@@ -56,14 +57,14 @@ const ServiceDetail = () => {
                     <span className="text-secondary font-medium text-sm tracking-wide uppercase">{specific.badge}</span>
                   </div>
                 )}
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                   {section.title}
                 </h1>
                 <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-8">
                   {section.subtitle}
                 </p>
                 {section.primary_cta_text && (
-                    <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6">
+                    <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6 h-auto">
                     <Link to="/contact">
                         {section.primary_cta_text}
                         <ArrowRight className="ml-2 h-5 w-5" />
@@ -77,11 +78,13 @@ const ServiceDetail = () => {
 
       case 'problem_block':
         return (
-           <section key={section.id} className="py-20 bg-background">
+           <section key={section.id} className="py-24 bg-background">
               <div className="container mx-auto px-4">
                  <div className="max-w-4xl mx-auto">
                     <h2 className="text-3xl font-bold text-primary mb-6 text-center">{section.title}</h2>
-                    <p className="text-center text-muted-foreground text-lg mb-12">{section.subtitle}</p>
+                    <p className="text-center text-muted-foreground text-lg mb-16 leading-relaxed bg-muted/20 p-6 rounded-xl border border-primary/5">
+                        {section.subtitle}
+                    </p>
                     <div className="grid md:grid-cols-2 gap-6">
                        {specific.list?.map((item: string, idx: number) => (
                           <motion.div 
@@ -89,12 +92,12 @@ const ServiceDetail = () => {
                              initial={{ opacity: 0, x: -20 }}
                              whileInView={{ opacity: 1, x: 0 }}
                              viewport={{ once: true }}
-                             className="flex items-start gap-4 p-4 rounded-lg bg-red-500/5 border border-red-500/10"
+                             className="flex items-start gap-4 p-6 rounded-xl bg-destructive/5 border border-destructive/10 hover:border-destructive/20 transition-colors"
                           >
-                             <div className="p-2 bg-red-500/10 rounded-full shrink-0">
-                                <AlertTriangle className="h-5 w-5 text-red-500" />
+                             <div className="p-2 bg-destructive/10 rounded-full shrink-0">
+                                <AlertTriangle className="h-5 w-5 text-destructive" />
                              </div>
-                             <p className="text-foreground font-medium">{item}</p>
+                             <p className="text-foreground font-medium text-lg leading-snug">{item}</p>
                           </motion.div>
                        ))}
                     </div>
@@ -109,14 +112,14 @@ const ServiceDetail = () => {
             <div className="container mx-auto px-4">
               <div className="text-center max-w-3xl mx-auto mb-16">
                 <h2 className="text-3xl font-bold text-primary mb-4">{section.title}</h2>
-                <p className="text-muted-foreground text-lg">
+                <p className="text-muted-foreground text-lg leading-relaxed">
                   {section.subtitle}
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Masonry Fix: h-full and flex-col */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
                 {specific.steps?.map((item: any, index: number) => {
-                   const Icon = DefaultIcon;
                    return (
                     <motion.div
                       key={index}
@@ -124,13 +127,16 @@ const ServiceDetail = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-card p-8 rounded-xl border border-border/50 hover:shadow-lg hover:border-secondary/50 transition-all group"
+                      className="bg-card p-8 rounded-xl border border-border/50 hover:shadow-lg hover:border-secondary/50 transition-all group flex flex-col h-full"
                     >
                       <div className="mb-6 p-4 bg-primary/5 rounded-full w-fit group-hover:bg-primary/10 transition-colors">
                         <span className="text-2xl font-bold text-secondary">0{index + 1}</span>
                       </div>
-                      <h3 className="text-xl font-bold text-primary mb-3">{item.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                      <h3 className="text-xl font-bold text-primary mb-4">{item.title}</h3>
+                      {/* Flex grow to push content */}
+                      <div className="text-muted-foreground leading-relaxed flex-grow">
+                        <RichText content={item.desc} />
+                      </div>
                     </motion.div>
                    );
                 })}

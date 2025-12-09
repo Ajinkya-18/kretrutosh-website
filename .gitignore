@@ -26,5 +26,3 @@ web_dev/
 admin-panel/
 .env
 /new-google-oauth-credentials-for-nocturnal-content-automator.json
-src/sql/
-*.sql
