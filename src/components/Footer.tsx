@@ -1,12 +1,8 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Linkedin, Mail, MapPin, Phone, Youtube, Loader2, Twitter } from "lucide-react";
+import { Linkedin, Mail, MapPin, Phone, Youtube, Twitter } from "lucide-react";
 import logo from "@/assets/kretrutosh-logo.png";
 import { useContent } from "@/hooks/useContent";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabaseClient";
-import { useState } from "react";
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -14,40 +10,9 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { getText } = useContent('global');
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setIsSubmitting(true);
 
-    const { error } = await supabase
-      .from('subscribers')
-      .insert([{ email }]);
 
-    if (error) {
-        if (error.code === '23505') {
-             toast({
-                title: "Already Subscribed",
-                description: "This email is already on our list.",
-             });
-        } else {
-            toast({
-                title: "Error",
-                description: "Could not subscribe. Please try again.",
-                variant: "destructive",
-            });
-        }
-    } else {
-      toast({
-        title: "Success!",
-        description: "You have been subscribed to our newsletter.",
-      });
-      setEmail("");
-    }
-    setIsSubmitting(false);
-  };
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -138,24 +103,7 @@ const Footer = () => {
               </div>
           </div>
 
-          {/* Newsletter */}
-          <div className="w-full max-w-md bg-primary-foreground/5 p-6 rounded-xl border border-primary-foreground/10">
-            <h4 className="text-lg font-semibold text-secondary mb-2">{getText('footer.newsletter_title', 'Stay Updated')}</h4>
-            <p className="text-sm text-primary-foreground/70 mb-4">{getText('footer.newsletter_desc', 'Get the latest insights on GTM velocity and culture transformation.')}</p>
-            <form onSubmit={handleSubscribe} className="flex gap-2">
-                <Input 
-                    type="email" 
-                    placeholder="Enter your email" 
-                    className="bg-primary/50 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <Button type="submit" variant="secondary" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : getText('footer.newsletter_cta', 'Subscribe')}
-                </Button>
-            </form>
-          </div>
+
         </div>
 
         {/* Main Grid: 5 Columns */}
