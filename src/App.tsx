@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import Frameworks from "./pages/Frameworks";
 import FrameworkDetail from "./pages/FrameworkDetail";
 import IndustryDetail from "./pages/IndustryDetail";
+import AssessmentDetail from "./pages/AssessmentDetail";
 import ServiceDetail from "./pages/ServiceDetail"; // New Dynamic Page
 
 // --- Resources & Legal ---
@@ -61,6 +62,9 @@ const App = () => (
             {/* --- Industries Routes --- */}
             <Route path="/industries" element={<ComingSoon />} />
             <Route path="/industries/:id" element={<IndustryDetail />} />
+            
+            {/* --- Assessments Routes --- */}
+            <Route path="/assessments/:id" element={<AssessmentDetail />} />
 
             {/* --- Resources Routes --- */}
             <Route path="/resources" element={<Resources />} />
