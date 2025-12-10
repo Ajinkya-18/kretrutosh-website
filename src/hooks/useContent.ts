@@ -26,6 +26,35 @@ export const useContent = (pageName: string) => {
     };
 
     fetchContent();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel(`content-${pageName}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'website_content',
+          filter: `page_name=in.(${pageName},global)` // Note: complex filters might not work in realtime consistently with 'or', so we might just listen to table
+        },
+        () => {
+            fetchContent();
+        }
+      )
+      .subscribe();
+
+      // Actually, simple filter on table is safer
+      const globalChannel = supabase
+        .channel(`content-global-all`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'website_content' }, () => fetchContent())
+        .subscribe();
+
+
+    return () => {
+        supabase.removeChannel(channel);
+        supabase.removeChannel(globalChannel);
+    };
   }, [pageName]);
 
   // Helper to get text safely with a default fallback

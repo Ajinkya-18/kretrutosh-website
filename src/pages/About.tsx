@@ -50,6 +50,22 @@ const About = () => {
     };
 
     fetchPage();
+
+    // Real-time Subscriptions
+    const pageChannel = supabase
+        .channel('about-page-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'about'" }, () => fetchPage())
+        .subscribe();
+
+    const sectionsChannel = supabase
+        .channel('about-sections-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_about' }, () => fetchPage())
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(pageChannel);
+        supabase.removeChannel(sectionsChannel);
+    };
   }, []);
 
   const renderContent = (content?: string) => {
