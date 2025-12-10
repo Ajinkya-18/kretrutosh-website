@@ -9,7 +9,18 @@ import NotFound from "./NotFound";
 import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
-import QRCodeGenerator from "@/components/QRCodeGenerator";
+
+// QR Code Assets
+import qrCx from "@/assets/qr-cx-maturity.jpg";
+import qrCs from "@/assets/qr-cs-maturity.jpg";
+import qrCulture from "@/assets/qr-culture-maturity.jpg";
+
+const qrImageMap: Record<string, string> = {
+  'cx-maturity-diagnostic': qrCx,
+  'cs-maturity-model': qrCs,
+  'culture-maturity-assessment': qrCulture,
+};
+
 
 interface Assessment {
   id: number;
@@ -122,11 +133,18 @@ const AssessmentDetail = () => {
                      )}
                  </div>
 
-                 {assessment.external_link && (
-                     <div className="hidden lg:block">
-                         <div className="text-center">
-                             <p className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">Scan to Start on Mobile</p>
-                             <QRCodeGenerator url={assessment.external_link} size={180} />
+                 {/* QR Code Section - Only if we have a matching image */}
+                 {(assessment.slug && qrImageMap[assessment.slug]) && (
+                     <div className="hidden lg:block shrink-0">
+                         <div className="text-center bg-white p-4 rounded-xl border border-border shadow-sm">
+                             <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-widest">
+                               Scan to Start
+                             </p>
+                             <img 
+                                src={qrImageMap[assessment.slug]} 
+                                alt={`${assessment.title} QR Code`}
+                                className="h-40 w-40 object-contain mx-auto"
+                             />
                          </div>
                      </div>
                  )}
