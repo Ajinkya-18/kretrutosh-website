@@ -76,7 +76,11 @@ const Index = () => {
           .order('display_order', { ascending: true });
 
         if (sectionError) throw sectionError;
-        setSections(sectionData || []);
+        
+        // Deduplicate sections by key just in case
+        const uniqueSections = Array.from(new Map((sectionData || []).map(item => [item.section_key, item])).values());
+        
+        setSections(uniqueSections);
       } catch (err) {
         console.error('Error fetching page data:', err);
       } finally {

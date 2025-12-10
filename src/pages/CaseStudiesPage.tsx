@@ -21,6 +21,7 @@ interface CaseStudy {
   solution: string;
   results: string[];
   tags: string[];
+  link_url?: string;
 }
 
 const CaseStudiesPage = () => {
@@ -171,14 +172,14 @@ const CaseStudiesPage = () => {
                               </li>
                             ))}
                           </ul>
-                          {study.link_url ? (
+                          {study.link_url && study.link_url.length > 2 && study.link_url !== '#' ? (
                               <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all" asChild>
                                   <a href={study.link_url} target="_blank" rel="noopener noreferrer">
                                       Read Full Story <ArrowRight className="ml-2 h-4 w-4" />
                                   </a>
                               </Button>
                           ) : (
-                              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                              <Button variant="outline" disabled className="w-full opacity-50 cursor-not-allowed">
                                   Read Full Story
                               </Button>
                           )}

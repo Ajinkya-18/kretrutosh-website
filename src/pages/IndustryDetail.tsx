@@ -96,22 +96,23 @@ const IndustryDetail = () => {
         setSections(sectionsData || []);
 
         // 3. Fetch Linked Case Studies (Success Stories)
+        // Use slug matching against industry text column (e.g., 'retail' matches 'Retail')
         const { data: csData } = await supabase
             .from('case_studies')
             .select('*')
-            .eq('industry_slug', slug) // Assuming column added by SQL
-            .limit(3); 
-        
-        // Fallback: if no slug match, try name match
-        if (!csData || csData.length === 0) {
+            .ilike('industry', `%${slug}%`)
+            .limit(3);
+
+        if (csData && csData.length > 0) {
+            setCaseStudies(csData);
+        } else {
+            // Fallback to title match just in case
              const { data: csDataBackup } = await supabase
                 .from('case_studies')
                 .select('*')
-                .ilike('industry', `%${metaData.title}%`)
+                .ilike('industry', `%${metaData.title.split(' ')[0]}%`) // Try first word of title
                 .limit(3);
              setCaseStudies(csDataBackup || []);
-        } else {
-             setCaseStudies(csData || []);
         }
 
       } catch (err) {
@@ -152,25 +153,34 @@ const IndustryDetail = () => {
     const alignClass = ALIGN_MAP[section.alignment] || ALIGN_MAP['left'];
     const themeClass = THEME_MAP[section.bg_theme] || THEME_MAP['light'];
 
-    // Specific Handling for 'hero' if it is a section in DB (it might not be, usually hero is static or special)
-    // But if migrated to DB, we can render it here.
-    // Assuming for now Hero is still partly static (using meta) or specialized.
-    
-    // Example: Specialized "Approach" section rendering if needed, or generic:
-    if (section.section_key === 'approach') {
-         return (
-             <div className="py-12">
+    // Specific Handling for HTML sections
+    if (section.section_key === 'challenges' && section.challenges_html) {
+        return (
+             <div className="py-16 bg-muted/20">
                  <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-primary mb-6">{section.title}</h2>
-                    <div className="text-lg text-muted-foreground leading-relaxed p-8 bg-secondary/5 border-l-4 border-secondary rounded-r-xl whitespace-pre-line">
-                        {section.content_body}
+                    <h2 className="text-3xl font-bold text-primary mb-8 text-center">{section.title}</h2>
+                    <div className="max-w-4xl mx-auto prose prose-lg prose-headings:text-primary prose-strong:text-secondary">
+                        <RichText content={section.challenges_html} />
+                    </div>
+                 </div>
+             </div>
+        );
+    }
+
+    if (section.section_key === 'approach' && section.approach_html) {
+         return (
+             <div className="py-16 bg-background">
+                 <div className="container mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-primary mb-8 text-center">{section.title}</h2>
+                    <div className="max-w-4xl mx-auto p-8 bg-white border-l-4 border-secondary shadow-sm rounded-r-xl prose prose-lg prose-headings:text-primary">
+                        <RichText content={section.approach_html} />
                     </div>
                  </div>
              </div>
          );
     }
     
-    // Generic Render
+    // Generic Render (Hero or others)
     return (
         <div className={`py-12 ${themeClass}`}>
            <div className="container mx-auto px-4">
@@ -178,21 +188,14 @@ const IndustryDetail = () => {
                    <div className={`${alignClass} space-y-4`}>
                       {section.title && <h2 className="text-3xl font-bold">{section.title}</h2>}
                       {section.content_body && (
-                          <div 
-                            className="prose max-w-none text-muted-foreground whitespace-pre-line"
-                            dangerouslySetInnerHTML={{ __html: section.content_body }} // Allow Rich Text/HTML
-                          />
+                          <div className="prose max-w-none text-muted-foreground whitespace-pre-line">
+                              <RichText content={section.content_body} />
+                          </div>
                       )}
                       {section.image_url && (
                           <img src={section.image_url} alt={section.title} className="rounded-xl shadow-md mt-4 max-h-96 object-cover" />
                       )}
                    </div>
-                   {/* If grid > 1, maybe the content body is split or there are child items? 
-                       For now, assuming single block properties. 
-                       If deep nested items are needed (like cards), they would need a json column or joined table.
-                       The prompt asked for "section_key (e.g., 'benefits_grid')". 
-                       If it's a grid of benefits, 'content_body' might be JSON or we assume strict text for now as per schema.
-                   */}
               </div>
            </div>
         </div>
@@ -268,11 +271,21 @@ const IndustryDetail = () => {
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                      {caseStudies.map(study => (
-                         <Card key={study.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/case-studies#case-study-${study.id}`)}>
+                         <Card 
+                            key={study.id} 
+                            className="hover:shadow-lg transition-shadow cursor-pointer" 
+                            onClick={() => {
+                                if (study.link_url && study.link_url.length > 2) {
+                                    window.open(study.link_url, '_blank');
+                                } else {
+                                    navigate(`/case-studies#case-study-${study.id}`);
+                                }
+                            }}
+                         >
                              <CardContent className="p-6">
                                  <h3 className="font-bold text-xl mb-3 line-clamp-2">{study.title}</h3>
                                  <p className="text-muted-foreground mb-4 line-clamp-3">{study.challenge}</p>
-                                 <div className="text-sm font-semibold text-primary">
+                                 <div className="text-sm font-semibold text-primary flex items-center">
                                      Read Story <ArrowRight className="inline w-4 h-4 ml-1" />
                                  </div>
                              </CardContent>
