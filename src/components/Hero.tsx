@@ -7,9 +7,13 @@ interface HeroProps {
   title?: string;
   subtitle?: string;
   primaryCta?: string;
+  primaryCtaLink?: string;
   secondaryCta?: string;
+  secondaryCtaLink?: string;
   backgroundImage?: string;
+  mediaType?: 'image' | 'video';
   videoUrl?: string;
+  overlayOpacity?: number;
 }
 
 const Hero = ({ 
@@ -17,41 +21,74 @@ const Hero = ({
   title, 
   subtitle, 
   primaryCta,
+  primaryCtaLink = '/contact',
   secondaryCta,
+  secondaryCtaLink = '#growth-engine',
   backgroundImage, 
-  videoUrl 
+  mediaType = 'image',
+  videoUrl,
+  overlayOpacity = 30
 }: HeroProps) => {
+
+  // Convert Opacity to fraction (e.g. 30 -> 0.3)
+  const opacityValue = overlayOpacity / 100;
+
   return (
     <section 
       id="hero" 
-      className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-hero"
+      className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-[#0A192F]"
     >
-      {/* Dynamic Background Image/Video */}
-      {backgroundImage && (
-        <div className="absolute inset-0 z-0">
-          <img src={backgroundImage} alt="Hero Background" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background" />
-        </div>
-      )}
+      {/* Dynamic Background Media */}
+      <div className="absolute inset-0 z-0">
+        {mediaType === 'video' && videoUrl ? (
+             <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-full object-cover"
+                poster={backgroundImage}
+             >
+                <source src={videoUrl} type="video/mp4" />
+                {/* Fallback if video fails */}
+                <img src={backgroundImage} alt="Hero Background" className="w-full h-full object-cover" />
+             </video>
+        ) : (
+             backgroundImage && <img src={backgroundImage} alt="Hero Background" className="w-full h-full object-cover" />
+        )}
+        
+        {/* Dynamic Overlay */}
+        <div 
+            className="absolute inset-0 bg-black transition-opacity duration-300" 
+            style={{ opacity: opacityValue }}
+        />
+        
+        {/* Helper Gradient for Text Readability at bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F] via-transparent to-transparent opacity-90" />
+      </div>
 
       {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03] z-0" />
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.05] z-0 pointer-events-none" />
       
       <div className="container mx-auto px-4 py-32 relative z-10">
         <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in-up">
-          <div className="inline-block px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/10 backdrop-blur-sm mb-4">
-            <span className="text-secondary font-medium text-sm tracking-wide uppercase">
-              {badge || 'The Premier Growth Transformation Firm'}
-            </span>
-          </div>
+          {badge && (
+            <div className="inline-block px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/10 backdrop-blur-sm mb-4">
+                <span className="text-secondary font-medium text-sm tracking-wide uppercase">
+                {badge}
+                </span>
+            </div>
+          )}
           
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight tracking-tight text-white">
-            {title || 'Build a Customer-Led Growth Engine That Scales'}
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight tracking-tight text-white drop-shadow-lg">
+            {title}
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-4xl mx-auto font-light">
-            {subtitle || 'Integrated Go-To-Market (GTM), Customer Experience, Customer Success, Digital, AI & Culture Transformation — driving predictable, scalable growth across the customer lifecycle.'}
-          </p>
+          {subtitle && (
+            <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-4xl mx-auto font-light drop-shadow-md">
+                {subtitle}
+            </p>
+          )}
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <Button 
@@ -59,33 +96,30 @@ const Hero = ({
               size="lg" 
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-lg px-8 py-6 shadow-glow transition-all hover:scale-105"
             >
-              <Link to="/contact">
+              <Link to={primaryCtaLink}>
                 {primaryCta || 'Book a Growth Strategy Review'}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button 
-              asChild 
-              variant="outline" 
-              size="lg" 
-              className="border-white/20 text-white hover:bg-white/10 hover:text-white font-medium text-lg px-8 py-6 backdrop-blur-sm transition-all cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                const element = document.getElementById('growth-engine');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            >
-              <a href="#growth-engine">
-                {secondaryCta || 'Explore Transformation Programs'}
-              </a>
-            </Button>
+            
+            {secondaryCta && (
+                <Button 
+                asChild 
+                variant="outline" 
+                size="lg" 
+                className="border-white/20 text-white hover:bg-white/10 hover:text-white font-medium text-lg px-8 py-6 backdrop-blur-sm transition-all cursor-pointer"
+                >
+                <a href={secondaryCtaLink}>
+                    {secondaryCta}
+                </a>
+                </Button>
+            )}
           </div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10" />
+      
+      {/* Smooth blending into next section */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-10" />
     </section>
   );
 };

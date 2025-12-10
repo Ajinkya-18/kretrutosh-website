@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Loader2, Zap, Mail, MapPin, Linkedin } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
+import Hero from "@/components/Hero";
 
 interface Section {
   id: string;
@@ -20,18 +21,26 @@ interface Section {
 const Contact = () => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pageConfig, setPageConfig] = useState<any>(null);
 
   useEffect(() => {
-    const fetchSections = async () => {
+    const fetchPage = async () => {
       try {
-        const { data, error } = await supabase
+        setLoading(true);
+        // 1. Fetch Master Page
+        const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'contact').single();
+        if (pageData) setPageConfig(pageData);
+
+        // 2. Fetch Sections
+        const { data: sectionData, error } = await supabase
           .from('sections_contact')
           .select('*')
           .eq('is_visible', true)
+          .neq('section_key', 'hero')
           .order('display_order', { ascending: true });
 
         if (error) throw error;
-        setSections(data || []);
+        setSections(sectionData || []);
       } catch (error) {
         console.error("Error fetching contact sections:", error);
       } finally {
@@ -39,7 +48,7 @@ const Contact = () => {
       }
     };
 
-    fetchSections();
+    fetchPage();
   }, []);
 
   const renderContent = (content?: string) => {
@@ -62,26 +71,7 @@ const Contact = () => {
     const alignClass = alignment === 'center' ? 'text-center mx-auto' : 'text-left';
     const containerClass = `py-20 ${themeClasses[bg_theme] || themeClasses.light}`;
 
-    if (section_key === 'hero') {
-      return (
-        <section key={section.id} className="pt-32 pb-24 bg-[#0A192F] text-white text-center relative overflow-hidden">
-             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-             {/* Gradient glow to make it premium */}
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-secondary/20 blur-[100px] rounded-full" />
-             
-            <div className="container mx-auto px-4 relative z-10 animate-fade-in-up">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-                {title}
-              </h1>
-              {subtitle && (
-                <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto font-light leading-relaxed">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-        </section>
-      );
-    }
+    // Hero case handled by component outside
 
     if (section_key === 'info_block') {
          // Specialized Card Layout for Info
@@ -169,7 +159,21 @@ const Contact = () => {
     <div className="min-h-screen bg-background font-sans">
       <Navbar />
       <main>
-        {sections.map(renderSection)}
+        {/* Master Hero */}
+        <Hero 
+           mediaType={pageConfig?.media_type || 'image'}
+           videoUrl={pageConfig?.hero_video_url}
+           backgroundImage={pageConfig?.hero_image_url}
+           overlayOpacity={pageConfig?.overlay_opacity}
+           title={pageConfig?.title}
+           subtitle={pageConfig?.subtitle}
+        />
+
+        {sections.map(section => (
+             <div key={section.id}>
+                {renderSection(section)}
+             </div>
+        ))}
         
         {/* Static Contact Form Block - Always Present */}
         <section className="py-20 bg-muted/20">

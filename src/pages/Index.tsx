@@ -46,16 +46,39 @@ const Index = () => {
   useEffect(() => {
     const fetchPage = async () => {
       try {
-        const { data, error } = await supabase
+        setLoading(true);
+        // 1. Fetch Master Page Config (Hero & SEO)
+        const { data: pageData, error: pageError } = await supabase
+          .from('pages')
+          .select('*')
+          .eq('slug', 'home')
+          .single();
+
+        if (pageData) {
+            // Merge pageData into a reliable config object
+            // We use this to feed the Hero and Meta
+            setSections(prev => {
+                // We keep prev sections if we want, but for now we are just setting state
+                // Actually, we need to fetch SECTIONS separately or merge efficiently.
+                // Let's store page config in a separate state or just use it directly.
+                return prev; 
+            });
+            // Better strategy: Store pageConfig in a ref or state
+            setPageConfig(pageData);
+        }
+
+        // 2. Fetch Body Sections
+        const { data: sectionData, error: sectionError } = await supabase
           .from('sections_home')
           .select('*')
           .eq('is_visible', true)
+          .neq('section_key', 'hero') // Exclude old hero if it exists
           .order('display_order', { ascending: true });
 
-        if (error) throw error;
-        setSections(data || []);
+        if (sectionError) throw sectionError;
+        setSections(sectionData || []);
       } catch (err) {
-        console.error('Error fetching page layout:', err);
+        console.error('Error fetching page data:', err);
       } finally {
         setLoading(false);
       }
@@ -63,31 +86,26 @@ const Index = () => {
 
     fetchPage();
 
-    // Real-time subscription for layout updates
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'sections_home',
-        },
-        () => {
-          console.log('Real-time update received: sections_home');
-          fetchPage();
-        }
-      )
-      .subscribe();
+    // Real-time subscriptions
+    const pageChannel = supabase
+        .channel('home-page-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'home'" }, () => fetchPage())
+        .subscribe();
+
+    const sectionsChannel = supabase
+        .channel('home-sections-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_home' }, () => fetchPage())
+        .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(pageChannel);
+      supabase.removeChannel(sectionsChannel);
     };
   }, []);
 
+  const [pageConfig, setPageConfig] = useState<any>(null); // New state for Master Config
 
-
-// ... imports
+  // ... imports
 
   // Section Renderer
   const renderSection = (section: any) => {
@@ -96,18 +114,8 @@ const Index = () => {
     const alignClass = ALIGN_MAP[section.alignment] || ALIGN_MAP['left'];
     // Theme is handled in the wrapper (parent div)
 
-
     switch (section.section_key) {
-      case 'hero':
-        return (
-          <Hero 
-            badge={section.badge || getText('hero.badge', 'The Premier Growth Transformation Firm')}
-            title={section.title || getText('hero.title', 'Build a Customer-Led Growth Engine That Scales')}
-            subtitle={section.subtitle || getText('hero.subtitle', 'Integrated Go-To-Market and Customer Transformation.')}
-            primaryCta={section.primary_cta_text || getText('hero.primary_cta', 'Book a Growth Strategy Review')}
-            secondaryCta={section.secondary_cta_text || getText('hero.secondary_cta', 'Explore Transformation Programs')}
-          />
-        );
+      // 'hero' case is removed from here because it's handled by Master Page Config
       
       case 'what_means':
         const specific = section.specific_data || {};
@@ -251,8 +259,22 @@ const Index = () => {
     <div className="min-h-screen bg-background font-sans text-foreground">
       <Navbar />
       <main>
+        {/* Master Hero Render */}
+        <Hero 
+            badge={getText('hero.badge', 'The Premier Growth Transformation Firm')} // Badge might not be in pages table yet, defaulting or using content.
+            title={pageConfig?.title || 'Build a Customer-Led Growth Engine That Scales'}
+            subtitle={pageConfig?.subtitle}
+            primaryCta={pageConfig?.cta_text}
+            primaryCtaLink={pageConfig?.cta_link}
+            // Logic: Media Type from Master Config
+            mediaType={pageConfig?.media_type || 'image'}
+            backgroundImage={pageConfig?.hero_image_url}
+            videoUrl={pageConfig?.hero_video_url}
+            overlayOpacity={pageConfig?.overlay_opacity}
+        />
+
         {sections.length > 0 ? (
-          // Render Dynamic Sections
+          // Render Dynamic Sections (Body)
           sections.map((section) => (
             <div key={section.id} className={THEME_MAP[section.bg_theme] || THEME_MAP['light']}>
                {renderSection(section)}

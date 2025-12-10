@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import Hero from "@/components/Hero";
 
 interface Section {
   id: string;
@@ -21,18 +22,26 @@ interface Section {
 const About = () => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pageConfig, setPageConfig] = useState<any>(null);
 
   useEffect(() => {
-    const fetchSections = async () => {
+    const fetchPage = async () => {
       try {
-        const { data, error } = await supabase
+        setLoading(true);
+        // 1. Fetch Master Page
+        const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'about').single();
+        if (pageData) setPageConfig(pageData);
+
+        // 2. Fetch Sections
+        const { data: sectionData, error } = await supabase
           .from('sections_about')
           .select('*')
           .eq('is_visible', true)
+          .neq('section_key', 'hero')
           .order('display_order', { ascending: true });
 
         if (error) throw error;
-        setSections(data || []);
+        setSections(sectionData || []);
       } catch (error) {
         console.error("Error fetching about sections:", error);
       } finally {
@@ -40,7 +49,7 @@ const About = () => {
       }
     };
 
-    fetchSections();
+    fetchPage();
   }, []);
 
   const renderContent = (content?: string) => {
@@ -62,24 +71,8 @@ const About = () => {
 
     const alignClass = alignment === 'center' ? 'text-center mx-auto' : 'text-left';
     const containerClass = `py-20 ${themeClasses[bg_theme] || themeClasses.light}`;
-
-    if (section_key === 'hero') {
-      return (
-        <section key={section.id} className="pt-32 pb-20 bg-[#0A192F] text-white text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-          <div className="container mx-auto px-4 relative z-10 animate-fade-in-up">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-              {title}
-            </h1>
-            {subtitle && (
-              <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto font-light leading-relaxed">
-                {subtitle}
-              </p>
-            )}
-          </div>
-        </section>
-      );
-    }
+    
+    // Hero case removed (handled by component)
 
     return (
       <section key={section.id} className={containerClass}>
@@ -116,11 +109,25 @@ const About = () => {
     <div className="min-h-screen bg-background font-sans">
       <Navbar />
       <main>
+        <Hero 
+           mediaType={pageConfig?.media_type || 'image'}
+           videoUrl={pageConfig?.hero_video_url}
+           backgroundImage={pageConfig?.hero_image_url}
+           overlayOpacity={pageConfig?.overlay_opacity}
+           title={pageConfig?.title}
+           subtitle={pageConfig?.subtitle}
+           // Use title/subtitle only, About might not have CTAs.
+        />
+
         {sections.length > 0 ? (
-          sections.map(renderSection)
+          sections.map(section => (
+               <div key={section.id}>
+                    {renderSection(section)}
+               </div>
+          ))
         ) : (
           <div className="container mx-auto py-32 text-center text-muted-foreground">
-            No content available.
+             {/* If DB empty, just show loading or empty state. */}
           </div>
         )}
       </main>

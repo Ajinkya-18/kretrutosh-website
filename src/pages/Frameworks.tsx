@@ -7,6 +7,7 @@ import { ArrowRight, Megaphone, Ear, BookOpen, BarChart, Scale, HeartHandshake, 
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
+import Hero from "@/components/Hero";
 
 // Map string names from DB to actual Lucide components
 const iconMap: Record<string, any> = {
@@ -26,10 +27,16 @@ const Frameworks = () => {
   const navigate = useNavigate();
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [pageConfig, setPageConfig] = useState<any>(null);
 
   useEffect(() => {
-    const fetchFrameworks = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
+      // 1. Fetch Master Page
+      const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'frameworks').single();
+      if (pageData) setPageConfig(pageData);
+
+      // 2. Fetch Frameworks
       const { data, error } = await supabase
         .from('frameworks')
         .select('*')
@@ -43,33 +50,23 @@ const Frameworks = () => {
       setIsLoading(false);
     };
 
-    fetchFrameworks();
+    fetchData();
   }, []);
 
   return (
     <div className="min-h-screen bg-background font-sans">
       <Navbar />
       
-      <section className="relative pt-32 pb-20 bg-gradient-hero overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-block px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/10 backdrop-blur-sm mb-6">
-              <span className="text-secondary font-medium text-sm tracking-wide uppercase">Proprietary Toolkit</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Signature <span className="text-secondary">Frameworks</span>
-            </h1>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-8">
-              We don't just consult; we equip you with battle-tested methodologies to drive predictable, scalable growth.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      {/* Master Hero */}
+      <Hero 
+           mediaType={pageConfig?.media_type || 'image'}
+           videoUrl={pageConfig?.hero_video_url}
+           backgroundImage={pageConfig?.hero_image_url}
+           overlayOpacity={pageConfig?.overlay_opacity}
+           title={pageConfig?.title}
+           subtitle={pageConfig?.subtitle}
+           badge="PROPRIETARY TOOLKIT"
+      />
 
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
