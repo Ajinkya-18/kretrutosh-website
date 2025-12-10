@@ -12,43 +12,43 @@ All colors MUST be HSL.
   :root {
     /* Premium Navy & Gold Theme - Light Mode */
     --background: 210 40% 98%; /* Very light blue-grey tint */
-    --foreground: 222 47% 11%; /* Deep Navy */
+    --foreground: 220 70% 14%; /* #0B1C3E - Brand Navy */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 220 70% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 220 70% 14%;
 
-    --primary: 222 47% 11%; /* Deep Navy */
+    --primary: 220 70% 14%; /* #0B1C3E - Brand Navy */
     --primary-foreground: 210 40% 98%;
-    --primary-glow: 222 47% 20%;
+    --primary-glow: 220 70% 25%;
 
-    --secondary: 25 95% 50%; /* Orange */
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 30 100% 60%; /* #FF9933 - Brand Saffron */
+    --secondary-foreground: 220 70% 14%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 25 95% 50%; /* Orange */
-    --accent-foreground: 222 47% 11%;
-    --accent-hover: 25 95% 45%;
+    --accent: 30 100% 60%; /* #FF9933 - Brand Saffron */
+    --accent-foreground: 220 70% 14%;
+    --accent-hover: 30 100% 55%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222 47% 11%;
+    --ring: 220 70% 14%;
 
     --radius: 0.5rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(215 32% 17%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(217 33% 17%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(220 70% 14%) 0%, hsl(220 60% 20%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 70% 14%) 0%, hsl(220 60% 20%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
     --gradient-subtle: linear-gradient(135deg, hsl(210 40% 98%) 0%, hsl(0 0% 100%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(25 95% 50%) 0%, hsl(30 100% 60%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(30 100% 60%) 0%, hsl(30 100% 65%) 100%);
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 hsl(222 47% 11% / 0.05);

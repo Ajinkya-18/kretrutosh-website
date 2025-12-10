@@ -1,24 +1,23 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import NotFound from "./NotFound";
 import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 
-// Placeholder interfaces
 interface Assessment {
   id: number;
   title: string;
   slug: string;
   description: string;
-  // Add other fields as per assessments table if known. 
-  // Assuming basic fields for now.
+  external_link?: string;
+  image_url?: string;
 } 
 
 const AssessmentDetail = () => {
@@ -33,9 +32,6 @@ const AssessmentDetail = () => {
       if (!slug) return;
       setLoading(true);
 
-      // 1. Fetch Assessment Meta
-      // Note: If 'assessments' table does not truly exist or has different schema, this might fail.
-      // Assuming 'assessments' table matches standard pattern.
       const { data: metaData, error: metaError } = await supabase
         .from('assessments')
         .select('*')
@@ -44,14 +40,12 @@ const AssessmentDetail = () => {
 
       if (metaError) {
           console.error("Errors fetching assessment:", metaError);
-          // If 406 or Not Found, maybe handle gracefully?
           setAssessment(null);
           setLoading(false);
           return;
       }
       setAssessment(metaData);
 
-      // 2. Fetch Sections
       const { data: secData, error: secError } = await supabase
         .from('sections_assessment_details')
         .select('*')
@@ -67,7 +61,6 @@ const AssessmentDetail = () => {
 
     fetchData();
 
-    // Real-time
     const channel = supabase
       .channel(`assessment-${slug}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_assessment_details', filter: `parent_slug=eq.${slug}` }, () => fetchData())
@@ -104,11 +97,40 @@ const AssessmentDetail = () => {
       <SEO title={assessment.title} description={assessment.description} />
       <Navbar />
 
-      <div className="pt-32 pb-12 bg-muted/30">
+      <div className="pt-32 pb-20 bg-muted/30 border-b border-border/50">
           <div className="container mx-auto px-4">
-             <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 pl-0 hover:bg-transparent hover:text-primary"><ArrowLeft className="mr-2 h-4 w-4"/> Back</Button>
-             <h1 className="text-4xl font-bold mb-4">{assessment.title}</h1>
-             <p className="text-xl text-muted-foreground">{assessment.description}</p>
+             <Button variant="ghost" onClick={() => navigate(-1)} className="mb-8 pl-0 hover:bg-transparent hover:text-primary group"><ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform"/> Back to Assessments</Button>
+             
+             <div className="flex flex-col lg:flex-row gap-12 items-start">
+                 <div className="flex-1">
+                     <h1 className="text-4xl md:text-5xl font-bold mb-6 text-primary">{assessment.title}</h1>
+                     <p className="text-xl text-muted-foreground leading-relaxed mb-8">{assessment.description}</p>
+                     
+                     {assessment.external_link ? (
+                         <div className="flex flex-col sm:flex-row gap-4">
+                             <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 h-auto py-4 px-8 text-lg" asChild>
+                                 <a href={assessment.external_link} target="_blank" rel="noopener noreferrer">
+                                     Start Assessment Now <ArrowRight className="ml-2 h-5 w-5"/>
+                                 </a>
+                             </Button>
+                         </div>
+                     ) : (
+                         <div className="p-4 bg-primary/5 rounded-lg border border-primary/10 inline-block">
+                             <p className="font-semibold text-primary">This assessment requires consultant access.</p>
+                             <Button variant="link" className="px-0 text-secondary" asChild><Link to="/contact">Contact us to enable access</Link></Button>
+                         </div>
+                     )}
+                 </div>
+
+                 {assessment.external_link && (
+                     <div className="hidden lg:block">
+                         <div className="text-center">
+                             <p className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">Scan to Start on Mobile</p>
+                             <QRCodeGenerator url={assessment.external_link} size={180} />
+                         </div>
+                     </div>
+                 )}
+             </div>
           </div>
       </div>
 
