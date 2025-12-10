@@ -46,7 +46,6 @@ const ServiceDetail = () => {
           filter: `page_slug=eq.${slug}`,
         },
         () => {
-           console.log('Real-time update received: sections_services');
            fetchSections();
         }
       )
