@@ -19,6 +19,7 @@ import Frameworks from "./pages/Frameworks";
 import FrameworkDetail from "./pages/FrameworkDetail";
 import IndustryDetail from "./pages/IndustryDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
+import Assessments from "./pages/Assessments";
 import ServiceDetail from "./pages/ServiceDetail"; // New Dynamic Page
 
 // --- Resources & Legal ---
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/industries/:id" element={<IndustryDetail />} />
             
             {/* --- Assessments Routes --- */}
+            <Route path="/assessments" element={<Assessments />} />
             <Route path="/assessments/:id" element={<AssessmentDetail />} />
 
             {/* --- Resources Routes --- */}
