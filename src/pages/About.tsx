@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Hero from "@/components/Hero";
+import ClientLogos from "@/components/home/ClientLogos";
 
 interface Section {
   id: string;
@@ -134,6 +135,8 @@ const About = () => {
            subtitle={pageConfig?.subtitle}
            // Use title/subtitle only, About might not have CTAs.
         />
+
+        <ClientLogos />
 
         {sections.length > 0 ? (
           sections.map(section => (

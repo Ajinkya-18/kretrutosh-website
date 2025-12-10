@@ -276,7 +276,11 @@ const Index = () => {
         {sections.length > 0 ? (
           // Render Dynamic Sections (Body)
           sections.map((section) => (
-            <div key={section.id} className={THEME_MAP[section.bg_theme] || THEME_MAP['light']}>
+            <div 
+                key={section.id} 
+                id={section.section_key} // deep-linking support
+                className={THEME_MAP[section.bg_theme] || THEME_MAP['light']}
+            >
                {renderSection(section)}
             </div>
           ))

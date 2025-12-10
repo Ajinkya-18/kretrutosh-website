@@ -171,9 +171,17 @@ const CaseStudiesPage = () => {
                               </li>
                             ))}
                           </ul>
-                          <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                            Read Full Story
-                          </Button>
+                          {study.link_url ? (
+                              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all" asChild>
+                                  <a href={study.link_url} target="_blank" rel="noopener noreferrer">
+                                      Read Full Story <ArrowRight className="ml-2 h-4 w-4" />
+                                  </a>
+                              </Button>
+                          ) : (
+                              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                                  Read Full Story
+                              </Button>
+                          )}
                         </div>
                       </div>
                     </Card>

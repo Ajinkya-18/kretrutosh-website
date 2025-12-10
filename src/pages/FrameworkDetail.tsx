@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft, CheckCircle2, Layers, Megaphone, Ear, BookOpen, BarChart, Scale, HeartHandshake, Thermometer, Trophy, Map, Calculator, Factory } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Layers, Megaphone, Ear, BookOpen, BarChart, Scale, HeartHandshake, Thermometer, Trophy, Map, Calculator, Factory, Target } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -104,17 +104,18 @@ const FrameworkDetail = () => {
   
   if (!framework) return <NotFound />;
 
-  const Icon = iconMap[framework.icon_name] || Layers;
+  const Icon = iconMap[framework.icon_name] || iconMap['Layers'] || Layers;
+
+  // Separate sections for layout reordering
+  const idealSection = sections.find(s => s.section_key === 'ideal' || s.title?.toLowerCase().includes('ideal'));
+  const overviewSection = sections.find(s => s.section_key === 'overview');
+  const otherSections = sections.filter(s => s !== idealSection && s !== overviewSection);
 
   // Helper to render dynamic sections
   const renderSection = (section: any) => {
     const gridClass = GRID_MAP[section.grid_columns] || GRID_MAP[1];
     const themeClass = THEME_MAP[section.bg_theme] || THEME_MAP['light'];
 
-    // If it's a known "special" section key that needs custom logic, handle it.
-    // Otherwise, generic render.
-    
-    // Example Special Blocks (migrated from old hardcoded layout):
     if (section.section_key === 'overview') {
         return (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
@@ -124,10 +125,7 @@ const FrameworkDetail = () => {
                       {section.content_body} 
                    </div>
                 </div>
-                {/* Right side widgets can be hardcoded or another section? 
-                    For now, preserving the Outcome widget on the right as part of the page layout or separate section.
-                    If the user wants FULL control, we should assume the 'outcomes' widget is its own section.
-                */}
+                {/* Right side widgets can be managed here if needed */}
             </div>
         );
     }
@@ -203,16 +201,60 @@ const FrameworkDetail = () => {
 
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
-           {/* If no sections, show legacy fallback (optional) or just empty */}
-           {sections.length > 0 ? (
-               <div className="space-y-20">
-                   {sections.map(section => (
-                       <div key={section.id} className={THEME_MAP[section.bg_theme] || ''}>
-                           {renderSection(section)}
-                       </div>
-                   ))}
+            
+            {/* Top Section: Ideal For + Measurable Outcomes */}
+            <div className="grid md:grid-cols-2 gap-12 mb-20 animate-fade-in-up">
+                {/* Ideal For (Left) */}
+                {idealSection ? (
+                    <div className="bg-secondary/5 p-8 rounded-2xl border border-secondary/20">
+                        <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+                            <Target className="h-6 w-6 text-secondary" />
+                            {idealSection.title}
+                        </h3>
+                        <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
+                            {idealSection.content_body}
+                        </div>
+                    </div>
+                ) : (
+                    // Fallback if 'ideal' section is missing - maybe render outcomes full width?
+                    // For now, keeping empty or placeholder if needed.
+                    <div className="hidden md:block" /> 
+                )}
+
+                {/* Measurable Outcomes (Right) */}
+                <div className="bg-primary/5 p-8 rounded-2xl border border-primary/10">
+                    <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+                        <Trophy className="h-6 w-6 text-secondary" />
+                        Measurable Outcomes
+                    </h3>
+                    <ul className="space-y-4">
+                        {framework.outcomes?.map((outcome, idx) => (
+                            <li key={idx} className="flex items-start gap-3">
+                                <CheckCircle2 className="h-5 w-5 text-secondary shrink-0 mt-1" />
+                                <span className="text-foreground/80 font-medium">{outcome}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+
+           {/* Remaining Dynamic Sections */}
+           <div className="space-y-20">
+               {otherSections.map(section => (
+                   <div key={section.id} className={THEME_MAP[section.bg_theme] || ''}>
+                       {renderSection(section)}
+                   </div>
+               ))}
+           </div>
+           
+           {/* Overview (Bottom) */}
+           {overviewSection && (
+               <div className={`mt-20 ${THEME_MAP[overviewSection.bg_theme] || ''}`}>
+                   {renderSection(overviewSection)}
                </div>
-           ) : (
+           )}
+
+           {sections.length === 0 && (
                <div className="text-center py-20 text-muted-foreground">
                    No details available for this framework yet.
                </div>

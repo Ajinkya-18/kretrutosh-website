@@ -67,7 +67,7 @@ const ClientLogos = ({ title }: ClientLogosProps) => {
   return (
     <section className="py-10 bg-white overflow-hidden border-y border-border/50">
       <div className="container mx-auto px-4 mb-6 text-center">
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">
+        <p className="text-lg font-bold text-gray-800 uppercase tracking-[0.2em]">
           {title || "Trusted by Industry Leaders"}
         </p>
       </div>

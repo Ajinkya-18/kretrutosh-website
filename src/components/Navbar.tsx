@@ -177,7 +177,7 @@ const Navbar = () => {
                 asChild 
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
-                <Link to="/contact">{getText('navbar.cta', 'Book Strategy Review')}</Link>
+                <Link to="/contact">{getText('navbar.cta', 'Book a Growth Strategy Review')}</Link>
               </Button>
             </div>
           </div>
@@ -237,7 +237,7 @@ const Navbar = () => {
               <div className="pt-4 mt-2 border-t border-border">
                 <Button className="w-full bg-primary text-primary-foreground" asChild>
                   <Link to="/contact">
-                    {getText('navbar.cta', 'Book Strategy Review')}
+                    {getText('navbar.cta', 'Book a Growth Strategy Review')}
                   </Link>
                 </Button>
               </div>

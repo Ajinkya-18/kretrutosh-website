@@ -101,6 +101,14 @@ const Footer = () => {
                   <Twitter size={20} />
                 </a>
               </div>
+              
+              {/* LinkedIn Script */}
+              <div className="mt-4">
+                 <div dangerouslySetInnerHTML={{ __html: `
+                    <script src="https://platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+                    <script type="IN/FollowCompany" data-id="72285978" data-counter="bottom"></script>
+                 `}} />
+              </div>
           </div>
 
 

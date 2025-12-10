@@ -59,6 +59,7 @@ const IndustryDetail = () => {
   const navigate = useNavigate();
   const [industryMeta, setIndustryMeta] = useState<Industry | null>(null);
   const [sections, setSections] = useState<any[]>([]);
+  const [caseStudies, setCaseStudies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { getText } = useContent('industry_detail');
 
@@ -93,6 +94,25 @@ const IndustryDetail = () => {
         
         if (sectionsError) console.error("Error fetching sections:", sectionsError);
         setSections(sectionsData || []);
+
+        // 3. Fetch Linked Case Studies (Success Stories)
+        const { data: csData } = await supabase
+            .from('case_studies')
+            .select('*')
+            .eq('industry_slug', slug) // Assuming column added by SQL
+            .limit(3); 
+        
+        // Fallback: if no slug match, try name match
+        if (!csData || csData.length === 0) {
+             const { data: csDataBackup } = await supabase
+                .from('case_studies')
+                .select('*')
+                .ilike('industry', `%${metaData.title}%`)
+                .limit(3);
+             setCaseStudies(csDataBackup || []);
+        } else {
+             setCaseStudies(csData || []);
+        }
 
       } catch (err) {
           console.error("Unexpected error:", err);
@@ -158,9 +178,10 @@ const IndustryDetail = () => {
                    <div className={`${alignClass} space-y-4`}>
                       {section.title && <h2 className="text-3xl font-bold">{section.title}</h2>}
                       {section.content_body && (
-                          <div className="prose max-w-none text-muted-foreground whitespace-pre-line">
-                              {section.content_body}
-                          </div>
+                          <div 
+                            className="prose max-w-none text-muted-foreground whitespace-pre-line"
+                            dangerouslySetInnerHTML={{ __html: section.content_body }} // Allow Rich Text/HTML
+                          />
                       )}
                       {section.image_url && (
                           <img src={section.image_url} alt={section.title} className="rounded-xl shadow-md mt-4 max-h-96 object-cover" />
@@ -236,6 +257,31 @@ const IndustryDetail = () => {
                 </div>
           )}
       </div>
+
+      {/* Success Stories (Case Studies) Section */}
+      {caseStudies.length > 0 && (
+        <section className="py-24 bg-muted/30 border-t border-border/50">
+            <div className="container mx-auto px-4">
+                <div className="flex items-center justify-between mb-12">
+                     <h2 className="text-3xl font-bold">Success Stories</h2>
+                     <Button variant="outline" onClick={() => navigate('/case-studies')}>View All Stories</Button>
+                </div>
+                <div className="grid md:grid-cols-3 gap-8">
+                     {caseStudies.map(study => (
+                         <Card key={study.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/case-studies#case-study-${study.id}`)}>
+                             <CardContent className="p-6">
+                                 <h3 className="font-bold text-xl mb-3 line-clamp-2">{study.title}</h3>
+                                 <p className="text-muted-foreground mb-4 line-clamp-3">{study.challenge}</p>
+                                 <div className="text-sm font-semibold text-primary">
+                                     Read Story <ArrowRight className="inline w-4 h-4 ml-1" />
+                                 </div>
+                             </CardContent>
+                         </Card>
+                     ))}
+                </div>
+            </div>
+        </section>
+      )}
 
       <Footer />
     </div>
