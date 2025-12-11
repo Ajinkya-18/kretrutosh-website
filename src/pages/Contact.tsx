@@ -116,9 +116,31 @@ const Contact = () => {
                                  </div>
 
                                  <div className="space-y-8">
-                                    {/* Dynamic Info Render or Fallback */}
-                                    {infoBlock && infoBlock.content_body ? (
-                                        infoBlock.content_body.split('\n').filter(l => l.trim()).map((line, idx) => {
+                                    {/* Dynamic Info Render: Priority to Structured Data */}
+                                    {infoBlock && (infoBlock.specific_data?.items ? (
+                                        // New Visual Editor Data
+                                        infoBlock.specific_data.items.map((item: any, idx: number) => {
+                                            let Icon = Zap;
+                                            if (item.type === 'email') Icon = Mail;
+                                            if (item.type === 'location') Icon = MapPin;
+                                            if (item.type === 'linkedin') Icon = Linkedin;
+                                            if (item.type === 'phone') Icon = Phone;
+
+                                            return (
+                                                <div key={idx} className="flex items-start gap-6 group">
+                                                    <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                                                        <Icon className="h-6 w-6 text-secondary" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-lg font-bold text-white mb-1">{item.label}</h4>
+                                                        <p className="text-white/70">{item.value}</p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    ) : infoBlock.content_body ? (
+                                        // Legacy Text Data
+                                        infoBlock.content_body.split('\n').filter((l: string) => l.trim()).map((line: string, idx: number) => {
                                             let Icon = Zap;
                                             if (line.toLowerCase().includes('email')) Icon = Mail;
                                             if (line.toLowerCase().includes('location')) Icon = MapPin;
@@ -159,7 +181,7 @@ const Contact = () => {
                                                 </div>
                                             </div>
                                         </>
-                                    )}
+                                    ))}
                                  </div>
                              </div>
 
@@ -177,12 +199,23 @@ const Contact = () => {
                         <div className="container mx-auto px-4 text-center max-w-4xl">
                             <h2 className="text-3xl font-bold text-primary mb-12">{section.title}</h2>
                             <div className="grid md:grid-cols-2 gap-8 text-left">
-                                {section.content_body?.split('\n').filter(l => l.includes('•')).map((item, idx) => (
-                                     <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
-                                         <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                         <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
-                                     </div>
-                                ))}
+                                {section.specific_data?.items ? (
+                                    // Visual Editor Data
+                                    section.specific_data.items.map((item: any, idx: number) => (
+                                         <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
+                                             <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
+                                             <p className="text-lg text-foreground/80 leading-relaxed">{item.text}</p>
+                                         </div>
+                                    ))
+                                ) : (
+                                    // Legacy Text Data
+                                    section.content_body?.split('\n').filter((l: string) => l.includes('•')).map((item: string, idx: number) => (
+                                         <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
+                                             <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
+                                             <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
+                                         </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </section>
