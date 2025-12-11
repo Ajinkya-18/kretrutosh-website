@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -260,6 +261,11 @@ const Index = () => {
   
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
+      <SEO 
+        title={pageConfig?.meta_title || "KretruTosh Consulting | GTM & CX Transformation"}
+        description={pageConfig?.meta_description || "Build a customer-led growth engine with our proven frameworks and strategies."}
+        image={pageConfig?.hero_image_url}
+      />
       <Navbar />
       <main>
         {/* Master Hero Render */}

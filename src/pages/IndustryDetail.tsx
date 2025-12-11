@@ -149,9 +149,20 @@ const IndustryDetail = () => {
       )
       .subscribe();
 
+    // Real-time subscription for Case Studies (Success Stories)
+    const csChannel = supabase
+      .channel(`industry-cs-${slug}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'case_studies' },
+        () => fetchData()
+      )
+      .subscribe();
+
     return () => { 
         supabase.removeChannel(channel);
         supabase.removeChannel(metaChannel);
+        supabase.removeChannel(csChannel);
     };
   }, [slug]);
 
@@ -218,7 +229,7 @@ const IndustryDetail = () => {
   return (
     <div className="min-h-screen bg-background font-sans">
       <SEO 
-        title={industryMeta.meta_title || industryMeta.title}
+        title={`${industryMeta.meta_title || industryMeta.title} Consulting | KretruTosh`}
         description={industryMeta.meta_description || industryMeta.description}
       />
       <Navbar />

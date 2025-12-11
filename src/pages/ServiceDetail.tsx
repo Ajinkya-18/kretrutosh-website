@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Loader2 } from "lucide-react";
 import NotFound from "./NotFound";
+import SEO from "@/components/SEO";
 import RichText from "@/components/ui/RichText";
 import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
 
@@ -17,24 +18,35 @@ const DefaultIcon = Target;
 const ServiceDetail = () => {
   const { slug } = useParams();
   const [sections, setSections] = useState<any[]>([]);
+  const [serviceMeta, setServiceMeta] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSections = async () => {
+    const fetchData = async () => {
       if (!slug) return;
+      
+      // 1. Fetch Metadata
+      const { data: meta } = await supabase
+        .from('services')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+        
+      if (meta) setServiceMeta(meta);
+
+      // 2. Fetch Sections
       const { data, error } = await supabase
         .from('sections_services')
         .select('*')
-        .eq('page_slug', slug)
+        .eq('page_slug', slug) // Note: confirm if column is 'page_slug' or 'service_slug'. Step 564 used 'page_slug'.
         .eq('is_visible', true)
         .order('display_order', { ascending: true });
 
       if (data) setSections(data);
       setLoading(false);
     };
-    fetchSections();
+    fetchData();
 
-    // Real-time subscription
     // Real-time subscription
     const channel = supabase
       .channel(`services-${slug}`)
@@ -44,15 +56,11 @@ const ServiceDetail = () => {
           event: '*',
           schema: 'public',
           table: 'sections_services',
-          filter: `page_slug=eq.${slug}`, // Hyphens in slugs usually work without quotes in realtime, but let's try strict string matching if issues persist.
-          // Actually, 'page_slug=eq.pre-sales' is valid.
-          // Problem might be related to previous component state not updating or fetchSections not running.
-          // Let's add a console log to debug in user environment if possible, or just force the fetch.
-          // Filter safety: `page_slug=eq.${slug}`
+          filter: `page_slug=eq.${slug}`,
         },
         (payload) => {
            console.log('Realtime update:', payload);
-           fetchSections();
+           fetchData();
         }
       )
       .subscribe();
@@ -240,6 +248,11 @@ const ServiceDetail = () => {
 
   return (
     <div className="min-h-screen bg-background font-sans">
+      <SEO 
+        title={`${serviceMeta?.meta_title || serviceMeta?.title || 'Service'} | KretruTosh`}
+        description={serviceMeta?.meta_description || serviceMeta?.short_description}
+        image={serviceMeta?.hero_image_url}
+      />
       <Navbar />
       {sections.map(section => (
         <div key={section.id}>

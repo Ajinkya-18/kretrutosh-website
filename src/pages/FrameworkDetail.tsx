@@ -160,7 +160,7 @@ const FrameworkDetail = () => {
   return (
     <div className="min-h-screen bg-background font-sans">
       <SEO 
-        title={framework.meta_title || framework.title}
+        title={`${framework.meta_title || framework.title} | KretruTosh`}
         description={framework.meta_description || framework.short_description}
         image={framework.image_url || undefined}
       />

@@ -60,6 +60,23 @@ const CaseStudiesPage = () => {
     };
 
     fetchData();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel('case-studies-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'case_studies' },
+        (payload) => {
+          console.log('Case Studies changed:', payload);
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Scroll to hash after data loads
