@@ -12,7 +12,8 @@ interface Video {
   id: number;
   title: string;
   description: string;
-  youtubeId: string;
+  youtube_id: string;
+  date_published?: string;
 }
 
 const Videos = () => {
@@ -108,7 +109,7 @@ const Videos = () => {
                       <div className="relative aspect-video rounded-lg overflow-hidden bg-muted mb-4">
                         <iframe
                           className="w-full h-full"
-                          src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                          src={`https://www.youtube.com/embed/${video.youtube_id}`}
                           title={video.title}
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen

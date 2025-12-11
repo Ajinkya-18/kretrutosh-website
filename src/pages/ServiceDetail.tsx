@@ -96,7 +96,7 @@ const ServiceDetail = () => {
                 </p>
                 {section.primary_cta_text && (
                     <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6 h-auto shadow-glow">
-                    <Link to="/contact">
+                    <Link to={section.primary_cta_link || "/contact"}>
                         {section.primary_cta_text}
                         <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
@@ -205,7 +205,7 @@ const ServiceDetail = () => {
                   </p>
                   {section.primary_cta_text && (
                     <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white hover:text-primary mt-2">
-                        <Link to="/case-studies">{section.primary_cta_text}</Link>
+                        <Link to={section.primary_cta_link || "/case-studies"}>{section.primary_cta_text}</Link>
                     </Button>
                   )}
                 </div>
