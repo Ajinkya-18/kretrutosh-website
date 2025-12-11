@@ -48,88 +48,69 @@ const ContactForm = () => {
   };
 
   return (
-    <section id="contact" className="py-24 bg-muted/30 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
-        <div className="absolute top-1/4 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16 animate-fade-in space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-primary">
-            {getText('form.title', 'Get In Touch')}
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
-            {getText('form.desc', "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.")}
-          </p>
-        </div>
-
-        <Card className="border-border/50 shadow-elegant backdrop-blur-sm bg-card/80 max-w-xl mx-auto animate-scale-in">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-primary">Send us a message</CardTitle>
-            <CardDescription>Fill out the form below and we'll get back to you shortly</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Your name"
-                  className="bg-background/50 border-input/50 focus:border-primary focus:ring-primary/20 transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="your@email.com"
-                  className="bg-background/50 border-input/50 focus:border-primary focus:ring-primary/20 transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject *</Label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  placeholder="How can we help?"
-                  className="bg-background/50 border-input/50 focus:border-primary focus:ring-primary/20 transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="message">Message *</Label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  placeholder="Tell us more about your inquiry..."
-                  className="min-h-[120px] bg-background/50 border-input/50 focus:border-primary focus:ring-primary/20 transition-all"
-                />
-              </div>
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all" disabled={isSubmitting}>
-                {isSubmitting ? "Sending..." : getText('form.btn', 'Send Message')}
-                <Send className="ml-2 h-4 w-4" />
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
+    <Card className="border-white/10 shadow-2xl backdrop-blur-md bg-white/5 text-white w-full animate-scale-in">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-white">Send us a message</CardTitle>
+        <CardDescription className="text-white/60">Fill out the form below and we'll get back to you shortly</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-white">Name *</Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              placeholder="Your name"
+              className="bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-secondary focus:ring-secondary/20 transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">Email *</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              placeholder="your@email.com"
+              className="bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-secondary focus:ring-secondary/20 transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="subject" className="text-white">Subject *</Label>
+            <Input
+              id="subject"
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+              required
+              placeholder="How can we help?"
+              className="bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-secondary focus:ring-secondary/20 transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="message" className="text-white">Message *</Label>
+            <Textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              required
+              placeholder="Tell us more about your inquiry..."
+              className="min-h-[120px] bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-secondary focus:ring-secondary/20 transition-all"
+            />
+          </div>
+          <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90 text-primary-foreground font-bold shadow-lg hover:shadow-xl transition-all h-12" disabled={isSubmitting}>
+            {isSubmitting ? "Sending..." : getText('form.btn', 'Send Message')}
+            <Send className="ml-2 h-4 w-4" />
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

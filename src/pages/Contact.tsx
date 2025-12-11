@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Loader2, Zap, Mail, MapPin, Linkedin } from "lucide-react";
+import { Loader2, Zap, Mail, MapPin, Linkedin, Phone } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import Hero from "@/components/Hero";
+import { useContent } from "@/hooks/useContent";
 
 interface Section {
   id: string;
@@ -19,177 +20,162 @@ interface Section {
 }
 
 const Contact = () => {
-  const [sections, setSections] = useState<Section[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pageConfig, setPageConfig] = useState<any>(null);
+    const [sections, setSections] = useState<Section[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [pageConfig, setPageConfig] = useState<any>(null);
+    const { getText } = useContent('contact');
 
-  useEffect(() => {
-    const fetchPage = async () => {
-      try {
-        setLoading(true);
-        // 1. Fetch Master Page
-        const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'contact').single();
-        if (pageData) setPageConfig(pageData);
+    useEffect(() => {
+        const fetchPage = async () => {
+            try {
+                setLoading(true);
+                // 1. Fetch Master Page
+                const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'contact').single();
+                if (pageData) setPageConfig(pageData);
 
-        // 2. Fetch Sections
-        const { data: sectionData, error } = await supabase
-          .from('sections_contact')
-          .select('*')
-          .eq('is_visible', true)
-          .neq('section_key', 'hero')
-          .order('display_order', { ascending: true });
+                // 2. Fetch Sections
+                const { data: sectionData, error } = await supabase
+                    .from('sections_contact')
+                    .select('*')
+                    .eq('is_visible', true)
+                    .neq('section_key', 'hero')
+                    .order('display_order', { ascending: true });
 
-        if (error) throw error;
-        setSections(sectionData || []);
-      } catch (error) {
-        console.error("Error fetching contact sections:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+                if (error) throw error;
+                setSections(sectionData || []);
+            } catch (error) {
+                console.error("Error fetching contact sections:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchPage();
-  }, []);
+        fetchPage();
+    }, []);
 
-  const renderContent = (content?: string) => {
-    if (!content) return null;
-    return content.split('\n').map((line, i) => (
-      line.trim() ? <p key={i} className="mb-4 text-lg leading-relaxed">{line}</p> : <br key={i} />
-    ));
-  };
+    // Extract Info Block data if available
+    const infoBlock = sections.find(s => s.section_key === 'info_block');
 
-  const renderSection = (section: Section) => {
-    const { section_key, title, subtitle, content_body, bg_theme, alignment } = section;
-    
-    // Theme Classes
-    const themeClasses = {
-      light: "bg-background text-foreground",
-      navy: "bg-[#0A192F] text-white",
-      gray: "bg-muted/30 text-foreground"
-    };
-
-    const alignClass = alignment === 'center' ? 'text-center mx-auto' : 'text-left';
-    const containerClass = `py-20 ${themeClasses[bg_theme] || themeClasses.light}`;
-
-    // Hero case handled by component outside
-
-    if (section_key === 'info_block') {
-         // Specialized Card Layout for Info
-         return (
-             <section key={section.id} className="py-20 relative -mt-16 z-20">
-                 <div className="container mx-auto px-4">
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        {/* Map the content_body lines to cards */}
-                        {content_body?.split('\n').filter(l => l.trim()).map((line, idx) => {
-                             let Icon = Zap; 
-                             let label = "Connect";
-                             
-                             if (line.toLowerCase().includes('email')) { Icon = Mail; label = "Email Us"; }
-                             if (line.toLowerCase().includes('location')) { Icon = MapPin; label = "Visit Us"; }
-                             if (line.toLowerCase().includes('linkedin')) { Icon = Linkedin; label = "Follow Us"; }
-
-                             return (
-                                <div key={idx} className="bg-white p-8 rounded-2xl shadow-xl border border-border/50 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center group">
-                                    <div className="h-14 w-14 bg-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors">
-                                        <Icon className="h-7 w-7 text-secondary" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-primary mb-3">{label}</h3>
-                                    <p className="text-muted-foreground font-medium">{line.replace(/^(Email:|Location:)/i, '').trim()}</p>
-                                </div>
-                             )
-                        })}
-                     </div>
-                 </div>
-             </section>
-         )
-    }
-
-    if (section_key === 'strategy_block') {
-        // Highlighted Value Proposition Block
+    if (loading) {
         return (
-            <section key={section.id} className="py-24 bg-muted/30 border-y border-border/50">
-                <div className="container mx-auto px-4 text-center max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold text-primary mb-12">{title}</h2>
-                    <div className="grid md:grid-cols-3 gap-8 text-left">
-                        {content_body?.split('\n').filter(l => l.includes('•')).map((item, idx) => (
-                             <div key={idx} className="flex gap-4">
-                                 <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                 <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
-                             </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-        )
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
     }
 
-    // Default Fallback
     return (
-      <section key={section.id} className={containerClass}>
-        <div className="container mx-auto px-4">
-          <div className={`max-w-4xl ${alignClass} animate-on-scroll`}>
-            {title && (
-              <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${bg_theme === 'navy' ? 'text-white' : 'text-primary'}`}>
-                {title}
-              </h2>
-            )}
-            {subtitle && (
-              <p className={`text-xl font-medium mb-8 ${bg_theme === 'navy' ? 'text-secondary' : 'text-secondary'}`}>
-                {subtitle}
-              </p>
-            )}
-            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert' : 'text-muted-foreground'}`}>
-               {renderContent(content_body)}
-            </div>
-          </div>
+        <div className="min-h-screen bg-background font-sans">
+            <Navbar />
+            <main>
+                <Hero
+                    mediaType={pageConfig?.media_type || 'image'}
+                    videoUrl={pageConfig?.hero_video_url}
+                    backgroundImage={pageConfig?.hero_image_url}
+                    overlayOpacity={pageConfig?.overlay_opacity}
+                    title={pageConfig?.title}
+                    subtitle={pageConfig?.subtitle}
+                />
+
+                <section className="py-24 bg-primary relative overflow-hidden">
+                     {/* Decorative Background */}
+                     <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 -skew-x-12 pointer-events-none" />
+                     <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+
+                     <div className="container mx-auto px-4 relative z-10">
+                        <div className="grid lg:grid-cols-2 gap-16 items-start">
+                             
+                             {/* Left Column: Contact Info & Context */}
+                             <div className="space-y-12 animate-fade-in-up">
+                                 <div>
+                                    <div className="inline-block px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-semibold uppercase tracking-wider mb-4 border border-secondary/20">
+                                        Let's Connect
+                                    </div>
+                                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                                        Ready to Transform Your Growth Engine?
+                                    </h2>
+                                    <p className="text-xl text-white/70 leading-relaxed font-light">
+                                        Whether you have a specific challenge or just want to explore what's possible, our team is ready to listen.
+                                    </p>
+                                 </div>
+
+                                 <div className="space-y-8">
+                                    {/* Dynamic Info Render or Fallback */}
+                                    {infoBlock && infoBlock.content_body ? (
+                                        infoBlock.content_body.split('\n').filter(l => l.trim()).map((line, idx) => {
+                                            let Icon = Zap;
+                                            if (line.toLowerCase().includes('email')) Icon = Mail;
+                                            if (line.toLowerCase().includes('location')) Icon = MapPin;
+                                            if (line.toLowerCase().includes('linkedin')) Icon = Linkedin;
+                                            if (line.toLowerCase().includes('phone')) Icon = Phone;
+
+                                            return (
+                                                <div key={idx} className="flex items-start gap-6 group">
+                                                    <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                                                        <Icon className="h-6 w-6 text-secondary" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-lg font-bold text-white mb-1">{line.split(':')[0]}</h4>
+                                                        <p className="text-white/70">{line.replace(/^[^:]+:/, '').trim()}</p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        // Static Fallback if DB is empty
+                                        <>
+                                            <div className="flex items-start gap-6 group">
+                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                                                    <Mail className="h-6 w-6 text-secondary" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-lg font-bold text-white mb-1">Email Us</h4>
+                                                    <p className="text-white/70">connect@kretrutosh.com</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-6 group">
+                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                                                     <Linkedin className="h-6 w-6 text-secondary" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-lg font-bold text-white mb-1">Follow Us</h4>
+                                                    <p className="text-white/70">KretruTosh Consulting</p>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                 </div>
+                             </div>
+
+                             {/* Right Column: The Form */}
+                             <div className="lg:pl-10">
+                                 <ContactForm />
+                             </div>
+                        </div>
+                     </div>
+                </section>
+                
+                {/* Additional Strategy Section if exists */}
+                {sections.filter(s => s.section_key === 'strategy_block').map(section => (
+                    <section key={section.id} className="py-24 bg-white">
+                        <div className="container mx-auto px-4 text-center max-w-4xl">
+                            <h2 className="text-3xl font-bold text-primary mb-12">{section.title}</h2>
+                            <div className="grid md:grid-cols-2 gap-8 text-left">
+                                {section.content_body?.split('\n').filter(l => l.includes('•')).map((item, idx) => (
+                                     <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
+                                         <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
+                                         <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
+                                     </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                ))}
+
+            </main>
+            <Footer />
         </div>
-      </section>
     );
-  };
-
-  if (loading) {
-     return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-     );
-  }
-
-  return (
-    <div className="min-h-screen bg-background font-sans">
-      <Navbar />
-      <main>
-        {/* Master Hero */}
-        <Hero 
-           mediaType={pageConfig?.media_type || 'image'}
-           videoUrl={pageConfig?.hero_video_url}
-           backgroundImage={pageConfig?.hero_image_url}
-           overlayOpacity={pageConfig?.overlay_opacity}
-           title={pageConfig?.title}
-           subtitle={pageConfig?.subtitle}
-        />
-
-        {sections.map(section => (
-             <div key={section.id}>
-                {renderSection(section)}
-             </div>
-        ))}
-        
-        {/* Static Contact Form Block - Always Present */}
-        <section className="py-20 bg-muted/20">
-           <div className="container mx-auto px-4">
-                <div className="max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-bold text-center mb-8 text-primary">Send us a Message</h2>
-                    <div className="bg-white p-8 rounded-2xl shadow-lg border border-border/50">
-                        <ContactForm />
-                    </div>
-                </div>
-           </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
 };
 
 export default Contact;
