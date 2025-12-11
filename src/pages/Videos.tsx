@@ -26,7 +26,7 @@ const Videos = () => {
       const { data, error } = await supabase
         .from('videos')
         .select('*')
-        .order('date_published', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error("Error fetching videos:", error);

@@ -16,6 +16,7 @@ interface Assessment {
   id: string;
   title: string;
   description: string;
+  slug: string; // Added slug
   icon_name: string;
   external_link: string;
 }
@@ -84,7 +85,7 @@ const Assessments = ({ title, description, gridClass }: AssessmentsProps) => {
                   {item.description}
                 </p>
                 <Button asChild variant="outline" className="border-primary/20 hover:bg-primary/5 hover:text-secondary group-hover:border-secondary/30">
-                  <Link to={item.external_link || '#'}>
+                  <Link to={`/assessments/${item.slug}`}>
                     Start Assessment <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
