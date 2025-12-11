@@ -70,7 +70,7 @@ const Contact = () => {
     }, []);
 
     // Extract Info Block data if available
-    const infoBlock = sections.find(s => s.section_key === 'info_block');
+    const infoBlocks = sections.filter(s => s.section_key === 'info_block');
     
     // Helper to safely parse specific_data
     const getSpecificData = (section: any) => {
@@ -82,7 +82,14 @@ const Contact = () => {
         return section.specific_data;
     };
 
-    const infoData = getSpecificData(infoBlock);
+    // Helper to format text with newlines
+    const formatText = (text: string) => {
+        if (!text) return '';
+        // Handle literal \n or real newlines
+        return text.replace(/\\n/g, '\n');
+    };
+
+
 
     if (loading) {
         return (
@@ -128,51 +135,64 @@ const Contact = () => {
                                  </div>
 
                                  <div className="space-y-8">
-                                    {/* Dynamic Info Render: Priority to Structured Data */}
-                                    {infoBlock && (infoData?.items && Array.isArray(infoData.items) ? (
-                                        // New Visual Editor Data
-                                        infoData.items.map((item: any, idx: number) => {
-                                            let Icon = Zap;
-                                            if (item.type === 'email') Icon = Mail;
-                                            if (item.type === 'location') Icon = MapPin;
-                                            if (item.type === 'linkedin') Icon = Linkedin;
-                                            if (item.type === 'phone') Icon = Phone;
+                                    {infoBlocks.map((block) => {
+                                        const blockData = getSpecificData(block);
+                                        return (
+                                            <div key={block.id} className="space-y-6">
+                                                {/* Optional Block Title if User entered one */}
+                                                {block.title && block.title !== 'General' && block.title !== 'Contact Details' && (
+                                                    <h3 className="text-xl font-semibold text-white/90">{block.title}</h3>
+                                                )}
 
-                                            return (
-                                                <div key={idx} className="flex items-start gap-6 group">
-                                                    <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
-                                                        <Icon className="h-6 w-6 text-secondary" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-lg font-bold text-white mb-1">{item.label}</h4>
-                                                        <p className="text-white/70">{item.value}</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    ) : infoBlock.content_body ? (
-                                        // Legacy Text Data
-                                        infoBlock.content_body.split('\n').filter((l: string) => l.trim()).map((line: string, idx: number) => {
-                                            let Icon = Zap;
-                                            if (line.toLowerCase().includes('email')) Icon = Mail;
-                                            if (line.toLowerCase().includes('location')) Icon = MapPin;
-                                            if (line.toLowerCase().includes('linkedin')) Icon = Linkedin;
-                                            if (line.toLowerCase().includes('phone')) Icon = Phone;
+                                                {blockData?.items && Array.isArray(blockData.items) ? (
+                                                    // New Visual Editor Data
+                                                    blockData.items.map((item: any, idx: number) => {
+                                                        let Icon = Zap;
+                                                        if (item.type === 'email') Icon = Mail;
+                                                        if (item.type === 'location') Icon = MapPin;
+                                                        if (item.type === 'linkedin') Icon = Linkedin;
+                                                        if (item.type === 'phone') Icon = Phone;
 
-                                            return (
-                                                <div key={idx} className="flex items-start gap-6 group">
-                                                    <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
-                                                        <Icon className="h-6 w-6 text-secondary" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-lg font-bold text-white mb-1">{line.split(':')[0]}</h4>
-                                                        <p className="text-white/70">{line.replace(/^[^:]+:/, '').trim()}</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        // Static Fallback if DB is empty
+                                                        return (
+                                                            <div key={idx} className="flex items-start gap-6 group">
+                                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                                                                    <Icon className="h-6 w-6 text-secondary" />
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="text-lg font-bold text-white mb-1">{item.label}</h4>
+                                                                    <p className="text-white/70 whitespace-pre-line leading-relaxed">{formatText(item.value)}</p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                ) : block.content_body ? (
+                                                    // Legacy Text Data
+                                                    block.content_body.split('\n').filter((l: string) => l.trim()).map((line: string, idx: number) => {
+                                                        let Icon = Zap;
+                                                        if (line.toLowerCase().includes('email')) Icon = Mail;
+                                                        if (line.toLowerCase().includes('location')) Icon = MapPin;
+                                                        if (line.toLowerCase().includes('linkedin')) Icon = Linkedin;
+                                                        if (line.toLowerCase().includes('phone')) Icon = Phone;
+
+                                                        return (
+                                                            <div key={idx} className="flex items-start gap-6 group">
+                                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                                                                    <Icon className="h-6 w-6 text-secondary" />
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="text-lg font-bold text-white mb-1">{line.split(':')[0]}</h4>
+                                                                    <p className="text-white/70">{line.replace(/^[^:]+:/, '').trim()}</p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                ) : null}
+                                            </div>
+                                        );
+                                    })}
+                                    
+                                    {/* Fallback Only if NO blocks exist */}
+                                    {infoBlocks.length === 0 && (
                                         <>
                                             <div className="flex items-start gap-6 group">
                                                 <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
@@ -193,8 +213,7 @@ const Contact = () => {
                                                 </div>
                                             </div>
                                         </>
-                                    ))}
-                                 </div>
+                                    )}
                              </div>
 
                              {/* Right Column: The Form */}
@@ -218,7 +237,7 @@ const Contact = () => {
                                         strategyData.items.map((item: any, idx: number) => (
                                              <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
                                                  <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                                 <p className="text-lg text-foreground/80 leading-relaxed">{item.text}</p>
+                                                 <p className="text-lg text-foreground/80 leading-relaxed whitespace-pre-line">{formatText(item.text)}</p>
                                              </div>
                                         ))
                                     ) : (
