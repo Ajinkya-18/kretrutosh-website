@@ -215,6 +215,7 @@ const Contact = () => {
                                         </>
                                     )}
                              </div>
+                             </div>
 
                              {/* Right Column: The Form */}
                              <div className="lg:pl-10">
