@@ -15,7 +15,8 @@ interface CardData {
   description: string;
   cta_text: string;
   link: string;
-  image_key: string;
+  image_key?: string; // made optional
+  image_url?: string; // new field for custom uploads
 }
 
 interface ThoughtLeadershipProps {
@@ -38,7 +39,7 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
   const [displayCards, setDisplayCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Default Static Items
+  // Default Static Items (Fallback)
   const podcastCard: CardData = {
       id: 'podcast',
       badge: getText('thought_leadership.podcast.badge', 'Podcast'),
@@ -59,15 +60,39 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
       image_key: 'book'
   };
 
+  const blogCard: CardData = {
+      id: 'blogs',
+      badge: getText('thought_leadership.blogs.badge', 'LinkedIn Articles'),
+      title: getText('thought_leadership.blogs.title', 'Expert Perspectives'),
+      description: getText('thought_leadership.blogs.desc', 'Deep dives into CX, Culture, and Growth Strategy on LinkedIn.'),
+      cta_text: getText('thought_leadership.blogs.cta', 'Read Articles'),
+      link: '/resources/articles',
+      image_key: 'whitepapers'
+  };
+
   useEffect(() => {
+    // If cards are provided via props (from DB/Admin), use them exclusively
+    if (cards && cards.length > 0) {
+        setDisplayCards(cards);
+        setLoading(false);
+        return;
+    }
+
+    // Fallback: Fetch default dynamic data if no Admin config exists
     const fetchData = async () => {
        try {
-          // Fetch latest 2 whitepapers
+          // Fetch Latest Whitepaper
           const { data: whitepapers, error } = await supabase
-            .from('whitepapers') // Assuming table exists based on admin-panel
+            .from('whitepapers')
             .select('*')
-            .order('created_at', { ascending: false }) // Latest first
-            .limit(2);
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          // Process Book Card (Ensure Link is dynamic via getText)
+          const finalBookCard = {
+              ...bookCard,
+              link: getText('thought_leadership.book.link', '/book')
+          };
 
           const whitepaperCards: CardData[] = (whitepapers || []).map((wp: any) => ({
              id: wp.id || 'wp',
@@ -75,23 +100,21 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
              title: wp.title,
              description: wp.summary || wp.description || 'Download our latest insights.',
              cta_text: 'Read Article',
-             link: `/resources/${wp.slug}`,
-             image_key: 'whitepapers' // Fallback image
+             link: `/resources/whitepapers`,
+             image_key: 'whitepapers'
           }));
 
-          // Combine: Podcast, Book, WP1, WP2
-          setDisplayCards([podcastCard, bookCard, ...whitepaperCards]);
+          setDisplayCards([podcastCard, finalBookCard, blogCard, ...whitepaperCards]);
        } catch (err) {
           console.error("Error fetching thought leadership:", err);
-          // Fallback
-          setDisplayCards([podcastCard, bookCard]);
+          setDisplayCards([podcastCard, bookCard, blogCard]);
        } finally {
           setLoading(false);
        }
     };
 
     fetchData();
-  }, []);
+  }, [cards, getText]); // Depend on cards and getText
 
   return (
     <section className="py-24 bg-muted/30">
@@ -110,7 +133,7 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
             <div key={card.id} className="bg-card rounded-xl overflow-hidden border border-border/50 hover:shadow-lg transition-all group flex flex-col h-full">
               <div className={`h-40 flex items-center justify-center overflow-hidden ${card.id === 'book' ? 'bg-primary/5' : 'bg-black'}`}>
                 <img 
-                  src={imageMap[card.image_key] || whitepaperImage} 
+                  src={card.image_url || imageMap[card.image_key || 'whitepapers'] || whitepaperImage} 
                   alt={card.title} 
                   className={`w-full h-full object-cover ${card.id === 'podcast' ? 'opacity-90 group-hover:opacity-100' : 'group-hover:scale-105'} transition-all duration-300`}
                 />

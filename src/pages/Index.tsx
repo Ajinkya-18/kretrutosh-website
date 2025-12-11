@@ -142,13 +142,12 @@ const Index = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <GrowthEngine 
-               title={section.title || 'One Engine. Five Motions. Infinite Growth.'}
-               subtitle={section.subtitle || 'Your GTM Velocity model...'}
-               motions={section.specific_data?.motions}
-               gridClass={gridClass}
-               getText={getText}
-            />
+             <GrowthEngine 
+                title={section.title || 'One Engine. Five Motions. Infinite Growth.'}
+                subtitle={section.subtitle || 'Your GTM Velocity model...'}
+                gridClass={gridClass}
+                getText={getText}
+             />
           </motion.div>
         );
 
