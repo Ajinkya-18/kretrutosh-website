@@ -35,6 +35,7 @@ const ServiceDetail = () => {
     fetchSections();
 
     // Real-time subscription
+    // Real-time subscription
     const channel = supabase
       .channel(`services-${slug}`)
       .on(
@@ -43,9 +44,14 @@ const ServiceDetail = () => {
           event: '*',
           schema: 'public',
           table: 'sections_services',
-          filter: `page_slug=eq.${slug}`,
+          filter: `page_slug=eq.${slug}`, // Hyphens in slugs usually work without quotes in realtime, but let's try strict string matching if issues persist.
+          // Actually, 'page_slug=eq.pre-sales' is valid.
+          // Problem might be related to previous component state not updating or fetchSections not running.
+          // Let's add a console log to debug in user environment if possible, or just force the fetch.
+          // Filter safety: `page_slug=eq.${slug}`
         },
-        () => {
+        (payload) => {
+           console.log('Realtime update:', payload);
            fetchSections();
         }
       )

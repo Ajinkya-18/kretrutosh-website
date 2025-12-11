@@ -38,6 +38,15 @@ const Assessments = () => {
     };
 
     fetchAssessments();
+
+    const channel = supabase
+      .channel('assessments-list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'assessments' }, () => fetchAssessments())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

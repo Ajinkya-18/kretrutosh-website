@@ -46,6 +46,15 @@ const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetTe
       setLoading(false);
     };
     fetchFrameworks();
+
+    const channel = supabase
+      .channel('home-frameworks')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, () => fetchFrameworks())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

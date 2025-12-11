@@ -51,6 +51,22 @@ const Frameworks = () => {
     };
 
     fetchData();
+
+    // Real-time subscriptions
+    const frameChannel = supabase
+      .channel('frameworks-list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, () => fetchData())
+      .subscribe();
+
+    const pageChannel = supabase
+      .channel('frameworks-page')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'frameworks'" }, () => fetchData())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(frameChannel);
+      supabase.removeChannel(pageChannel);
+    };
   }, []);
 
   return (

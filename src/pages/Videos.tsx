@@ -36,6 +36,15 @@ const Videos = () => {
     };
 
     fetchVideos();
+
+    const channel = supabase
+      .channel('videos-list')
+       .on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, () => fetchVideos())
+       .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

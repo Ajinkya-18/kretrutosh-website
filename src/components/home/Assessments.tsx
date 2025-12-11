@@ -46,6 +46,15 @@ const Assessments = ({ title, description, gridClass }: AssessmentsProps) => {
       setLoading(false);
     };
     fetchAssessments();
+
+    const channel = supabase
+      .channel('home-assessments')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'assessments' }, () => fetchAssessments())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   if (!loading && assessments.length === 0) return null;

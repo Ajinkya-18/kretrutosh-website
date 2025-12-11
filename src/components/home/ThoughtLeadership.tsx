@@ -114,6 +114,15 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
     };
 
     fetchData();
+
+    const channel = supabase
+      .channel('thought-leadership-updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'whitepapers' }, () => fetchData())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [cards, getText]); // Depend on cards and getText
 
   return (

@@ -38,6 +38,15 @@ const Whitepapers = () => {
     };
 
     fetchWhitepapers();
+
+    const channel = supabase
+      .channel('whitepapers-list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'whitepapers' }, () => fetchWhitepapers())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Helper to determine the correct link

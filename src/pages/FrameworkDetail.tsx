@@ -82,7 +82,7 @@ const FrameworkDetail = () => {
 
     fetchData();
 
-    // Real-time subscription
+    // Real-time subscription (Sections)
     const channel = supabase
       .channel(`framework-detail-${slug}`)
       .on(
@@ -97,7 +97,20 @@ const FrameworkDetail = () => {
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Real-time metadata subscription
+    const metaChannel = supabase
+      .channel(`framework-meta-${slug}`)
+       .on(
+           'postgres_changes', 
+           { event: '*', schema: 'public', table: 'frameworks', filter: `slug=eq.${slug}` }, 
+           () => fetchData()
+       )
+       .subscribe();
+
+    return () => { 
+        supabase.removeChannel(channel); 
+        supabase.removeChannel(metaChannel); 
+    };
   }, [slug]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>;

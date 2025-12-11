@@ -72,12 +72,22 @@ const AssessmentDetail = () => {
 
     fetchData();
 
+    // Real-time subscription for sections
     const channel = supabase
       .channel(`assessment-${slug}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_assessment_details', filter: `parent_slug=eq.${slug}` }, () => fetchData())
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Real-time subscription for metadata
+    const metaChannel = supabase
+      .channel(`assessment-meta-${slug}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'assessments', filter: `slug=eq.${slug}` }, () => fetchData())
+      .subscribe();
+      
+    return () => { 
+        supabase.removeChannel(channel); 
+        supabase.removeChannel(metaChannel);
+    };
   }, [slug]);
 
   if (loading) return <div className="h-screen flex items-center justify-center"><Skeleton className="h-12 w-12 rounded-full" /></div>;

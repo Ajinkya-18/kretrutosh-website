@@ -64,6 +64,20 @@ const GrowthEngine = ({ title, subtitle, gridClass, getText }: GrowthEngineProps
     };
 
     fetchServices();
+
+    // Real-time subscription for immediate updates
+    const channel = supabase
+      .channel('growth-engine-updates')
+      .on(
+        'postgres_changes', 
+        { event: '*', schema: 'public', table: 'sections_services' }, 
+        () => fetchServices()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

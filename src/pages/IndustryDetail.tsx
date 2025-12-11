@@ -124,7 +124,7 @@ const IndustryDetail = () => {
 
     fetchData();
 
-    // Real-time subscription
+    // Real-time subscription for sections
     const channel = supabase
       .channel(`industry-${slug}`)
       .on(
@@ -138,8 +138,21 @@ const IndustryDetail = () => {
         () => fetchData()
       )
       .subscribe();
+    
+    // Real-time subscription for Metadata
+    const metaChannel = supabase
+      .channel(`industry-meta-${slug}`)
+      .on(
+        'postgres_changes', 
+        { event: '*', schema: 'public', table: 'industries', filter: `slug=eq.${slug}` }, 
+        () => fetchData()
+      )
+      .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { 
+        supabase.removeChannel(channel);
+        supabase.removeChannel(metaChannel);
+    };
   }, [slug]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>;

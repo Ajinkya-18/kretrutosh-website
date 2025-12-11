@@ -51,6 +51,22 @@ const Contact = () => {
         };
 
         fetchPage();
+
+        // Real-time Subscriptions
+        const pageChannel = supabase
+            .channel('contact-page-update')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'contact'" }, () => fetchPage())
+            .subscribe();
+
+        const sectionsChannel = supabase
+            .channel('contact-sections-update')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_contact' }, () => fetchPage())
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(pageChannel);
+            supabase.removeChannel(sectionsChannel);
+        };
     }, []);
 
     // Extract Info Block data if available
