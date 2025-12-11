@@ -71,6 +71,18 @@ const Contact = () => {
 
     // Extract Info Block data if available
     const infoBlock = sections.find(s => s.section_key === 'info_block');
+    
+    // Helper to safely parse specific_data
+    const getSpecificData = (section: any) => {
+        if (!section?.specific_data) return {};
+        if (typeof section.specific_data === 'string') {
+            try { return JSON.parse(section.specific_data); } 
+            catch { return {}; }
+        }
+        return section.specific_data;
+    };
+
+    const infoData = getSpecificData(infoBlock);
 
     if (loading) {
         return (
@@ -117,9 +129,9 @@ const Contact = () => {
 
                                  <div className="space-y-8">
                                     {/* Dynamic Info Render: Priority to Structured Data */}
-                                    {infoBlock && (infoBlock.specific_data?.items ? (
+                                    {infoBlock && (infoData?.items && Array.isArray(infoData.items) ? (
                                         // New Visual Editor Data
-                                        infoBlock.specific_data.items.map((item: any, idx: number) => {
+                                        infoData.items.map((item: any, idx: number) => {
                                             let Icon = Zap;
                                             if (item.type === 'email') Icon = Mail;
                                             if (item.type === 'location') Icon = MapPin;
@@ -194,32 +206,35 @@ const Contact = () => {
                 </section>
                 
                 {/* Additional Strategy Section if exists */}
-                {sections.filter(s => s.section_key === 'strategy_block').map(section => (
-                    <section key={section.id} className="py-24 bg-white">
-                        <div className="container mx-auto px-4 text-center max-w-4xl">
-                            <h2 className="text-3xl font-bold text-primary mb-12">{section.title}</h2>
-                            <div className="grid md:grid-cols-2 gap-8 text-left">
-                                {section.specific_data?.items ? (
-                                    // Visual Editor Data
-                                    section.specific_data.items.map((item: any, idx: number) => (
-                                         <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
-                                             <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                             <p className="text-lg text-foreground/80 leading-relaxed">{item.text}</p>
-                                         </div>
-                                    ))
-                                ) : (
-                                    // Legacy Text Data
-                                    section.content_body?.split('\n').filter((l: string) => l.includes('•')).map((item: string, idx: number) => (
-                                         <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
-                                             <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                             <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
-                                         </div>
-                                    ))
-                                )}
+                {sections.filter(s => s.section_key === 'strategy_block').map(section => {
+                    const strategyData = getSpecificData(section);
+                    return (
+                        <section key={section.id} className="py-24 bg-white">
+                            <div className="container mx-auto px-4 text-center max-w-4xl">
+                                <h2 className="text-3xl font-bold text-primary mb-12">{section.title}</h2>
+                                <div className="grid md:grid-cols-2 gap-8 text-left">
+                                    {strategyData?.items && Array.isArray(strategyData.items) ? (
+                                        // Visual Editor Data
+                                        strategyData.items.map((item: any, idx: number) => (
+                                             <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
+                                                 <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
+                                                 <p className="text-lg text-foreground/80 leading-relaxed">{item.text}</p>
+                                             </div>
+                                        ))
+                                    ) : (
+                                        // Legacy Text Data
+                                        section.content_body?.split('\n').filter((l: string) => l.includes('•')).map((item: string, idx: number) => (
+                                             <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
+                                                 <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
+                                                 <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
+                                             </div>
+                                        ))
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </section>
-                ))}
+                        </section>
+                    );
+                })}
 
             </main>
             <Footer />
