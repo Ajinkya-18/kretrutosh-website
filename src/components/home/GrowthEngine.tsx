@@ -11,14 +11,12 @@ interface Motion {
 }
 
 interface GrowthEngineProps {
-  title: string;
-  subtitle: string;
-  // motions prop removed as we now fetch securely from DB
+  title?: string;
+  subtitle?: string;
   gridClass?: string;
-  getText: (key: string, defaultText: string) => string;
 }
 
-const GrowthEngine = ({ title, subtitle, gridClass, getText }: GrowthEngineProps) => {
+const GrowthEngine = ({ title, subtitle, gridClass }: GrowthEngineProps) => {
   const [motions, setMotions] = useState<Motion[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,27 +35,24 @@ const GrowthEngine = ({ title, subtitle, gridClass, getText }: GrowthEngineProps
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        // Fetch the 'hero' section of each service page to get the high-level summary
         const { data, error } = await supabase
-          .from('sections_services')
-          .select('page_slug, title, subtitle, icon, display_order')
-          .eq('section_key', 'hero')
-          .eq('is_visible', true)
-          .order('display_order', { ascending: true });
+          .from('services')
+          .select('slug, title, subtitle, icon_name')
+          .order('id', { ascending: true }); // or display_order if added
 
         if (error) throw error;
 
         if (data) {
           const mappedMotions: Motion[] = data.map(item => ({
-            icon: item.icon || 'Target', // Fallback to Target if no icon set
+            icon: item.icon_name || 'Target', 
             title: item.title,
-            description: item.subtitle || 'Transform your growth.', // Use Hero subtitle as description
-            link: `/services/${item.page_slug}`
+            description: item.subtitle || '',
+            link: `/services/${item.slug}`
           }));
           setMotions(mappedMotions);
         }
       } catch (err) {
-        console.error('Error fetching service motions:', err);
+        console.error('Error fetching services:', err);
       } finally {
         setLoading(false);
       }
@@ -65,12 +60,11 @@ const GrowthEngine = ({ title, subtitle, gridClass, getText }: GrowthEngineProps
 
     fetchServices();
 
-    // Real-time subscription for immediate updates
     const channel = supabase
       .channel('growth-engine-updates')
       .on(
         'postgres_changes', 
-        { event: '*', schema: 'public', table: 'sections_services' }, 
+        { event: '*', schema: 'public', table: 'services' }, 
         () => fetchServices()
       )
       .subscribe();
@@ -85,10 +79,10 @@ const GrowthEngine = ({ title, subtitle, gridClass, getText }: GrowthEngineProps
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold text-primary">
-            {title}
+            {title || "One Engine. Five Motions. Infinite Growth."}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {subtitle}
+            {subtitle || "Your GTM Velocity model..."}
           </p>
         </div>
 

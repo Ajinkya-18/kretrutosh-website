@@ -1,15 +1,22 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Linkedin, Mail, MapPin, Phone, Youtube, Twitter } from "lucide-react";
 import logo from "@/assets/kretrutosh-logo.png";
-import { useContent } from "@/hooks/useContent";
-import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabaseClient";
+import { useEffect, useState } from "react";
 
 const Footer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentYear = new Date().getFullYear();
-  const { getText } = useContent('global');
-  const { toast } = useToast();
+  const [config, setConfig] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+        const { data } = await supabase.from('config_footer').select('*').single();
+        if (data) setConfig(data);
+    };
+    fetchConfig();
+  }, []);
 
 
 
@@ -54,10 +61,6 @@ const Footer = () => {
       { name: "VRM", path: "/frameworks/value-realization-map" },
       { name: "Heatmap", path: "/frameworks/lifecycle-heatmap" },
       { name: "VICTORY", path: "/frameworks/victory" },
-      { name: "EAR", path: "/frameworks/ear" },
-      { name: "9Ps", path: "/frameworks/9ps" },
-      { name: "PPP", path: "/frameworks/ppp" },
-      { name: "ROI Calculator", path: "/frameworks/cx-roi-calculator" },
     ],
     resources: [
       { name: "Book", path: "/resources/book" },
@@ -71,6 +74,24 @@ const Footer = () => {
       { name: "Contact", path: "/contact" },
     ],
   };
+
+  // Helper for Social
+  const getSocialIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+        case 'linkedin': return <Linkedin size={20} />;
+        case 'youtube': return <Youtube size={20} />;
+        case 'twitter': return <Twitter size={20} />;
+        case 'x': return <Twitter size={20} />;
+        default: return <Linkedin size={20} />;
+    }
+  };
+
+  // If DB has social_links, use them. Otherwise fallback.
+  const socialLinks = config?.social_links || [
+      { platform: 'linkedin', url: 'https://www.linkedin.com/in/ashutosh-karandikar-ccxp/' },
+      { platform: 'youtube', url: 'https://www.youtube.com/@theXTPodcast' },
+      { platform: 'twitter', url: 'https://x.com/AshutoshCK' }
+  ];
 
   return (
     <footer className="bg-primary text-primary-foreground border-t border-primary/20">
@@ -86,20 +107,22 @@ const Footer = () => {
                     <span className="text-secondary"> Consulting</span>
                   </h3>
                   <p className="text-sm text-primary-foreground/70 mt-2 max-w-xs">
-                    {getText('footer.brand_desc', 'Transforming businesses through Customer-Led Growth.')}
+                    {config?.brand_description || 'Transforming businesses through Customer-Led Growth.'}
                   </p>
                 </div>
               </Link>
               <div className="flex gap-4">
-                <a href="https://www.linkedin.com/in/ashutosh-karandikar-ccxp/" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
-                  <Linkedin size={20} />
-                </a>
-                <a href="https://www.youtube.com/@theXTPodcast" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
-                  <Youtube size={20} />
-                </a>
-                <a href="https://x.com/AshutoshCK" target="_blank" rel="noopener noreferrer" className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110">
-                  <Twitter size={20} />
-                </a>
+                {socialLinks.map((link: any, idx: number) => (
+                    <a 
+                        key={idx} 
+                        href={link.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="p-2 bg-primary-foreground/5 rounded-full hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110"
+                    >
+                        {getSocialIcon(link.platform)}
+                    </a>
+                ))}
               </div>
               
               {/* LinkedIn Script */}
@@ -135,7 +158,7 @@ const Footer = () => {
           {/* Column 2: Industries */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-secondary">
-              {getText('footer.col_2_title', 'Industries')}
+              Industries
             </h4>
             <ul className="space-y-3">
               {footerLinks.industries.map((link) => (
@@ -151,7 +174,7 @@ const Footer = () => {
           {/* Column 3: Frameworks */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-secondary">
-              {getText('footer.col_3_title', 'Frameworks')}
+              Frameworks
             </h4>
             <ul className="space-y-3">
               {footerLinks.frameworks.map((link) => (
@@ -167,7 +190,7 @@ const Footer = () => {
           {/* Column 4: Resources */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-secondary">
-              {getText('footer.col_4_title', 'Resources')}
+              Resources
             </h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
@@ -183,7 +206,7 @@ const Footer = () => {
           {/* Column 5: Company */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-secondary">
-              {getText('footer.col_5_title', 'Company')}
+              Company
             </h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
@@ -205,18 +228,18 @@ const Footer = () => {
             <div className="mt-6 space-y-3">
               <div className="flex items-start gap-3 text-primary-foreground/70 text-sm">
                 <MapPin className="mt-1 shrink-0 text-secondary" size={16} />
-                <span>{getText('footer.address_city', 'Mumbai, Maharashtra, India')}</span>
+                <span>{config?.address || 'Mumbai, Maharashtra, India'}</span>
               </div>
               <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
                 <Phone className="shrink-0 text-secondary" size={16} />
-                <a href="tel:+919591387838" className="hover:text-white transition-colors">
-                  {getText('footer.phone', '+91 95913 87838')}
+                <a href={`tel:${config?.phone || '+919591387838'}`} className="hover:text-white transition-colors">
+                  {config?.phone || '+91 95913 87838'}
                 </a>
               </div>
               <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
                 <Mail className="shrink-0 text-secondary" size={16} />
-                <a href="mailto:consult.ashutosh@kretru.com" className="hover:text-white transition-colors">
-                  {getText('footer.email', 'consult.ashutosh@kretru.com')}
+                <a href={`mailto:${config?.email || 'consult.ashutosh@kretru.com'}`} className="hover:text-white transition-colors">
+                  {config?.email || 'consult.ashutosh@kretru.com'}
                 </a>
               </div>
             </div>
@@ -225,7 +248,7 @@ const Footer = () => {
 
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/50 text-sm">
-            {getText('footer.copyright', `© ${currentYear} KretruTosh Consulting. All rights reserved.`)}
+            {config?.copyright_text ? `© ${currentYear} ${config.copyright_text}` : `© ${currentYear} KretruTosh Consulting. All rights reserved.`}
           </p>
           <div className="flex gap-6 text-sm text-primary-foreground/50">
             <Link to="/privacy" className="hover:text-secondary transition-colors" onClick={() => handleLinkClick("/privacy")}>Privacy Policy</Link>

@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import podcastLogo from "@/assets/xt-podcast-logo.jpeg";
 import bookCover from "@/assets/3d-book-cover.jpeg";
 import whitepaperImage from "@/assets/whitepaper-articles.jpeg";
-import { useContent } from "@/hooks/useContent";
+// import { useContent } from "@/hooks/useContent"; // Removed for cleanup
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -32,9 +33,8 @@ const imageMap: Record<string, string> = {
   whitepapers: whitepaperImage,
 };
 
-const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: ThoughtLeadershipProps) => {
-  const { getText: hookGetText } = useContent('home');
-  const getText = propGetText || hookGetText;
+const ThoughtLeadership = ({ title, description, cards }: ThoughtLeadershipProps) => {
+
 
   const [displayCards, setDisplayCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,32 +42,35 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
   // Default Static Items (Fallback)
   const podcastCard: CardData = {
       id: 'podcast',
-      badge: getText('thought_leadership.podcast.badge', 'Podcast'),
-      title: getText('thought_leadership.podcast.title', 'The XT Podcast'),
-      description: getText('thought_leadership.podcast.desc', 'Conversations with industry leaders on experience transformation.'),
-      cta_text: getText('thought_leadership.podcast.cta', 'Listen Now'),
+      badge: 'Podcast',
+      title: 'The XT Podcast',
+      description: 'Conversations with industry leaders on experience transformation.',
+      cta_text: 'Listen Now',
       link: '/resources/podcast',
       image_key: 'podcast'
+
   };
 
   const bookCard: CardData = {
       id: 'book',
-      badge: getText('thought_leadership.book.badge', 'Book'),
-      title: getText('thought_leadership.book.title', 'Beyond Customer Satisfaction'),
-      description: getText('thought_leadership.book.desc', 'The definitive guide to customer-centric growth in the modern era.'),
-      cta_text: getText('thought_leadership.book.cta', 'Read More'),
+      badge: 'Book',
+      title: 'Beyond Customer Satisfaction',
+      description: 'The definitive guide to customer-centric growth in the modern era.',
+      cta_text: 'Read More',
       link: '/book',
       image_key: 'book'
+
   };
 
   const blogCard: CardData = {
       id: 'blogs',
-      badge: getText('thought_leadership.blogs.badge', 'LinkedIn Articles'),
-      title: getText('thought_leadership.blogs.title', 'Expert Perspectives'),
-      description: getText('thought_leadership.blogs.desc', 'Deep dives into CX, Culture, and Growth Strategy on LinkedIn.'),
-      cta_text: getText('thought_leadership.blogs.cta', 'Read Articles'),
+      badge: 'LinkedIn Articles',
+      title: 'Expert Perspectives',
+      description: 'Deep dives into CX, Culture, and Growth Strategy on LinkedIn.',
+      cta_text: 'Read Articles',
       link: '/resources/articles',
       image_key: 'whitepapers'
+
   };
 
   useEffect(() => {
@@ -91,8 +94,9 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
           // Process Book Card (Ensure Link is dynamic via getText)
           const finalBookCard = {
               ...bookCard,
-              link: getText('thought_leadership.book.link', '/book')
+              link: '/book'
           };
+
 
           const whitepaperCards: CardData[] = (whitepapers || []).map((wp: any) => ({
              id: wp.id || 'wp',
@@ -123,18 +127,20 @@ const ThoughtLeadership = ({ title, description, cards, getText: propGetText }: 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [cards, getText]); // Depend on cards and getText
+  }, [cards]); // Depend only on cards
+
 
   return (
     <section className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            {title || getText('thought_leadership.title', 'Thought Leadership Hub')}
+            {title || 'Thought Leadership Hub'}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {description || getText('thought_leadership.description', 'Insights, strategies, and conversations shaping the future of growth.')}
+            {description || 'Insights, strategies, and conversations shaping the future of growth.'}
           </p>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto items-stretch">

@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useContent } from "@/hooks/useContent";
+// import { useContent } from "@/hooks/useContent"; // Removed for cleanup
+
 import { getIcon } from "@/utils/iconMap";
 
 interface Framework {
@@ -23,9 +24,8 @@ interface FrameworksProps {
   getText?: (key: string, defaultText: string) => string;
 }
 
-const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetText }: FrameworksProps) => {
-  const { getText: hookGetText } = useContent('home');
-  const getText = propGetText || hookGetText;
+const Frameworks = ({ title, description, ctaText, gridClass }: FrameworksProps) => {
+
   
   const navigate = useNavigate();
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
@@ -63,11 +63,12 @@ const Frameworks = ({ title, description, ctaText, gridClass, getText: propGetTe
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              {title || getText('frameworks.title', 'Signature Proprietary Frameworks')}
+              {title || 'Signature Proprietary Frameworks'}
             </h2>
             <p className="text-lg text-muted-foreground">
-              {description || getText('frameworks.description', 'Our battle-tested methodologies for driving predictable growth.')}
+              {description || 'Our battle-tested methodologies for driving predictable growth.'}
             </p>
+
           </div>
         </div>
 

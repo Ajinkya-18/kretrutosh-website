@@ -3,8 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/kretrutosh-logo.png";
-import { useContent } from "@/hooks/useContent";
+import defaultLogo from "@/assets/kretrutosh-logo.png";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,29 +13,17 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { supabase } from "@/lib/supabaseClient";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const { getText } = useContent('global');
+  const [items, setItems] = useState<any[]>([]);
+  const [config, setConfig] = useState<any>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleLinkClick = (path: string) => {
-    setIsOpen(false);
-    if (location.pathname === path) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  const navItems = [
+  // Default Items (Fallback)
+  const defaultNavItems = [
     {
       name: "Services",
       path: "/services",
@@ -48,58 +35,50 @@ const Navbar = () => {
         { name: "Culture & Leadership", path: "/services/culture-transformation" },
       ],
     },
+    // ... (Keep existing structure if DB empty)
     {
-      name: "Frameworks",
-      path: "/frameworks",
-      children: [
-        { name: "CX Maturity Framework", path: "/frameworks/cx-maturity" },
-        { name: "Expectation Management (EMM)", path: "/frameworks/expectation-management" },
-        { name: "HAND Culture Framework", path: "/frameworks/hand" },
-        { name: "Value Realization Map (VRM)", path: "/frameworks/value-realization-map" },
-        { name: "Customer Lifecycle Heatmap", path: "/frameworks/lifecycle-heatmap" },
-        { name: "VICTORY™ Framework", path: "/frameworks/victory" },
-        { name: "9Ps Advocacy Framework", path: "/frameworks/9ps" },
-        { name: "EAR™ Empathy Framework", path: "/frameworks/ear" },
-        { name: "PPP Playbook", path: "/frameworks/ppp" },
-        { name: "CX ROI Calculator", path: "/frameworks/cx-roi-calculator" },
-      ],
+        name: "Frameworks",
+        path: "/frameworks",
+        children: [] // Simplified for fallback brevity, full list in DB ideal
     },
-    {
-      name: "Industries",
-      path: "/industries",
-      children: [
-        { name: "Retail", path: "/industries/retail" },
-        { name: "E-Commerce / D2C", path: "/industries/ecommerce" },
-        { name: "SaaS & B2B Tech", path: "/industries/saas" },
-        { name: "Insurance (Life & General)", path: "/industries/insurance" },
-        { name: "Banking & Financial Services", path: "/industries/bfsi" },
-        { name: "Manufacturing", path: "/industries/manufacturing" },
-      ],
-    },
-    {
-      name: "Impact & Case Studies",
-      path: "/case-studies",
-      children: [],
-    },
-    {
-      name: "Resources",
-      path: "/resources",
-      children: [
-        { name: "Book", path: "/resources/book" },
-        { name: "The XT Podcast", path: "/resources/podcast" },
-        { name: "Assessments", path: "/assessments" },
-        { name: "Whitepapers", path: "/resources/whitepapers" },
-        { name: "Articles / Insights", path: "/resources/articles" },
-      ],
-    },
-    {
-      name: "About",
-      path: "/about",
-      children: [
-        { name: "Founder", path: "/about/founder" },
-      ],
-    },
+    { name: "Industries", path: "/industries", children: [] },
+    { name: "Impact", path: "/case-studies", children: [] },
+    { name: "About", path: "/about", children: [] },
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+
+    // Fetch Config
+    const fetchConfig = async () => {
+        const { data } = await supabase.from('config_navbar').select('*').single();
+        if (data) {
+            setConfig(data);
+            if (data.menu_items && Array.isArray(data.menu_items)) {
+                setItems(data.menu_items);
+            } else {
+                setItems(defaultNavItems);
+            }
+        } else {
+            setItems(defaultNavItems);
+        }
+    };
+    fetchConfig();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleLinkClick = (path: string) => {
+    setIsOpen(false);
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const navItems = items.length > 0 ? items : defaultNavItems;
 
   return (
     <nav
@@ -117,7 +96,7 @@ const Navbar = () => {
             className="flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight text-primary transition-transform hover:scale-[1.02] z-50"
             onClick={() => handleLinkClick("/")}
           >
-            <img src={logo} alt="KretruTosh Consulting" className="h-16 w-auto" />
+            <img src={config?.logo_url || defaultLogo} alt="KretruTosh Consulting" className="h-16 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -132,19 +111,17 @@ const Navbar = () => {
                   </Link>
                 </NavigationMenuItem>
                 
-                {navItems.map((item) => (
+                {navItems.map((item: any) => (
                   <NavigationMenuItem key={item.name}>
                     {item.children && item.children.length > 0 ? (
                       <>
                         <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">{item.name}</NavigationMenuTrigger>
                         <NavigationMenuContent>
                           <ul className={cn(
-                            "grid gap-3 p-4",
-                            item.name === "Frameworks" ? "w-[400px] md:w-[500px] lg:w-[600px] md:grid-cols-2" :
-                            item.name === "About" ? "w-[200px] md:w-[300px]" :
-                            "w-[400px] md:w-[500px] md:grid-cols-2"
+                            "grid gap-3 p-4 w-[400px] md:w-[500px]",
+                            item.children.length > 5 ? "md:grid-cols-2" : ""
                           )}>
-                            {item.children.map((child) => (
+                            {item.children.map((child: any) => (
                               <li key={child.name}>
                                 <NavigationMenuLink asChild>
                                   <Link
@@ -177,7 +154,7 @@ const Navbar = () => {
                 asChild 
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
-                <Link to="/contact">{getText('navbar.cta', 'Schedule a Consultation')}</Link>
+                <Link to={config?.cta_link || "/contact"}>{config?.cta_text || 'Schedule a Consultation'}</Link>
               </Button>
             </div>
           </div>
@@ -204,14 +181,14 @@ const Navbar = () => {
                 Home
               </Link>
               
-              {navItems.map((item) => (
+              {navItems.map((item: any) => (
                 <div key={item.name} className="space-y-1">
                   <div className="px-4 py-2 text-sm font-semibold text-primary/80 uppercase tracking-wider">
                     {item.name}
                   </div>
                   <div className="pl-4 space-y-1 border-l-2 border-primary/10 ml-4">
-                    {item.children.length > 0 ? (
-                      item.children.map((child) => (
+                    {item.children && item.children.length > 0 ? (
+                      item.children.map((child: any) => (
                         <Link
                           key={child.name}
                           to={child.path}
@@ -236,8 +213,8 @@ const Navbar = () => {
 
               <div className="pt-4 mt-2 border-t border-border">
                 <Button className="w-full bg-primary text-primary-foreground" asChild>
-                  <Link to="/contact">
-                    {getText('navbar.cta', 'Schedule a Consultation')}
+                  <Link to={config?.cta_link || "/contact"}>
+                    {config?.cta_text || 'Schedule a Consultation'}
                   </Link>
                 </Button>
               </div>
