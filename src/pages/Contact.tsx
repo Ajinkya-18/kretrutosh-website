@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Loader2 } from "lucide-react";
-import ContactForm from "@/components/ContactForm";
+import { Loader2, Calendar } from "lucide-react";
 import Hero from "@/components/Hero";
-import RichText from "@/components/ui/RichText";
+import { Button } from "@/components/ui/button";
 
 const Contact = () => {
     const [pageConfig, setPageConfig] = useState<any>(null);
@@ -83,7 +82,7 @@ const Contact = () => {
                     mediaType="image"
                     title={pageConfig?.hero_title || "Let's Connect"}
                     subtitle="We are ready to listen."
-                    backgroundImage={pageConfig?.hero_image_url} // If we add this column later
+                    backgroundImage={pageConfig?.hero_image_url} 
                 />
 
                 <section className="py-24 bg-primary relative overflow-hidden">
@@ -115,13 +114,30 @@ const Contact = () => {
                                              <div dangerouslySetInnerHTML={{ __html: pageConfig.address_html }} />
                                          </div>
                                      ) : (
-                                        // Fallback if nothing in DB
                                         <div className="text-white/70">
                                             <p>No contact details configured. Please update in Admin Panel.</p>
                                         </div>
                                      )}
                                  </div>
                                  
+                                 {/* Calendly Block - Distinct, Prominent */}
+                                 {pageConfig?.calendly_url && (
+                                     <div className="bg-white p-8 rounded-2xl shadow-xl border-l-4 border-secondary">
+                                         <h3 className="text-xl font-bold text-primary mb-2">Skip the inbox?</h3>
+                                         <p className="text-muted-foreground mb-6">Book a direct strategy session with our leadership team.</p>
+                                         <Button 
+                                            asChild 
+                                            size="lg" 
+                                            className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 w-full md:w-auto shadow-md text-lg"
+                                         >
+                                             <a href={pageConfig.calendly_url} target="_blank" rel="noopener noreferrer">
+                                                 <Calendar className="mr-2 h-5 w-5" />
+                                                 {pageConfig.calendly_cta_text || "Book a Strategy Call"}
+                                             </a>
+                                         </Button>
+                                     </div>
+                                 )}
+
                                  {/* Map Section */}
                                  {pageConfig?.map_embed && (
                                      <div className="h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
@@ -131,9 +147,25 @@ const Contact = () => {
 
                              </div>
 
-                             {/* Right Column: The Form */}
+                             {/* Right Column: Google Form Iframe */}
                              <div className="lg:pl-10">
-                                 <ContactForm />
+                                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[800px]">
+                                     {pageConfig?.google_form_url ? (
+                                         <iframe 
+                                            src={pageConfig.google_form_url} 
+                                            className="w-full h-[800px] border-0 bg-transparent"
+                                            title="Contact Form"
+                                         >
+                                             Loading...
+                                         </iframe>
+                                     ) : (
+                                         <div className="h-full flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
+                                             <Loader2 className="h-12 w-12 animate-spin mb-4 text-secondary" />
+                                             <p>Loading Contact Form form...</p>
+                                             <p className="text-sm opacity-50 mt-2">(If this persists, please configure the Google Form URL in Admin)</p>
+                                         </div>
+                                     )}
+                                 </div>
                              </div>
                         </div>
                      </div>
