@@ -2,32 +2,49 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Loader2, Calendar } from "lucide-react";
+import { Loader2, Calendar, AlertCircle } from "lucide-react";
 import Hero from "@/components/Hero";
 import { Button } from "@/components/ui/button";
 
+interface PageContactConfig {
+    hero_title?: string;
+    hero_image_url?: string;
+    address_html?: string;
+    map_embed?: string;
+    google_form_url?: string;
+    calendly_url?: string;
+    calendly_cta_text?: string;
+}
+
 const Contact = () => {
-    const [pageConfig, setPageConfig] = useState<any>(null);
+    const [pageConfig, setPageConfig] = useState<PageContactConfig | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPage = async () => {
             try {
                 setLoading(true);
-                // 1. Fetch Page Config (New Table)
-                const { data: pageData, error } = await supabase
+                setError(null);
+                
+                const { data: pageData, error: fetchError } = await supabase
                     .from('page_contact')
                     .select('*')
                     .limit(1)
                     .single();
                 
-                if (error && error.code !== 'PGRST116') { // Ignore 'no rows' error
-                     console.error("Error fetching contact page:", error);
+                if (fetchError) {
+                    if (fetchError.code !== 'PGRST116') { // Ignore 'no rows' error
+                         console.error("Error fetching contact page:", fetchError);
+                         setError("Unable to load contact details. Please try again later.");
+                    }
+                } else {
+                    setPageConfig(pageData);
                 }
-                setPageConfig(pageData);
 
-            } catch (error) {
-                console.error("Error fetching contact page:", error);
+            } catch (err: any) {
+                console.error("Unexpected error:", err);
+                setError("An unexpected error occurred.");
             } finally {
                 setLoading(false);
             }
@@ -35,7 +52,6 @@ const Contact = () => {
 
         fetchPage();
 
-        // Real-time Subscriptions
         const pageChannel = supabase
             .channel('contact-page-update')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'page_contact' }, () => fetchPage())
@@ -48,12 +64,22 @@ const Contact = () => {
 
     const renderMap = (embedCode: string) => {
         if (!embedCode) return null;
-
-        if (embedCode.trim().startsWith('<iframe')) {
-            return <div dangerouslySetInnerHTML={{ __html: embedCode }} className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:rounded-xl [&>iframe]:shadow-lg" />;
+        
+        // Robust check for iframe tag
+        const isIframe = /<iframe/i.test(embedCode);
+        
+        if (isIframe) {
+            // Render the provided iframe HTML
+            // Note: Content is trusted from Admin Panel.
+            return (
+                <div 
+                    dangerouslySetInnerHTML={{ __html: embedCode }} 
+                    className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:rounded-xl [&>iframe]:shadow-lg" 
+                />
+            );
         }
         
-        // Assume it's a URL
+        // Fallback: Assume it's a direct URL and wrap it
         return (
             <iframe 
                 src={embedCode} 
@@ -61,23 +87,39 @@ const Contact = () => {
                 allowFullScreen={true} 
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"
+                title="Google Map"
             />
         );
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="min-h-screen flex items-center justify-center bg-primary">
+                <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-primary font-sans text-white flex flex-col items-center justify-center">
+                <Navbar />
+                <div className="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/10">
+                    <AlertCircle className="h-12 w-12 text-red-400 mb-4" />
+                    <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
+                    <p className="text-white/70">{error}</p>
+                    <Button onClick={() => window.location.reload()} className="mt-6" variant="outline">
+                        Retry
+                    </Button>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-background font-sans">
+        <div className="min-h-screen bg-primary font-sans text-white">
             <Navbar />
             <main>
-                {/* Hero using page_contact data */}
                 <Hero
                     mediaType="image"
                     title={pageConfig?.hero_title || "Let's Connect"}
@@ -111,6 +153,7 @@ const Contact = () => {
                                  <div className="bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm">
                                      {pageConfig?.address_html ? (
                                          <div className="prose prose-lg prose-invert text-white/80 prose-headings:text-white prose-strong:text-secondary prose-a:text-secondary">
+                                             {/* Trusted HTML from Admin Panel */}
                                              <div dangerouslySetInnerHTML={{ __html: pageConfig.address_html }} />
                                          </div>
                                      ) : (
@@ -120,7 +163,7 @@ const Contact = () => {
                                      )}
                                  </div>
                                  
-                                 {/* Calendly Block - Distinct, Prominent */}
+                                 {/* Calendly Block */}
                                  {pageConfig?.calendly_url && (
                                      <div className="bg-white p-8 rounded-2xl shadow-xl border-l-4 border-secondary">
                                          <h3 className="text-xl font-bold text-primary mb-2">Skip the inbox?</h3>
@@ -155,6 +198,7 @@ const Contact = () => {
                                             src={pageConfig.google_form_url} 
                                             className="w-full h-[800px] border-0 bg-transparent"
                                             title="Contact Form"
+                                            sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-presentation"
                                          >
                                              Loading...
                                          </iframe>
