@@ -2,49 +2,33 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Loader2, Zap, Mail, MapPin, Linkedin, Phone } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import Hero from "@/components/Hero";
-import { useContent } from "@/hooks/useContent";
-
-interface Section {
-  id: string;
-  section_key: string;
-  title: string;
-  subtitle?: string;
-  content_body?: string;
-  specific_data?: any;
-  bg_theme: 'light' | 'navy' | 'gray';
-  alignment: 'left' | 'center' | 'right';
-  is_visible: boolean;
-}
+import RichText from "@/components/ui/RichText";
 
 const Contact = () => {
-    const [sections, setSections] = useState<Section[]>([]);
-    const [loading, setLoading] = useState(true);
     const [pageConfig, setPageConfig] = useState<any>(null);
-    const { getText } = useContent('contact');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPage = async () => {
             try {
                 setLoading(true);
-                // 1. Fetch Master Page
-                const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'contact').single();
-                if (pageData) setPageConfig(pageData);
-
-                // 2. Fetch Sections
-                const { data: sectionData, error } = await supabase
-                    .from('sections_contact')
+                // 1. Fetch Page Config (New Table)
+                const { data: pageData, error } = await supabase
+                    .from('page_contact')
                     .select('*')
-                    .eq('is_visible', true)
-                    .neq('section_key', 'hero')
-                    .order('display_order', { ascending: true });
+                    .limit(1)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') { // Ignore 'no rows' error
+                     console.error("Error fetching contact page:", error);
+                }
+                setPageConfig(pageData);
 
-                if (error) throw error;
-                setSections(sectionData || []);
             } catch (error) {
-                console.error("Error fetching contact sections:", error);
+                console.error("Error fetching contact page:", error);
             } finally {
                 setLoading(false);
             }
@@ -55,41 +39,32 @@ const Contact = () => {
         // Real-time Subscriptions
         const pageChannel = supabase
             .channel('contact-page-update')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'contact'" }, () => fetchPage())
-            .subscribe();
-
-        const sectionsChannel = supabase
-            .channel('contact-sections-update')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_contact' }, () => fetchPage())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'page_contact' }, () => fetchPage())
             .subscribe();
 
         return () => {
             supabase.removeChannel(pageChannel);
-            supabase.removeChannel(sectionsChannel);
         };
     }, []);
 
-    // Extract Info Block data if available
-    const infoBlocks = sections.filter(s => s.section_key === 'info_block');
-    
-    // Helper to safely parse specific_data
-    const getSpecificData = (section: any) => {
-        if (!section?.specific_data) return {};
-        if (typeof section.specific_data === 'string') {
-            try { return JSON.parse(section.specific_data); } 
-            catch { return {}; }
+    const renderMap = (embedCode: string) => {
+        if (!embedCode) return null;
+
+        if (embedCode.trim().startsWith('<iframe')) {
+            return <div dangerouslySetInnerHTML={{ __html: embedCode }} className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:rounded-xl [&>iframe]:shadow-lg" />;
         }
-        return section.specific_data;
+        
+        // Assume it's a URL
+        return (
+            <iframe 
+                src={embedCode} 
+                className="w-full h-full rounded-xl shadow-lg border-0" 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+            />
+        );
     };
-
-    // Helper to format text with newlines
-    const formatText = (text: string) => {
-        if (!text) return '';
-        // Handle literal \n or real newlines
-        return text.replace(/\\n/g, '\n');
-    };
-
-
 
     if (loading) {
         return (
@@ -103,13 +78,12 @@ const Contact = () => {
         <div className="min-h-screen bg-background font-sans">
             <Navbar />
             <main>
+                {/* Hero using page_contact data */}
                 <Hero
-                    mediaType={pageConfig?.media_type || 'image'}
-                    videoUrl={pageConfig?.hero_video_url}
-                    backgroundImage={pageConfig?.hero_image_url}
-                    overlayOpacity={pageConfig?.overlay_opacity}
-                    title={pageConfig?.title}
-                    subtitle={pageConfig?.subtitle}
+                    mediaType="image"
+                    title={pageConfig?.hero_title || "Let's Connect"}
+                    subtitle="We are ready to listen."
+                    backgroundImage={pageConfig?.hero_image_url} // If we add this column later
                 />
 
                 <section className="py-24 bg-primary relative overflow-hidden">
@@ -124,97 +98,37 @@ const Contact = () => {
                              <div className="space-y-12 animate-fade-in-up">
                                  <div>
                                     <div className="inline-block px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-semibold uppercase tracking-wider mb-4 border border-secondary/20">
-                                        Let's Connect
+                                        Get in Touch
                                     </div>
                                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                                        Ready to Transform Your Growth Engine?
+                                        {pageConfig?.hero_title || "Ready to Transform Your Growth Engine?"}
                                     </h2>
                                     <p className="text-xl text-white/70 leading-relaxed font-light">
                                         Whether you have a specific challenge or just want to explore what's possible, our team is ready to listen.
                                     </p>
                                  </div>
 
-                                 <div className="space-y-8">
-                                    {infoBlocks.map((block) => {
-                                        const blockData = getSpecificData(block);
-                                        return (
-                                            <div key={block.id} className="space-y-6">
-                                                {/* Optional Block Title if User entered one */}
-                                                {block.title && block.title !== 'General' && block.title !== 'Contact Details' && (
-                                                    <h3 className="text-xl font-semibold text-white/90">{block.title}</h3>
-                                                )}
+                                 {/* Dynamic Address / Contact Info Block */}
+                                 <div className="bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm">
+                                     {pageConfig?.address_html ? (
+                                         <div className="prose prose-lg prose-invert text-white/80 prose-headings:text-white prose-strong:text-secondary prose-a:text-secondary">
+                                             <div dangerouslySetInnerHTML={{ __html: pageConfig.address_html }} />
+                                         </div>
+                                     ) : (
+                                        // Fallback if nothing in DB
+                                        <div className="text-white/70">
+                                            <p>No contact details configured. Please update in Admin Panel.</p>
+                                        </div>
+                                     )}
+                                 </div>
+                                 
+                                 {/* Map Section */}
+                                 {pageConfig?.map_embed && (
+                                     <div className="h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                                         {renderMap(pageConfig.map_embed)}
+                                     </div>
+                                 )}
 
-                                                {blockData?.items && Array.isArray(blockData.items) ? (
-                                                    // New Visual Editor Data
-                                                    blockData.items.map((item: any, idx: number) => {
-                                                        let Icon = Zap;
-                                                        if (item.type === 'email') Icon = Mail;
-                                                        if (item.type === 'location') Icon = MapPin;
-                                                        if (item.type === 'linkedin') Icon = Linkedin;
-                                                        if (item.type === 'phone') Icon = Phone;
-
-                                                        return (
-                                                            <div key={idx} className="flex items-start gap-6 group">
-                                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
-                                                                    <Icon className="h-6 w-6 text-secondary" />
-                                                                </div>
-                                                                <div>
-                                                                    <h4 className="text-lg font-bold text-white mb-1">{item.label}</h4>
-                                                                    <p className="text-white/70 whitespace-pre-line leading-relaxed">{formatText(item.value)}</p>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })
-                                                ) : block.content_body ? (
-                                                    // Legacy Text Data
-                                                    block.content_body.split('\n').filter((l: string) => l.trim()).map((line: string, idx: number) => {
-                                                        let Icon = Zap;
-                                                        if (line.toLowerCase().includes('email')) Icon = Mail;
-                                                        if (line.toLowerCase().includes('location')) Icon = MapPin;
-                                                        if (line.toLowerCase().includes('linkedin')) Icon = Linkedin;
-                                                        if (line.toLowerCase().includes('phone')) Icon = Phone;
-
-                                                        return (
-                                                            <div key={idx} className="flex items-start gap-6 group">
-                                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
-                                                                    <Icon className="h-6 w-6 text-secondary" />
-                                                                </div>
-                                                                <div>
-                                                                    <h4 className="text-lg font-bold text-white mb-1">{line.split(':')[0]}</h4>
-                                                                    <p className="text-white/70">{line.replace(/^[^:]+:/, '').trim()}</p>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })
-                                                ) : null}
-                                            </div>
-                                        );
-                                    })}
-                                    
-                                    {/* Fallback Only if NO blocks exist */}
-                                    {infoBlocks.length === 0 && (
-                                        <>
-                                            <div className="flex items-start gap-6 group">
-                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
-                                                    <Mail className="h-6 w-6 text-secondary" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-lg font-bold text-white mb-1">Email Us</h4>
-                                                    <p className="text-white/70">connect@kretrutosh.com</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-start gap-6 group">
-                                                <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
-                                                     <Linkedin className="h-6 w-6 text-secondary" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-lg font-bold text-white mb-1">Follow Us</h4>
-                                                    <p className="text-white/70">KretruTosh Consulting</p>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                             </div>
                              </div>
 
                              {/* Right Column: The Form */}
@@ -224,38 +138,6 @@ const Contact = () => {
                         </div>
                      </div>
                 </section>
-                
-                {/* Additional Strategy Section if exists */}
-                {sections.filter(s => s.section_key === 'strategy_block').map(section => {
-                    const strategyData = getSpecificData(section);
-                    return (
-                        <section key={section.id} className="py-24 bg-white">
-                            <div className="container mx-auto px-4 text-center max-w-4xl">
-                                <h2 className="text-3xl font-bold text-primary mb-12">{section.title}</h2>
-                                <div className="grid md:grid-cols-2 gap-8 text-left">
-                                    {strategyData?.items && Array.isArray(strategyData.items) ? (
-                                        // Visual Editor Data
-                                        strategyData.items.map((item: any, idx: number) => (
-                                             <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
-                                                 <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                                 <p className="text-lg text-foreground/80 leading-relaxed whitespace-pre-line">{formatText(item.text)}</p>
-                                             </div>
-                                        ))
-                                    ) : (
-                                        // Legacy Text Data
-                                        section.content_body?.split('\n').filter((l: string) => l.includes('•')).map((item: string, idx: number) => (
-                                             <div key={idx} className="flex gap-4 p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
-                                                 <div className="h-2 w-2 mt-2.5 rounded-full bg-secondary shrink-0" />
-                                                 <p className="text-lg text-foreground/80 leading-relaxed">{item.replace(/^•/, '').trim()}</p>
-                                             </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        </section>
-                    );
-                })}
-
             </main>
             <Footer />
         </div>
