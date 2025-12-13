@@ -32,7 +32,7 @@ const Blogs = () => {
     const fetchBlogs = async () => {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from('blogs')
+        .from('articles') // Changed to 'articles' table
         .select('*')
         .order('publish_date', { ascending: false });
 
@@ -45,6 +45,15 @@ const Blogs = () => {
     };
 
     fetchBlogs();
+
+    const channel = supabase
+      .channel('blogs-list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'articles' }, () => fetchBlogs())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const formatDate = (dateString: string | null) => {

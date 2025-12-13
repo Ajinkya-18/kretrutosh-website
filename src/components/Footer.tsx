@@ -16,6 +16,22 @@ const Footer = () => {
         if (data) setConfig(data);
     };
     fetchConfig();
+
+    const channel = supabase
+      .channel('footer-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'config_footer' },
+        (payload) => {
+            console.log('Footer update received:', payload);
+            fetchConfig();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
 

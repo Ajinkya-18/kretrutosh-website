@@ -19,7 +19,7 @@ const ClientLogos = ({ title }: ClientLogosProps) => {
   useEffect(() => {
     const fetchLogos = async () => {
       const { data, error } = await supabase
-        .from('client_logos')
+        .from('clients') // Changed to clients table per new schema
         .select('*')
         .order('display_order', { ascending: true });
 
@@ -31,6 +31,15 @@ const ClientLogos = ({ title }: ClientLogosProps) => {
     };
 
     fetchLogos();
+
+    const channel = supabase
+      .channel('home-clients')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => fetchLogos())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Helper to render either Image or Text Fallback

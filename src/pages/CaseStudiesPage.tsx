@@ -61,9 +61,9 @@ const CaseStudiesPage = () => {
 
     fetchData();
 
-    // Real-time subscription
+    // Real-time subscription - Case Studies List
     const channel = supabase
-      .channel('case-studies-changes')
+      .channel('case-studies-list')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'case_studies' },
@@ -74,8 +74,22 @@ const CaseStudiesPage = () => {
       )
       .subscribe();
 
+    // Real-time subscription - Page Metadata
+    const pageChannel = supabase
+        .channel('case-studies-page')
+        .on(
+            'postgres_changes', 
+            { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'case-studies'" }, 
+            (payload) => {
+                console.log('Page meta changed:', payload);
+                fetchData();
+            }
+        )
+        .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(pageChannel);
     };
   }, []);
 

@@ -32,7 +32,6 @@ const CaseStudies = ({ title, description, ctaText }: CaseStudiesProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ... same fetch logic
     const fetchCases = async () => {
       const { data, error } = await supabase
         .from('case_studies')
@@ -46,6 +45,15 @@ const CaseStudies = ({ title, description, ctaText }: CaseStudiesProps) => {
       setLoading(false);
     };
     fetchCases();
+
+    const channel = supabase
+      .channel('home-casestudies')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'case_studies' }, () => fetchCases())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
