@@ -85,7 +85,7 @@ const Frameworks = ({ title, description, ctaText, gridClass }: FrameworksProps)
               return (
                 <div 
                   key={fw.id} 
-                  className="bg-card p-6 rounded-lg border border-border/50 hover:border-secondary hover:shadow-lg transition-all cursor-pointer group flex flex-col h-full"
+                  className="bg-card p-6 rounded-lg border border-border/50 hover:border-secondary hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full"
                   onClick={() => navigate(`/frameworks/${fw.slug}`)}
                 >
                   <div className="mb-3">

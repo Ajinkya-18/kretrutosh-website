@@ -84,7 +84,7 @@ const CaseStudies = ({ title, description, ctaText }: CaseStudiesProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cases.map((item) => (
               <Link key={item.id} to={`/case-studies#case-study-${item.id}`} className="block h-full">
-                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50 hover:border-secondary/50 h-full flex flex-col">
+                <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 hover:border-secondary/50 h-full flex flex-col">
                   <CardHeader className="pb-2">
                     <div className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
                       {item.industry}

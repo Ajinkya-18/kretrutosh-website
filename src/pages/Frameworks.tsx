@@ -103,7 +103,7 @@ const Frameworks = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
-                    className="bg-card p-6 rounded-xl border border-border/50 hover:shadow-lg hover:border-secondary/50 transition-all group flex flex-col h-full cursor-pointer"
+                    className="bg-card p-6 rounded-xl border border-border/50 hover:shadow-xl hover:border-secondary/50 transition-all group flex flex-col h-full cursor-pointer"
                     onClick={() => navigate(`/frameworks/${fw.slug}`)}
                   >
                     <div className="mb-4 p-3 bg-primary/5 rounded-lg w-fit group-hover:bg-primary/10 transition-colors">

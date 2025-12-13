@@ -94,7 +94,7 @@ const GrowthEngine = ({ title, subtitle, gridClass }: GrowthEngineProps) => {
                 <Link 
                 key={index} 
                 to={motion.link}
-                className="bg-card p-6 rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 text-center group block h-full"
+                className="bg-card p-6 rounded-xl border border-border/50 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 text-center group block h-full"
                 >
                 <div className="mb-4 inline-flex p-3 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors">
                     {getIcon(motion.icon)}

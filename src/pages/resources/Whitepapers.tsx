@@ -105,7 +105,7 @@ const Whitepapers = () => {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card className="h-full flex flex-col group border-border/50 overflow-hidden bg-card transition-all duration-300 hover:shadow-elegant hover:-translate-y-1">
+                    <Card className="h-full flex flex-col group border-border/50 overflow-hidden bg-card transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                       {/* Cover Image Area */}
                       <div className="aspect-[4/3] bg-muted/30 relative overflow-hidden border-b border-border/50">
                         {paper.cover_image_url ? (

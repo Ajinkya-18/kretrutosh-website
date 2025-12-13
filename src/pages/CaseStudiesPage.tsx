@@ -162,7 +162,7 @@ const CaseStudiesPage = () => {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
                     <Card 
-                      className="group border-border/50 overflow-hidden bg-card transition-all duration-300 hover:shadow-elegant hover:-translate-y-1"
+                      className="group border-border/50 overflow-hidden bg-card transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                     >
                       <div className="grid md:grid-cols-3 gap-6">
                         <div className="md:col-span-2">

@@ -8,34 +8,69 @@ const Footer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentYear = new Date().getFullYear();
+  
+  // Data State
   const [config, setConfig] = useState<any>(null);
+  const [contactInfo, setContactInfo] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [industries, setIndustries] = useState<any[]>([]);
+  // Making Frameworks dynamic too for consistency
+  const [frameworks, setFrameworks] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchConfig = async () => {
-        const { data } = await supabase.from('config_footer').select('*').single();
-        if (data) setConfig(data);
-    };
-    fetchConfig();
+    const fetchData = async () => {
+        // 1. Config Footer (Socials, Copyright)
+        const { data: configData } = await supabase.from('config_footer').select('*').single();
+        if (configData) setConfig(configData);
 
-    const channel = supabase
-      .channel('footer-updates')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'config_footer' },
-        (payload) => {
-            console.log('Footer update received:', payload);
-            fetchConfig();
-        }
-      )
+        // 2. Page Contact (Address, Email)
+        // Note: Assuming page_contact has 'address_html', 'email' (or similar fields).
+        // If 'email' isn't there, we might fallback or parsing. 
+        // Based on previous edits, page_contact has 'hero_title', 'address_html', 'google_form_url', 'calendly_...'
+        // It might NOT have a dedicated 'email' column if it's all in address_html. 
+        // However, user said "Read address_html and email directly from the Contact table". 
+        // I will select * to be safe.
+        const { data: contactData } = await supabase.from('page_contact').select('*').single();
+        if (contactData) setContactInfo(contactData);
+
+        // 3. Dynamic Lists (Limit 5)
+        const { data: servicesData } = await supabase.from('services').select('id, title, slug').limit(6).order('title');
+        if (servicesData) setServices(servicesData);
+
+        const { data: industriesData } = await supabase.from('industries').select('id, title, slug').limit(6).order('title');
+        if (industriesData) setIndustries(industriesData);
+        
+        const { data: frameworksData } = await supabase.from('frameworks').select('id, title, slug').limit(6).order('title');
+        if (frameworksData) setFrameworks(frameworksData);
+    };
+    fetchData();
+
+    // 4. Realtime Listeners
+    const channel = supabase.channel('footer_global_sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'config_footer' }, (payload) => {
+          if (payload.new) setConfig(payload.new);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'page_contact' }, (payload) => {
+          if (payload.new) setContactInfo(payload.new);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'services' }, async () => {
+          const { data } = await supabase.from('services').select('id, title, slug').limit(6).order('title');
+          if (data) setServices(data);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'industries' }, async () => {
+          const { data } = await supabase.from('industries').select('id, title, slug').limit(6).order('title');
+          if (data) setIndustries(data);
+      })
+       .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, async () => {
+          const { data } = await supabase.from('frameworks').select('id, title, slug').limit(6).order('title');
+          if (data) setFrameworks(data);
+      })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
-
-
-
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -52,45 +87,6 @@ const Footer = () => {
     }
   };
 
-  const footerLinks = {
-    solutions: [
-      { name: "Pre-Sales Transformation", path: "/services/pre-sales" },
-      { name: "Sales Velocity", path: "/services/sales-velocity" },
-      { name: "Customer Success", path: "/services/customer-success" },
-      { name: "Digital & AI Enablement", path: "/services/digital-ai" },
-      { name: "Culture Transformation", path: "/services/culture-transformation" },
-    ],
-    industries: [
-      { name: "Retail", path: "/industries/retail" },
-      { name: "E-Commerce", path: "/industries/ecommerce" },
-      { name: "SaaS", path: "/industries/saas" },
-      { name: "Insurance", path: "/industries/insurance" },
-      { name: "BFSI", path: "/industries/bfsi" },
-      { name: "Manufacturing", path: "/industries/manufacturing" },
-      { name: "Healthcare", path: "/industries/healthcare" },
-      { name: "EdTech", path: "/industries/edtech" },
-    ],
-    frameworks: [
-      { name: "CX Maturity", path: "/frameworks/cx-maturity" },
-      { name: "EMM", path: "/frameworks/expectation-management" },
-      { name: "HAND", path: "/frameworks/hand" },
-      { name: "VRM", path: "/frameworks/value-realization-map" },
-      { name: "Heatmap", path: "/frameworks/lifecycle-heatmap" },
-      { name: "VICTORY", path: "/frameworks/victory" },
-    ],
-    resources: [
-      { name: "Book", path: "/resources/book" },
-      { name: "Podcast", path: "/resources/podcast" },
-      { name: "Assessments", path: "/assessments" },
-      { name: "Whitepapers", path: "/resources/whitepapers" },
-      { name: "Articles", path: "/resources/articles" },
-    ],
-    company: [
-      { name: "About", path: "/about" },
-      { name: "Contact", path: "/contact" },
-    ],
-  };
-
   // Helper for Social
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
@@ -102,7 +98,7 @@ const Footer = () => {
     }
   };
 
-  // If DB has social_links, use them. Otherwise fallback.
+  // Social Links Fallback
   const socialLinks = config?.social_links || [
       { platform: 'linkedin', url: 'https://www.linkedin.com/in/ashutosh-karandikar-ccxp/' },
       { platform: 'youtube', url: 'https://www.youtube.com/@theXTPodcast' },
@@ -112,7 +108,7 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground border-t border-primary/20">
       <div className="container mx-auto px-4 py-16">
-        {/* Top Section: Brand & Socials & Newsletter */}
+        {/* Top Section: Brand & Socials */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8">
           <div className="flex flex-col gap-4">
               <Link to="/" className="flex items-center gap-3" onClick={() => handleLinkClick("/")}>
@@ -149,113 +145,95 @@ const Footer = () => {
                  `}} />
               </div>
           </div>
-
-
         </div>
 
-        {/* Main Grid: 5 Columns */}
+        {/* Main Grid: Columns */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
-          {/* Column 1: Solutions */}
+          {/* Column 1: Solutions (Services) */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">
-              Services
-            </h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">Services</h4>
             <ul className="space-y-3">
-              {footerLinks.solutions.map((link) => (
-                <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
-                    {link.name}
+              {services.map((item) => (
+                <li key={item.id}>
+                  <Link to={`/services/${item.slug}`} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(`/services/${item.slug}`)}>
+                    {item.title}
                   </Link>
                 </li>
               ))}
+               {services.length === 0 && <li className="text-sm text-primary-foreground/50">Loading services...</li>}
             </ul>
           </div>
 
           {/* Column 2: Industries */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">
-              Industries
-            </h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">Industries</h4>
             <ul className="space-y-3">
-              {footerLinks.industries.map((link) => (
-                <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
-                    {link.name}
+              {industries.map((item) => (
+                <li key={item.id}>
+                  <Link to={`/industries/${item.slug}`} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(`/industries/${item.slug}`)}>
+                    {item.title}
                   </Link>
                 </li>
               ))}
+              {industries.length === 0 && <li className="text-sm text-primary-foreground/50">Loading industries...</li>}
             </ul>
           </div>
 
           {/* Column 3: Frameworks */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">
-              Frameworks
-            </h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">Frameworks</h4>
             <ul className="space-y-3">
-              {footerLinks.frameworks.map((link) => (
-                <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
-                    {link.name}
+              {frameworks.map((item) => (
+                <li key={item.id}>
+                  <Link to={`/frameworks/${item.slug}`} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(`/frameworks/${item.slug}`)}>
+                    {item.title}
                   </Link>
                 </li>
               ))}
+              {frameworks.length === 0 && <li className="text-sm text-primary-foreground/50">Loading frameworks...</li>}
             </ul>
           </div>
 
-          {/* Column 4: Resources */}
+          {/* Column 4: Resources (Static for now) */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">
-              Resources
-            </h4>
+            <h4 className="text-lg font-semibold mb-6 text-secondary">Resources</h4>
             <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.name}>
-                  <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
+                <li><Link to="/resources/book" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">Book</Link></li>
+                <li><Link to="/resources/podcast" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">Podcast</Link></li>
+                <li><Link to="/assessments" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">Assessments</Link></li>
+                <li><Link to="/resources/whitepapers" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">Whitepapers</Link></li>
+                <li><Link to="/case-studies" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">Success Stories</Link></li>
             </ul>
           </div>
 
-          {/* Column 5: Company */}
+          {/* Column 5: Company & Contact (Dynamic) */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 text-secondary">
-              Company
-            </h4>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  {link.name === "Contact" ? (
-                    <a href="/#contact" onClick={handleContactClick} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
-                      {link.name}
-                    </a>
-                  ) : (
-                    <Link to={link.path} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(link.path)}>
-                      {link.name}
-                    </Link>
-                  )}
-                </li>
-              ))}
+            <h4 className="text-lg font-semibold mb-6 text-secondary">Company</h4>
+            <ul className="space-y-3 mb-6">
+                 <li><Link to="/about" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">About Us</Link></li>
+                 <li><Link to="/contact" className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">Contact</Link></li>
             </ul>
             
-            {/* Dynamic Contact Details */}
-            <div className="mt-6 space-y-3">
-              <div className="flex items-start gap-3 text-primary-foreground/70 text-sm">
-                <MapPin className="mt-1 shrink-0 text-secondary" size={16} />
-                <span>{config?.address || 'Mumbai, Maharashtra, India'}</span>
-              </div>
-              <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
-                <Phone className="shrink-0 text-secondary" size={16} />
-                <a href={`tel:${config?.phone || '+919591387838'}`} className="hover:text-white transition-colors">
-                  {config?.phone || '+91 95913 87838'}
-                </a>
-              </div>
+            {/* Dynamic Contact Details from page_contact */}
+            <div className="space-y-3">
+                {/* Address: Render HTML safely with minimal styling override */}
+               <div className="flex items-start gap-3 text-primary-foreground/70 text-sm">
+                 <MapPin className="mt-1 shrink-0 text-secondary" size={16} />
+                 {contactInfo?.address_html ? (
+                     <div 
+                        className="prose prose-invert prose-sm max-w-none [&>p]:m-0 [&>p]:leading-normal" 
+                        dangerouslySetInnerHTML={{ __html: contactInfo.address_html }} 
+                     />
+                 ) : (
+                    <span>{config?.address || 'Mumbai, Maharashtra, India'}</span>
+                 )}
+               </div>
+
+               {/* Email: Check contactInfo first, then config */}
               <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
                 <Mail className="shrink-0 text-secondary" size={16} />
-                <a href={`mailto:${config?.email || 'consult.ashutosh@kretru.com'}`} className="hover:text-white transition-colors">
-                  {config?.email || 'consult.ashutosh@kretru.com'}
+                <a href={`mailto:${contactInfo?.email || config?.email || 'consult.ashutosh@kretru.com'}`} className="hover:text-white transition-colors">
+                  {contactInfo?.email || config?.email || 'consult.ashutosh@kretru.com'}
                 </a>
               </div>
             </div>
