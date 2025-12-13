@@ -54,21 +54,38 @@ const Navbar = () => {
 
     // Fetch Config
     const fetchConfig = async () => {
+        // 1. Fetch the single config row
         const { data } = await supabase.from('config_navbar').select('*').single();
         if (data) {
-            setConfig(data);
-            if (data.menu_items && Array.isArray(data.menu_items)) {
+             // 2. IMPORTANT: Map the data to your state
+             if (data.menu_items && Array.isArray(data.menu_items)) {
                 setItems(data.menu_items);
-            } else {
-                setItems(defaultNavItems);
-            }
+             }
+             setConfig(data);
         } else {
-            setItems(defaultNavItems);
+             setItems(defaultNavItems);
         }
     };
     fetchConfig();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    // 3. Realtime Listener
+    const channel = supabase.channel('navbar_update')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'config_navbar' }, payload => {
+            console.log("Navbar Update Received:", payload);
+            if (payload.new) {
+                 const newData = payload.new as any;
+                 setConfig(newData);
+                 if (newData.menu_items) {
+                     setItems(newData.menu_items);
+                 }
+            }
+        })
+        .subscribe();
+    
+    return () => { 
+        window.removeEventListener("scroll", handleScroll);
+        supabase.removeChannel(channel);    
+    };
   }, []);
 
   const handleLinkClick = (path: string) => {
