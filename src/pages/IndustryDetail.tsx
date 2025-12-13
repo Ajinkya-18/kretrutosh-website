@@ -11,8 +11,6 @@ import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import RichText from "@/components/ui/RichText";
-import { GRID_MAP, ALIGN_MAP, THEME_MAP } from "@/lib/layoutConstants";
-import { useContent } from "@/hooks/useContent";
 
 // Icon mapping
 const iconMap: any = {
@@ -27,41 +25,23 @@ interface Industry {
   slug: string;
   subtitle: string;
   description: string;
-  challenges: string[];
+  challenges: string[]; // Keep for compatibility or remove if unused in new design
   approach: string;
   outcomes: string[];
   icon_name: string;
   meta_title?: string;
   meta_description?: string;
   framework_slugs?: string[];
-}
-
-interface Section {
-  id: string;
-  section_key: string;
-  title: string;
-  subtitle?: string;
-  description?: string;
-  specific_data: any;
-  bg_theme: 'light' | 'dark' | 'accent';
-  is_visible: boolean;
-}
-
-interface RelatedFramework {
-  id: number;
-  title: string;
-  slug: string;
-  icon_name: string;
+  challenges_html?: string;
+  approach_html?: string;
 }
 
 const IndustryDetail = () => {
   const { id: slug } = useParams(); 
   const navigate = useNavigate();
   const [industryMeta, setIndustryMeta] = useState<Industry | null>(null);
-  const [sections, setSections] = useState<any[]>([]);
   const [caseStudies, setCaseStudies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { getText } = useContent('industry_detail');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,19 +64,7 @@ const IndustryDetail = () => {
         }
         setIndustryMeta(metaData);
 
-        // 2. Fetch Page Sections (Dynamic Builder)
-        const { data: sectionsData, error: sectionsError } = await supabase
-            .from('sections_industry_details') // New Table
-            .select('*')
-            .eq('parent_slug', slug)
-            .eq('is_visible', true)
-            .order('display_order', { ascending: true });
-        
-        if (sectionsError) console.error("Error fetching sections:", sectionsError);
-        setSections(sectionsData || []);
-
-        // 3. Fetch Linked Case Studies (Success Stories)
-        // Use slug matching against industry text column (e.g., 'retail' matches 'Retail')
+        // 2. Fetch Linked Case Studies (Success Stories)
         const { data: csData } = await supabase
             .from('case_studies')
             .select('*')
@@ -124,21 +92,6 @@ const IndustryDetail = () => {
 
     fetchData();
 
-    // Real-time subscription for sections
-    const channel = supabase
-      .channel(`industry-${slug}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'sections_industry_details',
-          filter: `parent_slug=eq.${slug}`,
-        },
-        () => fetchData()
-      )
-      .subscribe();
-    
     // Real-time subscription for Metadata
     const metaChannel = supabase
       .channel(`industry-meta-${slug}`)
@@ -160,71 +113,18 @@ const IndustryDetail = () => {
       .subscribe();
 
     return () => { 
-        supabase.removeChannel(channel);
         supabase.removeChannel(metaChannel);
         supabase.removeChannel(csChannel);
     };
   }, [slug]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#0B1C3E]"><Skeleton className="h-12 w-12 rounded-full bg-white/10" /></div>;
 
   if (!industryMeta) return <NotFound />;
 
   const Icon = iconMap[industryMeta.icon_name] || Building2;
 
-  const renderSection = (section: any) => {
-    const gridClass = GRID_MAP[section.grid_columns] || GRID_MAP[1];
-    const alignClass = ALIGN_MAP[section.alignment] || ALIGN_MAP['left'];
-    const themeClass = THEME_MAP[section.bg_theme] || THEME_MAP['light'];
-
-    // Specific Handling for HTML sections
-    if (section.section_key === 'challenges' && section.challenges_html) {
-        return (
-             <div className="py-16 bg-muted/20">
-                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-primary mb-8 text-center">{section.title}</h2>
-                    <div className="max-w-4xl mx-auto prose prose-lg prose-headings:text-primary prose-strong:text-secondary">
-                        <RichText content={section.challenges_html} />
-                    </div>
-                 </div>
-             </div>
-        );
-    }
-
-    if (section.section_key === 'approach' && section.approach_html) {
-         return (
-             <div className="py-16 bg-background">
-                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-primary mb-8 text-center">{section.title}</h2>
-                    <div className="max-w-4xl mx-auto p-8 bg-white border-l-4 border-secondary shadow-sm rounded-r-xl prose prose-lg prose-headings:text-primary">
-                        <RichText content={section.approach_html} />
-                    </div>
-                 </div>
-             </div>
-         );
-    }
-    
-    // Generic Render (Hero or others)
-    return (
-        <div className={`py-12 ${themeClass}`}>
-           <div className="container mx-auto px-4">
-              <div className={`${gridClass} gap-8`}>
-                   <div className={`${alignClass} space-y-4`}>
-                      {section.title && <h2 className="text-3xl font-bold">{section.title}</h2>}
-                      {section.content_body && (
-                          <div className="prose max-w-none text-muted-foreground whitespace-pre-line">
-                              <RichText content={section.content_body} />
-                          </div>
-                      )}
-                      {section.image_url && (
-                          <img src={section.image_url} alt={section.title} className="rounded-xl shadow-md mt-4 max-h-96 object-cover" />
-                      )}
-                   </div>
-              </div>
-           </div>
-        </div>
-    );
-  };
+  // Use updated color scheme: Navy (#0B1C3E) and Saffron (#FF9933)
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -234,8 +134,8 @@ const IndustryDetail = () => {
       />
       <Navbar />
       
-      {/* Hero Section - Keeping static wrapper populated by Meta for now to ensure consistency */}
-      <section className="relative pt-32 pb-20 bg-gradient-hero overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 bg-[#0B1C3E] overflow-hidden text-white">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="container mx-auto px-4 relative z-10">
             <Button 
@@ -253,11 +153,11 @@ const IndustryDetail = () => {
                 className="flex flex-col md:flex-row gap-8 items-start"
             >
                 <div className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                <Icon className="h-16 w-16 text-secondary" />
+                <Icon className="h-16 w-16 text-[#FF9933]" />
                 </div>
                 <div>
-                <div className="inline-block px-3 py-1 rounded-full border border-secondary/30 bg-secondary/10 backdrop-blur-sm mb-4">
-                    <span className="text-secondary font-medium text-xs tracking-wide uppercase">{industryMeta.subtitle}</span>
+                <div className="inline-block px-3 py-1 rounded-full border border-[#FF9933]/30 bg-[#FF9933]/10 backdrop-blur-sm mb-4">
+                    <span className="text-[#FF9933] font-medium text-xs tracking-wide uppercase">{industryMeta.subtitle}</span>
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                     {industryMeta.title}
@@ -270,34 +170,66 @@ const IndustryDetail = () => {
         </div>
       </section>
 
-      {/* Dynamic Sections Renderer */}
-      <div className="flex flex-col">
-          {sections.length > 0 ? (
-              sections.map(section => (
-                  <div key={section.id}>
-                      {renderSection(section)}
-                  </div>
-              ))
-          ) : (
-                <div className="py-20 text-center text-muted-foreground">
-                    <p>Industry details coming soon.</p>
+      {/* Challenges Section */}
+      {industryMeta.challenges_html && (
+        <section className="py-20 bg-gray-50">
+             <div className="container mx-auto px-4">
+                <div className="max-w-4xl mx-auto">
+                    <div className="text-center mb-12">
+                        <span className="text-[#0B1C3E] font-bold tracking-widest uppercase text-sm mb-2 block">The Context</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-[#0B1C3E] mb-6">Key Challenges</h2>
+                    </div>
+                    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-strong:text-[#0B1C3E] prose-li:marker:text-[#FF9933]">
+                            <RichText content={industryMeta.challenges_html} />
+                        </div>
+                    </div>
+                 </div>
+             </div>
+        </section>
+      )}
+
+      {/* Approach Section */}
+      {industryMeta.approach_html && (
+         <section className="py-20 bg-white">
+             <div className="container mx-auto px-4">
+                <div className="max-w-5xl mx-auto">
+                   <div className="flex flex-col md:flex-row gap-12 items-start">
+                       <div className="md:w-1/3 sticky top-24">
+                            <h2 className="text-3xl md:text-4xl font-bold text-[#0B1C3E] mb-6">Our Approach</h2>
+                            <p className="text-lg text-muted-foreground mb-6">
+                                We don't just solve problems; we build systems for sustainable growth.
+                            </p>
+                            <Button asChild size="lg" className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 w-full md:w-auto shadow-md">
+                                <Link to="/contact">Discuss Strategy <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                            </Button>
+                       </div>
+                       <div className="md:w-2/3">
+                            <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-strong:text-[#0B1C3E] 
+                                prose-ul:space-y-4 prose-li:bg-gray-50 prose-li:p-6 prose-li:rounded-xl prose-li:border prose-li:border-gray-100 prose-li:list-none prose-li:m-0"
+                            >
+                                <RichText content={industryMeta.approach_html} />
+                            </div>
+                       </div>
+                   </div>
                 </div>
-          )}
-      </div>
+             </div>
+         </section>
+      )}
 
       {/* Success Stories (Case Studies) Section */}
       {caseStudies.length > 0 && (
-        <section className="py-24 bg-muted/30 border-t border-border/50">
+        <section className="py-24 bg-[#0B1C3E] text-white">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-12">
                      <h2 className="text-3xl font-bold">Success Stories</h2>
-                     <Button variant="outline" onClick={() => navigate('/case-studies')}>View All Stories</Button>
+                     <Button variant="outline" className="text-[#0B1C3E] border-white/20 hover:bg-white/10 hover:text-white" onClick={() => navigate('/case-studies')}>View All Stories</Button>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                      {caseStudies.map(study => (
                          <Card 
                             key={study.id} 
-                            className="hover:shadow-lg transition-shadow cursor-pointer" 
+                            className="bg-white/5 border-white/10 hover:bg-white/10 transition-all cursor-pointer text-white" 
                             onClick={() => {
                                 if (study.link_url && study.link_url.length > 2) {
                                     window.open(study.link_url, '_blank');
@@ -306,10 +238,10 @@ const IndustryDetail = () => {
                                 }
                             }}
                          >
-                             <CardContent className="p-6">
-                                 <h3 className="font-bold text-xl mb-3 line-clamp-2">{study.title}</h3>
-                                 <p className="text-muted-foreground mb-4 line-clamp-3">{study.challenge}</p>
-                                 <div className="text-sm font-semibold text-primary flex items-center">
+                             <CardContent className="p-8">
+                                 <h3 className="font-bold text-xl mb-3 line-clamp-2 text-white">{study.title}</h3>
+                                 <p className="text-white/70 mb-6 line-clamp-3">{study.challenge}</p>
+                                 <div className="text-sm font-bold text-[#FF9933] flex items-center">
                                      Read Story <ArrowRight className="inline w-4 h-4 ml-1" />
                                  </div>
                              </CardContent>
