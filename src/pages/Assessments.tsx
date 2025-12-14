@@ -94,8 +94,8 @@ const Assessments = () => {
                 >
                     <Card className="h-full flex flex-col hover:shadow-lg transition-all border-border/50 group">
                         <CardHeader>
-                            <div className="w-12 h-12 bg-primary/5 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                                <ClipboardCheck className="h-6 w-6 text-primary" />
+                            <div className="w-12 h-12 bg-[#FF9933]/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#FF9933]/20 transition-colors">
+                                <ClipboardCheck className="h-6 w-6 text-[#FF9933]" />
                             </div>
                             <CardTitle className="text-xl font-bold text-primary">{assessment.title}</CardTitle>
                         </CardHeader>
