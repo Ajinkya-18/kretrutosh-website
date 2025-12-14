@@ -21,12 +21,19 @@ const Outcomes = ({ title, description, items, gridClass }: OutcomesProps) => {
         </div>
 
         <div className={`grid gap-6 max-w-7xl mx-auto ${gridClass || 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-5'}`}>
-          {items.map((outcome, index) => (
-            <div key={index} className="flex items-center gap-4 p-6 bg-card rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all hover:border-secondary/50 group">
-              <CheckCircle2 className="h-6 w-6 text-secondary shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="text-lg font-medium text-primary">{outcome}</span>
+          {items && items.length > 0 ? (
+            items.map((outcome, index) => (
+              <div key={index} className="flex items-center gap-4 p-6 bg-card rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all hover:border-secondary/50 group">
+                <CheckCircle2 className="h-6 w-6 text-secondary shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="text-lg font-medium text-primary">{outcome}</span>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center p-12 bg-red-500/10 border-2 border-red-500 rounded-xl">
+              <p className="text-red-500 font-mono text-lg font-bold">NULL: No outcomes configured</p>
+              <p className="text-red-400 text-sm mt-2">Please configure outcomes in page_home.outcomes_items</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </section>

@@ -118,9 +118,9 @@ const Contact = () => {
     }
 
     return (
-        <div className="min-h-screen w-full bg-[#0B1C3E] text-white">
+        <div className="min-h-screen w-full !bg-[#0B1C3E] text-white" style={{ backgroundColor: '#0B1C3E' }}>
             {/* Debug Banner - Remove after verification */}
-            <div className="fixed top-0 left-0 z-50 bg-red-500 text-white px-4 py-2 text-xs font-mono">
+            <div className="fixed top-20 left-0 z-50 bg-red-500 text-white px-4 py-2 text-xs font-mono">
                 DEBUG: CONTACT PAGE LOADED (Navy BG: #0B1C3E)
             </div>
             
@@ -133,7 +133,7 @@ const Contact = () => {
                     backgroundImage={pageConfig?.hero_image_url} 
                 />
 
-                <section className="py-24 bg-primary relative overflow-hidden">
+                <section className="py-24 !bg-[#0B1C3E] relative overflow-hidden" style={{ backgroundColor: '#0B1C3E' }}>
                      {/* Decorative Background */}
                      <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 -skew-x-12 pointer-events-none" />
                      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />

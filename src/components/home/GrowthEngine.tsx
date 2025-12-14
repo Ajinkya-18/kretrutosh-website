@@ -35,24 +35,33 @@ const GrowthEngine = ({ title, subtitle, gridClass }: GrowthEngineProps) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
+        console.log('📊 GrowthEngine: Fetching services...');
         const { data, error } = await supabase
           .from('services')
           .select('slug, title, subtitle')
-          .order('id', { ascending: true }); // or display_order if added
+          .order('id', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ SUPABASE ERROR [GrowthEngine/Services]:', error);
+          alert('Data Load Failed [Services]: ' + error.message);
+          throw error;
+        }
 
-        if (data) {
+        if (data && data.length > 0) {
+          console.log(`✅ Fetched ${data.length} services:`, data);
           const mappedMotions: Motion[] = data.map(item => ({
-            icon: 'Target', // icon_name column doesn't exist in services table
+            icon: 'Target',
             title: item.title,
             description: item.subtitle || '',
             link: `/services/${item.slug}`
           }));
           setMotions(mappedMotions);
+        } else {
+          console.warn('⚠️ No services found in database');
+          alert('No services found. Please add services in Admin Panel.');
         }
-      } catch (err) {
-        console.error('Error fetching services:', err);
+      } catch (err: any) {
+        console.error('❌ Unexpected error fetching services:', err);
       } finally {
         setLoading(false);
       }

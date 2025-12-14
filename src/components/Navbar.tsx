@@ -78,15 +78,20 @@ const Navbar = () => {
             if (dataSource && DATA_SOURCE_MAP[dataSource]) {
               const { table, fields } = DATA_SOURCE_MAP[dataSource];
               const promise = (async () => {
+                console.log(`📊 Fetching ${dataSource} from table: ${table}`);
                 const { data, error } = await supabase
                   .from(table)
                   .select(fields)
                   .order('title');
                   
                 if (error) {
-                  console.error(`Error fetching ${dataSource}:`, error);
+                  console.error(`❌ Error fetching ${dataSource} from ${table}:`, error);
+                  alert(`Data Load Failed [${dataSource}]: ${error.message}`);
                 } else if (data) {
+                  console.log(`✅ Fetched ${data.length} items for ${dataSource}:`, data);
                   setDropdownData(prev => ({ ...prev, [dataSource]: data }));
+                } else {
+                  console.warn(`⚠️ No data returned for ${dataSource} from ${table}`);
                 }
               })();
               dataPromises.push(promise);
@@ -95,8 +100,10 @@ const Navbar = () => {
           
           await Promise.all(dataPromises);
           
-          // Debug logging to track dropdown data
-          console.log("NAVBAR DATA FETCHED:", dropdownData);
+          // Wait a tick for state updates to complete, then log final state
+          setTimeout(() => {
+            console.log("📋 NAVBAR DATA FETCHED (Final State):", dropdownData);
+          }, 100);
         }
     };
     
@@ -196,7 +203,9 @@ const Navbar = () => {
               </li>
             ))}
             {items.length === 0 && (
-              <li className="text-sm text-muted-foreground p-2">No items available</li>
+              <li className="text-sm text-red-500 p-2 font-mono border border-red-500">
+                NULL: No {dataSource || 'items'} available (Check console for errors)
+              </li>
             )}
           </ul>
         </NavigationMenuContent>
