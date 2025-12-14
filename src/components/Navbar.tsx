@@ -21,9 +21,9 @@ const DATA_SOURCE_MAP: Record<string, { table: string; fields: string }> = {
   services: { table: "services", fields: "title, slug" },
   frameworks: { table: "frameworks", fields: "title, slug" },
   industries: { table: "industries", fields: "title, slug" },
-  blogs: { table: "blogs", fields: "title, slug" },
   assessments: { table: "assessments", fields: "title, slug" },
-  "case-studies": { table: "case_studies", fields: "title, slug" },
+  blogs: { table: "articles", fields: "title, id" }, // articles table uses id, not slug
+  "case-studies": { table: "case_studies", fields: "title, id" }, // case_studies uses id, not slug
 };
 
 const Navbar = () => {
@@ -175,12 +175,12 @@ const Navbar = () => {
         <NavigationMenuContent>
           <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", items.length > 5 ? "md:grid-cols-2" : "")}>
             {items.map((child: any) => (
-              <li key={child.slug || child.path}>
+              <li key={child.slug || child.id || child.path}>
                 <NavigationMenuLink asChild>
                   <Link
-                    to={child.path || `${basePath}/${child.slug}`}
+                    to={child.path || `${basePath}/${child.slug || child.id}`}
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug}`)}
+                    onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug || child.id}`)}
                   >
                     <div className="text-sm font-medium leading-none">{child.name || child.title}</div>
                     {child.description && (
@@ -251,10 +251,10 @@ const Navbar = () => {
           <div className="pl-4 space-y-1 border-l-2 border-primary/10 ml-4">
             {items.map((child: any) => (
               <Link
-                key={child.slug || child.path}
-                to={child.path || `${basePath}/${child.slug}`}
+                key={child.slug || child.id || child.path}
+                to={child.path || `${basePath}/${child.slug || child.id}`}
                 className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-                onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug}`)}
+                onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug || child.id}`)}
               >
                 {child.name || child.title}
               </Link>
