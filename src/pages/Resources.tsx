@@ -59,8 +59,8 @@ const Resources = () => {
         if (bookRes.data) {
           dynamicResources.push({
             title: bookRes.data.title,
-            subtitle: bookRes.data.subtitle || "Beyond Customer Satisfaction",
-            desc: bookRes.data.description || "",
+            subtitle: bookRes.data.subtitle,
+            desc: bookRes.data.description,
             icon: <BookOpen className="h-8 w-8 text-secondary" />,
             link: "/resources/book",
             cta: "Read Chapter 1"
@@ -71,7 +71,7 @@ const Resources = () => {
           dynamicResources.push({
             title: videosRes.data.title,
             subtitle: "Experience Transformation",
-            desc: videosRes.data.description || "",
+            desc: videosRes.data.description,
             icon: <Mic className="h-8 w-8 text-secondary" />,
             link: "/resources/videos",
             cta: "Listen Now"

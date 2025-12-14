@@ -1,13 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 // Homepage Sections
@@ -17,8 +14,7 @@ import Frameworks from "@/components/home/Frameworks";
 import ClientLogos from "@/components/home/ClientLogos";
 import CaseStudies from "@/components/home/CaseStudies";
 import ThoughtLeadership from "@/components/home/ThoughtLeadership";
-// Other components might be deprecated or unused in new structure if not in page_home config, 
-// but we keep imports if we want to add them back later, or remove if unused.
+import Outcomes from "@/components/home/Outcomes";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -42,113 +38,127 @@ const Index = () => {
     const fetchPage = async () => {
       try {
         setLoading(true);
-        // Fetch from 'page_home' (Assuming only one row or we take the first)
         const { data, error } = await supabase
           .from('page_home')
           .select('*')
           .limit(1)
           .single();
 
-      if (error) {
-           console.error("SUPABASE ERROR [Index]:", error);
-           alert("Data Load Failed [Index]: " + error.message);
-      }
+        if (error) {
+          console.error("SUPABASE ERROR [Index]:", error);
+          alert("Data Load Failed [Index]: " + error.message);
+        }
       
-      if (data) {
+        if (data) {
           setPageConfig(data);
-      }
-    } finally {
+        }
+      } finally {
         setLoading(false);
-    }
-  };
+      }
+    };
 
     fetchPage();
 
     // Subscribe to changes
     const pageChannel = supabase
-        .channel('page-home-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'page_home' }, () => fetchPage())
-        .subscribe();
+      .channel('page-home-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'page_home' }, () => fetchPage())
+      .subscribe();
 
     return () => {
       supabase.removeChannel(pageChannel);
     };
   }, []);
 
+  // =====================================================
+  // DYNAMIC SECTION MAP
+  // =====================================================
+  // This maps section keys from layout_order to actual React components
+  const SECTION_MAP: Record<string, JSX.Element | null> = {
+    hero: (
+      <Hero 
+        key="hero"
+        badge="Customer-Led Growth"
+        title={pageConfig?.hero_title}
+        subtitle={pageConfig?.hero_subtitle}
+        primaryCta="Schedule Consultation"
+        primaryCtaLink="/contact"
+        mediaType="video"
+        videoUrl={pageConfig?.hero_video_url}
+      />
+    ),
+    age_of_kretru: pageConfig ? <AgeOfKretru key="age_of_kretru" /> : null,
+    growth_engine: pageConfig ? (
+      <GrowthEngine 
+        key="growth_engine" 
+        title={pageConfig.growth_engine_title}
+      />
+    ) : null,
+    frameworks: pageConfig ? (
+      <Frameworks 
+        key="frameworks" 
+        title={pageConfig.frameworks_title}
+      />
+    ) : null,
+    outcomes: pageConfig ? (
+      <Outcomes 
+        key="outcomes" 
+        title={pageConfig.outcomes_title || "Measurable Outcomes"}
+        description={pageConfig.outcomes_description || "Results-driven approach to customer-led growth"}
+        items={pageConfig.outcomes_items || []}
+      />
+    ) : null,
+    clients: <ClientLogos key="clients" />,
+    case_studies: <CaseStudies key="case_studies" />,
+    thought_leadership: <ThoughtLeadership key="thought_leadership" />
+  };
+
   if (loading) {
-     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
-  
+
+  // Get layout order from page config, or use default
+  const layoutOrder = pageConfig?.layout_order || [
+    "hero",
+    "growth_engine",
+    "frameworks",
+    "outcomes",
+    "clients",
+    "case_studies",
+    "thought_leadership"
+  ];
+
+  // Get section visibility settings
+  const sectionVisibility = pageConfig?.section_visibility || {};
+
+  // =====================================================
+  // DYNAMIC RENDERING LOOP
+  // =====================================================
+  const renderSections = () => {
+    return layoutOrder
+      .filter((sectionKey: string) => {
+        // Only render if section is visible (default to true if not specified)
+        const isVisible = sectionVisibility[sectionKey] !== false;
+        return isVisible && SECTION_MAP[sectionKey];
+      })
+      .map((sectionKey: string) => SECTION_MAP[sectionKey]);
+  };
+
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
-    <SEO   
-      title={pageConfig?.hero_title ? `${pageConfig.hero_title} | KretruTosh` : undefined}
-      description={pageConfig?.hero_subtitle}
-      image={pageConfig?.hero_video_url} 
-    />
-    <Navbar />
-    <main>
-      {/* Master Hero Render */}
-      <Hero 
-          badge="Customer-Led Growth"
-          title={pageConfig?.hero_title}
-          subtitle={pageConfig?.hero_subtitle}
-          primaryCta="Schedule Consultation"
-          primaryCtaLink="/contact"
-          mediaType="video"
-          videoUrl={pageConfig?.hero_video_url}
+      <SEO   
+        title={pageConfig?.hero_title ? `${pageConfig.hero_title} | KretruTosh` : undefined}
+        description={pageConfig?.hero_subtitle}
+        image={pageConfig?.hero_video_url} 
       />
-
-// ...
-
-       {/* Growth Engine (Services) */}
-      <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-      >
-           <GrowthEngine 
-              title={pageConfig?.growth_engine_title} 
-              subtitle="Your GTM Velocity Model"
-          />
-      </motion.div>
-
-        {/* Client Logos */}
-        <ClientLogos />
-
-        {/* Frameworks */}
-        <div className="bg-muted/30">
-            <Frameworks title={pageConfig?.frameworks_title} />
-        </div>
-
-        {/* Case Studies */}
-        <CaseStudies />
-
-        {/* Thought Leadership (includes Book reference and Whitepapers) */}
-        <ThoughtLeadership />
-
-        {/* Final CTA Section (replacing static Contact Form) */}
-        <div className="py-24 bg-primary text-center">
-            <div className="container mx-auto px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                    Ready to Transform Your Growth Engine?
-                </h2>
-                <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-                    Let's discuss how we can help you achieve predictable, customer-led growth.
-                </p>
-                <Button 
-                    asChild 
-                    size="lg" 
-                    className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 shadow-xl hover:scale-105 transition-all"
-                >
-                    <Link to="/contact">
-                       Schedule a Consultation
-                    </Link>
-                </Button>
-            </div>
-        </div>
-
+      <Navbar />
+      <main>
+        {/* DYNAMIC SECTION RENDERING */}
+        {renderSections()}
       </main>
       <Footer />
     </div>
