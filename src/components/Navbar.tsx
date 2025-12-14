@@ -24,6 +24,8 @@ const DATA_SOURCE_MAP: Record<string, { table: string; fields: string }> = {
   assessments: { table: "assessments", fields: "title, slug" },
   blogs: { table: "articles", fields: "title, id" }, // articles table uses id, not slug
   "case-studies": { table: "case_studies", fields: "title, id" }, // case_studies uses id, not slug
+  videos: { table: "videos", fields: "title, id" }, // videos/podcasts
+  whitepapers: { table: "whitepapers", fields: "title, id" }, // whitepapers
 };
 
 const Navbar = () => {
@@ -70,9 +72,11 @@ const Navbar = () => {
               if (itemNameLower.includes('service')) dataSource = 'services';
               else if (itemNameLower.includes('framework')) dataSource = 'frameworks';
               else if (itemNameLower.includes('industr')) dataSource = 'industries';
-              else if (itemNameLower.includes('blog') || itemNameLower.includes('leadership') || itemNameLower.includes('article')) dataSource = 'blogs';
+              else if (itemNameLower.includes('blog') || itemNameLower.includes('article')) dataSource = 'blogs';
               else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
               else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
+              else if (itemNameLower.includes('podcast') || itemNameLower.includes('video')) dataSource = 'videos';
+              else if (itemNameLower.includes('whitepaper')) dataSource = 'whitepapers';
             }
             
             if (dataSource && DATA_SOURCE_MAP[dataSource]) {
@@ -134,6 +138,14 @@ const Navbar = () => {
             const { data } = await supabase.from('assessments').select('title, slug').order('title');
             if (data) setDropdownData(prev => ({ ...prev, assessments: data }));
         })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, async () => {
+            const { data } = await supabase.from('videos').select('title, id').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, videos: data }));
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'whitepapers' }, async () => {
+            const { data } = await supabase.from('whitepapers').select('title, id').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, whitepapers: data }));
+        })
         .subscribe();
     
     return () => { 
@@ -168,6 +180,15 @@ const Navbar = () => {
       ? dropdownData[dataSource]
       : (item.children || []);
     
+    // Debug log for desktop rendering
+    console.log(`🎨 Rendering dropdown for "${item.name}":`, {
+      dataSource,
+      fetchedCount: dropdownData[dataSource]?.length || 0,
+      childrenCount: item.children?.length || 0,
+      finalItemsCount: items.length,
+      items: items
+    });
+    
     // Determine base path for dropdown items
     let basePath = "";
     if (dataSource === "services") basePath = "/services";
@@ -176,6 +197,8 @@ const Navbar = () => {
     else if (dataSource === "blogs") basePath = "/resources/blog";
     else if (dataSource === "assessments") basePath = "/assessments";
     else if (dataSource === "case-studies") basePath = "/case-studies";
+    else if (dataSource === "videos") basePath = "/resources/videos";
+    else if (dataSource === "whitepapers") basePath = "/resources/whitepapers";
     
     return (
       <NavigationMenuItem key={item.name || item.label}>
@@ -235,9 +258,11 @@ const Navbar = () => {
       if (itemNameLower.includes('service')) dataSource = 'services';
       else if (itemNameLower.includes('framework')) dataSource = 'frameworks';
       else if (itemNameLower.includes('industr')) dataSource = 'industries';
-      else if (itemNameLower.includes('blog') || itemNameLower.includes('leadership') || itemNameLower.includes('article')) dataSource = 'blogs';
+      else if (itemNameLower.includes('blog') || itemNameLower.includes('article')) dataSource = 'blogs';
       else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
       else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
+      else if (itemNameLower.includes('podcast') || itemNameLower.includes('video')) dataSource = 'videos';
+      else if (itemNameLower.includes('whitepaper')) dataSource = 'whitepapers';
     }
     
     // PREFER fetched data over hardcoded children for dynamic sources
@@ -253,6 +278,8 @@ const Navbar = () => {
     else if (dataSource === "blogs") basePath = "/resources/blog";
     else if (dataSource === "assessments") basePath = "/assessments";
     else if (dataSource === "case-studies") basePath = "/case-studies";
+    else if (dataSource === "videos") basePath = "/resources/videos";
+    else if (dataSource === "whitepapers") basePath = "/resources/whitepapers";
     
     if (items.length > 0) {
       return (

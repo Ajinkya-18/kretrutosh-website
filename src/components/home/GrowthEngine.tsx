@@ -39,7 +39,7 @@ const GrowthEngine = ({ title, subtitle, gridClass }: GrowthEngineProps) => {
         const { data, error } = await supabase
           .from('services')
           .select('slug, title, subtitle')
-          .order('id', { ascending: true });
+          .order('title', { ascending: true });
 
         if (error) {
           console.error('❌ SUPABASE ERROR [GrowthEngine/Services]:', error);
