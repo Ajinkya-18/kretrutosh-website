@@ -33,6 +33,9 @@ import NotFound from "./pages/NotFound";
 // --- Legacy Pages (Keeping only if strictly needed, but prefer new architecture) ---
 import CaseStudiesPage from "./pages/CaseStudiesPage";
 
+// --- Admin Pages ---
+import NavbarConfig from "./pages/admin/NavbarConfig";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -82,6 +85,9 @@ const App = () => (
             {/* --- Legal --- */}
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+
+            {/* --- Admin Panel --- */}
+            <Route path="/admin/navbar-config" element={<NavbarConfig />} />
 
             {/* --- Legacy/Other --- */}
             <Route path="/case-studies" element={<CaseStudiesPage />} />
