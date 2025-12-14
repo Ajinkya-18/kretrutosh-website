@@ -25,6 +25,11 @@ const ServiceDetail = () => {
         .eq('slug', slug)
         .single();
         
+      if (error) {
+        console.error("SUPABASE ERROR [ServiceDetail]:", error);
+        alert("Data Load Failed [ServiceDetail]: " + error.message);
+      }
+        
       if (data) setService(data);
       setLoading(false);
     };

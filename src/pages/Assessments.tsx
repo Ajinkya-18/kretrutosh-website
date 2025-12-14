@@ -30,7 +30,8 @@ const Assessments = () => {
         .order('id', { ascending: true });
 
       if (error) {
-        console.error("Error fetching assessments:", error);
+        console.error("SUPABASE ERROR [Assessments]:", error);
+        alert("Data Load Failed [Assessments]: " + error.message);
       } else if (data) {
         setAssessments(data);
       }

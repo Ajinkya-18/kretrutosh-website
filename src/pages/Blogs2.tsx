@@ -37,7 +37,8 @@ const Blogs = () => {
         .order('publish_date', { ascending: false });
 
       if (error) {
-        console.error("Error fetching blogs:", error);
+        console.error("SUPABASE ERROR [Blogs/Articles]:", error);
+        alert("Data Load Failed [Blogs/Articles]: " + error.message);
       } else if (data) {
         setBlogs(data);
       }

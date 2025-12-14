@@ -35,7 +35,8 @@ const Contact = () => {
                 
                 if (fetchError) {
                     if (fetchError.code !== 'PGRST116') { // Ignore 'no rows' error
-                         console.error("Error fetching contact page:", fetchError);
+                         console.error("SUPABASE ERROR [ContactPage]:", fetchError);
+                         alert("Data Load Failed [ContactPage]: " + fetchError.message);
                          setError("Unable to load contact details. Please try again later.");
                     }
                 } else {
@@ -122,7 +123,7 @@ const Contact = () => {
             <main>
                 <Hero
                     mediaType="image"
-                    title={pageConfig?.hero_title || "Let's Connect"}
+                    title={pageConfig?.hero_title}
                     subtitle="We are ready to listen."
                     backgroundImage={pageConfig?.hero_image_url} 
                 />
@@ -142,7 +143,7 @@ const Contact = () => {
                                         Get in Touch
                                     </div>
                                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                                        {pageConfig?.hero_title || "Ready to Transform Your Growth Engine?"}
+                                        {pageConfig?.hero_title}
                                     </h2>
                                     <p className="text-xl text-white/70 leading-relaxed font-light">
                                         Whether you have a specific challenge or just want to explore what's possible, our team is ready to listen.
@@ -175,7 +176,7 @@ const Contact = () => {
                                          >
                                              <a href={pageConfig.calendly_url} target="_blank" rel="noopener noreferrer">
                                                  <Calendar className="mr-2 h-5 w-5" />
-                                                 {pageConfig.calendly_cta_text || "Book a Strategy Call"}
+                                                 {pageConfig.calendly_cta_text}
                                              </a>
                                          </Button>
                                      </div>

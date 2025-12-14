@@ -127,7 +127,7 @@ const About = () => {
       <Navbar />
       <main>
         <Hero 
-           mediaType={pageConfig?.media_type || 'image'}
+           mediaType={pageConfig?.media_type}
            videoUrl={pageConfig?.hero_video_url}
            backgroundImage={pageConfig?.hero_image_url}
            overlayOpacity={pageConfig?.overlay_opacity}

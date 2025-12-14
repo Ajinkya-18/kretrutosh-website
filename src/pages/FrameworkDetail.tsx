@@ -59,7 +59,8 @@ const FrameworkDetail = () => {
         .single();
 
       if (fwError) {
-        console.error("Error fetching framework:", fwError);
+        console.error("SUPABASE ERROR [FrameworkMeta]:", fwError);
+        alert("Data Load Failed [FrameworkMeta]: " + fwError.message);
         setFramework(null);
         setLoading(false);
         return;
@@ -74,7 +75,10 @@ const FrameworkDetail = () => {
         .eq('is_visible', true)
         .order('display_order', { ascending: true });
 
-      if (secError) console.error("Error fetching sections:", secError);
+      if (secError) {
+           console.error("SUPABASE ERROR [FrameworkSections]:", secError);
+           alert("Data Load Failed [FrameworkSections]: " + secError.message);
+      }
       setSections(secData || []);
       
       setLoading(false);

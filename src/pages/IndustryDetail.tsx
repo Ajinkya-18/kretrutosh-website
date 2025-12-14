@@ -57,7 +57,8 @@ const IndustryDetail = () => {
           .single();
 
         if (metaError || !metaData) {
-            console.error("Error fetching industry meta:", metaError);
+            console.error("SUPABASE ERROR [IndustryDetail]:", metaError);
+            if (metaError) alert("Data Load Failed [IndustryMeta]: " + metaError.message);
             setIndustryMeta(null);
             setLoading(false);
             return;
@@ -65,11 +66,16 @@ const IndustryDetail = () => {
         setIndustryMeta(metaData);
 
         // 2. Fetch Linked Case Studies (Success Stories)
-        const { data: csData } = await supabase
+        const { data: csData, error: csError } = await supabase
             .from('case_studies')
             .select('*')
             .ilike('industry', `%${slug}%`)
             .limit(3);
+
+        if (csError) {
+             console.error("SUPABASE ERROR [IndustryCS]:", csError);
+             alert("Data Load Failed [IndustryCS]: " + csError.message);
+        }
 
         if (csData && csData.length > 0) {
             setCaseStudies(csData);

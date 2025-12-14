@@ -20,17 +20,19 @@ const Footer = () => {
   useEffect(() => {
     const fetchData = async () => {
         // 1. Config Footer (Socials, Copyright)
-        const { data: configData } = await supabase.from('config_footer').select('*').single();
+        const { data: configData, error: configError } = await supabase.from('config_footer').select('*').single();
+        if (configError) {
+             console.error("SUPABASE ERROR [Footer Config]:", configError);
+             alert("Data Load Failed [Footer Config]: " + configError.message);
+        }
         if (configData) setConfig(configData);
 
         // 2. Page Contact (Address, Email)
-        // Note: Assuming page_contact has 'address_html', 'email' (or similar fields).
-        // If 'email' isn't there, we might fallback or parsing. 
-        // Based on previous edits, page_contact has 'hero_title', 'address_html', 'google_form_url', 'calendly_...'
-        // It might NOT have a dedicated 'email' column if it's all in address_html. 
-        // However, user said "Read address_html and email directly from the Contact table". 
-        // I will select * to be safe.
-        const { data: contactData } = await supabase.from('page_contact').select('*').single();
+        const { data: contactData, error: contactError } = await supabase.from('page_contact').select('*').single();
+        if (contactError) {
+             console.error("SUPABASE ERROR [Footer Contact]:", contactError);
+             // Optional: Alert for contact too, or keep it to one main alert if possible, but FAIL LOUD means valid alerts.
+        }
         if (contactData) setContactInfo(contactData);
 
         // 3. Dynamic Lists (Limit 5)
@@ -99,11 +101,7 @@ const Footer = () => {
   };
 
   // Social Links Fallback
-  const socialLinks = config?.social_links || [
-      { platform: 'linkedin', url: 'https://www.linkedin.com/in/ashutosh-karandikar-ccxp/' },
-      { platform: 'youtube', url: 'https://www.youtube.com/@theXTPodcast' },
-      { platform: 'twitter', url: 'https://x.com/AshutoshCK' }
-  ];
+  const socialLinks = config?.social_links || [];
 
   return (
     <footer className="bg-primary text-primary-foreground border-t border-primary/20">
@@ -119,7 +117,7 @@ const Footer = () => {
                     <span className="text-secondary"> Consulting</span>
                   </h3>
                   <p className="text-sm text-primary-foreground/70 mt-2 max-w-xs">
-                    {config?.brand_description || 'Transforming businesses through Customer-Led Growth.'}
+                    {config?.brand_description}
                   </p>
                 </div>
               </Link>
@@ -225,15 +223,15 @@ const Footer = () => {
                         dangerouslySetInnerHTML={{ __html: contactInfo.address_html }} 
                      />
                  ) : (
-                    <span>{config?.address || 'Mumbai, Maharashtra, India'}</span>
+                    <span>{config?.address}</span>
                  )}
                </div>
 
                {/* Email: Check contactInfo first, then config */}
               <div className="flex items-center gap-3 text-primary-foreground/70 text-sm">
                 <Mail className="shrink-0 text-secondary" size={16} />
-                <a href={`mailto:${contactInfo?.email || config?.email || 'consult.ashutosh@kretru.com'}`} className="hover:text-white transition-colors">
-                  {contactInfo?.email || config?.email || 'consult.ashutosh@kretru.com'}
+                <a href={`mailto:${contactInfo?.email || config?.email}`} className="hover:text-white transition-colors">
+                  {contactInfo?.email || config?.email}
                 </a>
               </div>
             </div>
@@ -242,7 +240,7 @@ const Footer = () => {
 
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/50 text-sm">
-            {config?.copyright_text ? `© ${currentYear} ${config.copyright_text}` : `© ${currentYear} KretruTosh Consulting. All rights reserved.`}
+            {config?.copyright_text && `© ${currentYear} ${config.copyright_text}`}
           </p>
           <div className="flex gap-6 text-sm text-primary-foreground/50">
             <Link to="/privacy" className="hover:text-secondary transition-colors" onClick={() => handleLinkClick("/privacy")}>Privacy Policy</Link>

@@ -29,7 +29,8 @@ const Videos = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching videos:", error);
+        console.error("SUPABASE ERROR [Videos]:", error);
+        alert("Data Load Failed [Videos]: " + error.message);
       } else if (data) {
         setVideos(data);
       }

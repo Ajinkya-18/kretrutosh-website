@@ -49,20 +49,18 @@ const Index = () => {
           .limit(1)
           .single();
 
-        if (error) {
-             console.error("Error fetching page_home:", error);
-             // Fallback or retry?
-        }
-        
-        if (data) {
-            setPageConfig(data);
-        }
-      } catch (err) {
-        console.error('Error fetching page data:', err);
-      } finally {
-        setLoading(false);
+      if (error) {
+           console.error("SUPABASE ERROR [Index]:", error);
+           alert("Data Load Failed [Index]: " + error.message);
       }
-    };
+      
+      if (data) {
+          setPageConfig(data);
+      }
+    } finally {
+        setLoading(false);
+    }
+  };
 
     fetchPage();
 
@@ -83,46 +81,38 @@ const Index = () => {
   
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
-      <SEO 
-        title={pageConfig?.hero_title ? `${pageConfig.hero_title} | KretruTosh` : "KretruTosh Consulting"}
-        description={pageConfig?.hero_subtitle || "Customer-led growth transformation."}
-        image={pageConfig?.hero_video_url} // Or add hero_image logic if exists
+    <SEO   
+      title={pageConfig?.hero_title ? `${pageConfig.hero_title} | KretruTosh` : undefined}
+      description={pageConfig?.hero_subtitle}
+      image={pageConfig?.hero_video_url} 
+    />
+    <Navbar />
+    <main>
+      {/* Master Hero Render */}
+      <Hero 
+          badge="Customer-Led Growth"
+          title={pageConfig?.hero_title}
+          subtitle={pageConfig?.hero_subtitle}
+          primaryCta="Schedule Consultation"
+          primaryCtaLink="/contact"
+          mediaType="video"
+          videoUrl={pageConfig?.hero_video_url}
       />
-      <Navbar />
-      <main>
-        {/* Master Hero Render */}
-        <Hero 
-            badge="Customer-Led Growth"
-            title={pageConfig?.hero_title || 'Build a Customer-Led Growth Engine'}
-            subtitle={pageConfig?.hero_subtitle}
-            primaryCta="Schedule Consultation"
-            primaryCtaLink="/contact"
-            mediaType="video" // Or logic to detect
-            videoUrl={pageConfig?.hero_video_url}
-        />
 
-        {/* Book Section */}
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-        >
-            <AgeOfKretru />
-        </motion.div>
+// ...
 
-         {/* Growth Engine (Services) */}
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-        >
-             <GrowthEngine 
-                title={pageConfig?.growth_engine_title} 
-                subtitle="Your GTM Velocity Model" // Could add to DB if needed
-            />
-        </motion.div>
+       {/* Growth Engine (Services) */}
+      <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+      >
+           <GrowthEngine 
+              title={pageConfig?.growth_engine_title} 
+              subtitle="Your GTM Velocity Model"
+          />
+      </motion.div>
 
         {/* Client Logos */}
         <ClientLogos />

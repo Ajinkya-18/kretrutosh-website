@@ -52,7 +52,8 @@ const CaseStudiesPage = () => {
         .order('created_at', { ascending: true }); // Preserves the order from your brief
 
       if (error) {
-        console.error("Error fetching case studies:", error);
+        console.error("SUPABASE ERROR [CaseStudies]:", error);
+        alert("Data Load Failed [CaseStudies]: " + error.message);
       } else if (data) {
         setCaseStudies(data);
       }
@@ -109,8 +110,8 @@ const CaseStudiesPage = () => {
   return (
     <div className="min-h-screen">
       <SEO 
-        title={seoData?.meta_title || "Impact & Case Studies"}
-        description={seoData?.meta_description || "Real-world success stories demonstrating our impact on GTM Velocity, NRR, and Retention."}
+        title={seoData?.meta_title}
+        description={seoData?.meta_description}
       />
       <Navbar />
       <main className="pt-20">

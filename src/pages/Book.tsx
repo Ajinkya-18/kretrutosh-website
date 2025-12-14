@@ -19,6 +19,11 @@ const Book = () => {
         .select('*')
         .single();
 
+      if (error) {
+        console.error("SUPABASE ERROR [Book]:", error);
+        alert("Data Load Failed [Book]: " + error.message);
+      }
+      
       if (data) {
         setBookData(data);
       }

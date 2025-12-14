@@ -1,47 +1,149 @@
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Mic, FileText, ArrowRight, Video } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabaseClient";
+import { Loader2 } from "lucide-react";
+
+interface ResourceCard {
+  title: string;
+  subtitle: string;
+  desc: string;
+  icon: JSX.Element;
+  link: string;
+  cta: string;
+}
 
 const Resources = () => {
   const navigate = useNavigate();
+  const [resources, setResources] = useState<ResourceCard[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const resources = [
-    {
-      title: "The Book",
-      subtitle: "Beyond Customer Satisfaction",
-      desc: "Our founder's definitive guide to crafting exceptional customer experiences in the age of 'Kretru'.",
-      icon: <BookOpen className="h-8 w-8 text-secondary" />,
-      link: "/book",
-      cta: "Read Chapter 1"
-    },
-    {
-      title: "The XT Podcast",
-      subtitle: "Experience Transformation",
-      desc: "Deep dives into GTM, CX, and Culture with industry leaders and practitioners.",
-      icon: <Mic className="h-8 w-8 text-secondary" />,
-      link: "/videos", // Assuming Videos page hosts the podcast/video content
-      cta: "Listen Now"
-    },
-    {
-      title: "Articles & Insights",
-      subtitle: "Thought Leadership",
-      desc: "Actionable frameworks, case studies, and perspectives on the latest trends in business transformation.",
-      icon: <FileText className="h-8 w-8 text-secondary" />,
-      link: "/blogs",
-      cta: "Read Articles"
-    },
-    {
-      title: "Whitepapers",
-      subtitle: "Deep Research",
-      desc: "Comprehensive reports and maturity models to benchmark your organization's performance.",
-      icon: <FileText className="h-8 w-8 text-secondary" />,
-      link: "/resources/whitepapers", // Placeholder for now
-      cta: "Download Reports"
-    }
-  ];
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch latest data from each table using Promise.all
+        const [bookRes, videosRes, articlesRes, whitepapersRes] = await Promise.all([
+          supabase.from('book').select('*').limit(1).single(),
+          supabase.from('videos').select('*').eq('category', 'podcast').limit(1).single(),
+          supabase.from('articles').select('*').order('created_at', { ascending: false }).limit(1).single(),
+          supabase.from('whitepapers').select('*').order('created_at', { ascending: false }).limit(1).single()
+        ]);
+
+        // Handle errors with alerts
+        if (bookRes.error) {
+          console.error("SUPABASE ERROR [Book]:", bookRes.error);
+          alert("Data Load Failed [Book]: " + bookRes.error.message);
+        }
+        if (videosRes.error) {
+          console.error("SUPABASE ERROR [Videos/Podcast]:", videosRes.error);
+          alert("Data Load Failed [Videos/Podcast]: " + videosRes.error.message);
+        }
+        if (articlesRes.error) {
+          console.error("SUPABASE ERROR [Articles]:", articlesRes.error);
+          alert("Data Load Failed [Articles]: " + articlesRes.error.message);
+        }
+        if (whitepapersRes.error) {
+          console.error("SUPABASE ERROR [Whitepapers]:", whitepapersRes.error);
+          alert("Data Load Failed [Whitepapers]: " + whitepapersRes.error.message);
+        }
+
+        // Build dynamic resource cards
+        const dynamicResources: ResourceCard[] = [];
+
+        if (bookRes.data) {
+          dynamicResources.push({
+            title: bookRes.data.title,
+            subtitle: bookRes.data.subtitle || "Beyond Customer Satisfaction",
+            desc: bookRes.data.description || "",
+            icon: <BookOpen className="h-8 w-8 text-secondary" />,
+            link: "/resources/book",
+            cta: "Read Chapter 1"
+          });
+        }
+
+        if (videosRes.data) {
+          dynamicResources.push({
+            title: videosRes.data.title,
+            subtitle: "Experience Transformation",
+            desc: videosRes.data.description || "",
+            icon: <Mic className="h-8 w-8 text-secondary" />,
+            link: "/resources/videos",
+            cta: "Listen Now"
+          });
+        }
+
+        if (articlesRes.data) {
+          dynamicResources.push({
+            title: "Articles & Insights",
+            subtitle: "Thought Leadership",
+            desc: "Actionable frameworks, case studies, and perspectives on the latest trends in business transformation.",
+            icon: <FileText className="h-8 w-8 text-secondary" />,
+            link: "/blogs",
+            cta: "Read Articles"
+          });
+        }
+
+        if (whitepapersRes.data) {
+          dynamicResources.push({
+            title: "Whitepapers",
+            subtitle: "Deep Research",
+            desc: "Comprehensive reports and maturity models to benchmark your organization's performance.",
+            icon: <FileText className="h-8 w-8 text-secondary" />,
+            link: "/resources/whitepapers",
+            cta: "Download Reports"
+          });
+        }
+
+        setResources(dynamicResources);
+      } catch (err: any) {
+        console.error("Error fetching resources:", err);
+        alert("Data Load Failed [Resources Unexpected]: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResources();
+
+    // Realtime listeners for all 4 tables
+    const channel = supabase
+      .channel('resources-hub-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'book' }, () => {
+        console.log("Book updated");
+        fetchResources();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, () => {
+        console.log("Videos updated");
+        fetchResources();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'articles' }, () => {
+        console.log("Articles updated");
+        fetchResources();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'whitepapers' }, () => {
+        console.log("Whitepapers updated");
+        fetchResources();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -75,7 +177,7 @@ const Resources = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {resources.map((item, index) => (
               <motion.div
-                key={index}
+                key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -104,6 +206,12 @@ const Resources = () => {
                 </Button>
               </motion.div>
             ))}
+            
+            {resources.length === 0 && (
+              <div className="col-span-full text-center py-20">
+                <p className="text-muted-foreground">No resources available. Please configure in Admin Panel.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

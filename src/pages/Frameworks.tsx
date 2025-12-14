@@ -43,7 +43,8 @@ const Frameworks = () => {
         .order('id', { ascending: true });
 
       if (error) {
-        console.error("Error fetching frameworks:", error);
+        console.error("SUPABASE ERROR [Frameworks]:", error);
+        alert("Data Load Failed [Frameworks]: " + error.message);
       } else if (data) {
         setFrameworks(data);
       }
@@ -75,7 +76,7 @@ const Frameworks = () => {
       
       {/* Master Hero */}
       <Hero 
-           mediaType={pageConfig?.media_type || 'image'}
+           mediaType={pageConfig?.media_type}
            videoUrl={pageConfig?.hero_video_url}
            backgroundImage={pageConfig?.hero_image_url}
            overlayOpacity={pageConfig?.overlay_opacity}

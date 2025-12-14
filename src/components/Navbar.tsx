@@ -40,7 +40,10 @@ const Navbar = () => {
 
         // 2. Fetch Aggregates
         const { data: servicesData, error: servicesError } = await supabase.from('services').select('id, title, slug').order('title');
-        if (servicesError) console.error("Navbar Services Error:", servicesError);
+        if (servicesError) {
+             console.error("SUPABASE ERROR [Navbar Services]:", servicesError);
+             alert("Data Load Failed [Navbar Services]: " + servicesError.message);
+        }
         if (servicesData) {
             console.log("Navbar Services Data:", servicesData); // Debug log
             setServices(servicesData);
@@ -103,7 +106,11 @@ const Navbar = () => {
             className="flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight text-primary transition-transform hover:scale-[1.02] z-50"
             onClick={() => handleLinkClick("/")}
           >
-            <img src={config?.logo_url || defaultLogo} alt="KretruTosh Consulting" className="h-16 w-auto" />
+            {config?.logo_url ? (
+              <img src={config.logo_url} alt="KretruTosh Consulting" className="h-16 w-auto" />
+            ) : (
+               <span className="text-red-500 font-mono text-sm border border-red-500 p-1">NULL: LOGO</span>
+            )}
           </Link>
 
           {/* Desktop Navigation */}
@@ -137,7 +144,7 @@ const Navbar = () => {
                                 </NavigationMenuLink>
                                 </li>
                             ))}
-                            {services.length === 0 && <li className="text-sm text-muted-foreground p-2">No services found.</li>}
+                            {services.length === 0 && <li className="text-sm text-muted-foreground p-2">No services found (DB Empty/RLS Blocked).</li>}
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -160,7 +167,7 @@ const Navbar = () => {
                                 </NavigationMenuLink>
                                 </li>
                             ))}
-                            {industries.length === 0 && <li className="text-sm text-muted-foreground p-2">No industries found.</li>}
+                            {industries.length === 0 && <li className="text-sm text-muted-foreground p-2">No industries found (DB Empty).</li>}
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -183,7 +190,7 @@ const Navbar = () => {
                                 </NavigationMenuLink>
                                 </li>
                             ))}
-                           {frameworks.length === 0 && <li className="text-sm text-muted-foreground p-2">No frameworks found.</li>}
+                           {frameworks.length === 0 && <li className="text-sm text-muted-foreground p-2">No frameworks found (DB Empty).</li>}
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -215,7 +222,9 @@ const Navbar = () => {
                 asChild 
                 className="bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
-                <Link to={config?.cta_link || "/contact"}>{config?.cta_text || 'Schedule a Consultation'}</Link>
+                <Link to={config?.cta_link || "#"}>
+                    {config?.cta_text || <span className="text-red-900 font-bold bg-white px-2">NULL: CTA TEXT</span>}
+                </Link>
               </Button>
             </div>
           </div>
@@ -286,8 +295,8 @@ const Navbar = () => {
 
               <div className="pt-4 mt-2 border-t border-border">
                 <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg" asChild>
-                  <Link to={config?.cta_link || "/contact"}>
-                    {config?.cta_text || 'Schedule a Consultation'}
+                  <Link to={config?.cta_link || "#"}>
+                    {config?.cta_text || 'NULL: CTA TEXT'}
                   </Link>
                 </Button>
               </div>
