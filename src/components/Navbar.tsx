@@ -16,16 +16,24 @@ import {
 } from "@/components/ui/navigation-menu";
 import { supabase } from "@/lib/supabaseClient";
 
+// Data source mapping for dropdown menus
+const DATA_SOURCE_MAP: Record<string, { table: string; fields: string }> = {
+  services: { table: "services", fields: "title, slug" },
+  frameworks: { table: "frameworks", fields: "title, slug" },
+  industries: { table: "industries", fields: "title, slug" },
+  blogs: { table: "blogs", fields: "title, slug" },
+  assessments: { table: "assessments", fields: "title, slug" },
+  "case-studies": { table: "case_studies", fields: "title, slug" },
+};
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const [config, setConfig] = useState<any>(null);
   
-  // Dynamic Data State
-  const [services, setServices] = useState<any[]>([]);
-  const [frameworks, setFrameworks] = useState<any[]>([]);
-  const [industries, setIndustries] = useState<any[]>([]);
+  // Store dynamic data for each dropdown
+  const [dropdownData, setDropdownData] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,46 +42,76 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
 
     const fetchData = async () => {
-        // 1. Fetch Config
-        const { data: configData } = await supabase.from('config_navbar').select('*').single();
-        if (configData) setConfig(configData);
-
-        // 2. Fetch Aggregates
-        const { data: servicesData, error: servicesError } = await supabase.from('services').select('title, slug').order('title');
-        if (servicesError) {
-             console.error("SUPABASE ERROR [Navbar Services]:", servicesError);
-             alert("Data Load Failed [Navbar Services]: " + servicesError.message);
+        // Fetch navbar config
+        const { data: configData, error: configError } = await supabase
+          .from('config_navbar')
+          .select('*')
+          .single();
+        
+        if (configError) {
+          console.error("SUPABASE ERROR [Navbar Config]:", configError);
+          alert("Data Load Failed [Navbar Config]: " + configError.message);
         }
-        if (servicesData) {
-            console.log("Navbar Services Data:", servicesData); // Debug log
-            setServices(servicesData);
+        
+        if (configData) {
+          setConfig(configData);
+          
+          // Parse menu_items and fetch data for dropdowns
+          const menuItems = configData.menu_items || [];
+          const dataPromises: Promise<void>[] = [];
+          
+          menuItems.forEach((item: any) => {
+            // Check if item has children (dropdown) or a dataSource
+            const dataSource = item.dataSource || item.data_source;
+            
+            if (dataSource && DATA_SOURCE_MAP[dataSource]) {
+              const { table, fields } = DATA_SOURCE_MAP[dataSource];
+              const promise = (async () => {
+                const { data, error } = await supabase
+                  .from(table)
+                  .select(fields)
+                  .order('title');
+                  
+                if (error) {
+                  console.error(`Error fetching ${dataSource}:`, error);
+                } else if (data) {
+                  setDropdownData(prev => ({ ...prev, [dataSource]: data }));
+                }
+              })();
+              dataPromises.push(promise);
+            }
+          });
+          
+          await Promise.all(dataPromises);
         }
-
-        const { data: frameworksData, error: frameworksError } = await supabase.from('frameworks').select('title, slug').order('title');
-        if (frameworksError) console.error("Navbar Frameworks Error:", frameworksError);
-        if (frameworksData) setFrameworks(frameworksData);
-
-        const { data: industriesData } = await supabase.from('industries').select('title, slug').order('title');
-        if (industriesData) setIndustries(industriesData);
     };
+    
     fetchData();
 
-    // 3. Realtime Listeners
-    const channel = supabase.channel('navbar_global_sync')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'config_navbar' }, (payload) => {
-            if (payload.new) setConfig(payload.new);
+    // Realtime listeners for config and dynamic data
+    const channel = supabase.channel('navbar_realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'config_navbar' }, () => {
+            fetchData();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'services' }, async () => {
-             const { data } = await supabase.from('services').select('title, slug').order('title');
-             if (data) setServices(data);
+            const { data } = await supabase.from('services').select('title, slug').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, services: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, async () => {
-             const { data } = await supabase.from('frameworks').select('title, slug').order('title');
-             if (data) setFrameworks(data);
+            const { data } = await supabase.from('frameworks').select('title, slug').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, frameworks: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'industries' }, async () => {
-             const { data } = await supabase.from('industries').select('title, slug').order('title');
-             if (data) setIndustries(data);
+            const { data } = await supabase.from('industries').select('title, slug').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, industries: data }));
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'blogs' }, async () => {
+            const { data } = await supabase.from('blogs').select('title, slug').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, blogs: data }));
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'assessments' }, async () => {
+            const { data } = await supabase.from('assessments').select('title, slug').order('title');
+            if (data) setDropdownData(prev => ({ ...prev, assessments: data }));
         })
         .subscribe();
     
@@ -89,6 +127,107 @@ const Navbar = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+
+  // Render a dropdown menu item
+  const renderDropdown = (item: any) => {
+    const dataSource = item.dataSource || item.data_source;
+    const items = dataSource ? (dropdownData[dataSource] || []) : (item.children || []);
+    
+    // Determine base path for dropdown items
+    let basePath = "";
+    if (dataSource === "services") basePath = "/services";
+    else if (dataSource === "frameworks") basePath = "/frameworks";
+    else if (dataSource === "industries") basePath = "/industries";
+    else if (dataSource === "blogs") basePath = "/resources/blog";
+    else if (dataSource === "assessments") basePath = "/assessments";
+    else if (dataSource === "case-studies") basePath = "/case-studies";
+    
+    return (
+      <NavigationMenuItem key={item.name || item.label}>
+        <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+          {item.name || item.label}
+        </NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", items.length > 5 ? "md:grid-cols-2" : "")}>
+            {items.map((child: any) => (
+              <li key={child.slug || child.path}>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to={child.path || `${basePath}/${child.slug}`}
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug}`)}
+                  >
+                    <div className="text-sm font-medium leading-none">{child.name || child.title}</div>
+                    {child.description && (
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        {child.description}
+                      </p>
+                    )}
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+            ))}
+            {items.length === 0 && (
+              <li className="text-sm text-muted-foreground p-2">No items available</li>
+            )}
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    );
+  };
+
+  // Render a simple link menu item
+  const renderLink = (item: any) => {
+    return (
+      <NavigationMenuItem key={item.name || item.label}>
+        <Link to={item.path} onClick={() => handleLinkClick(item.path)}>
+          <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground")}>
+            {item.name || item.label}
+          </NavigationMenuLink>
+        </Link>
+      </NavigationMenuItem>
+    );
+  };
+
+  // Render mobile menu section
+  const renderMobileSection = (item: any) => {
+    const dataSource = item.dataSource || item.data_source;
+    const items = dataSource ? (dropdownData[dataSource] || []) : (item.children || []);
+    
+    // Determine base path
+    let basePath = "";
+    if (dataSource === "services") basePath = "/services";
+    else if (dataSource === "frameworks") basePath = "/frameworks";
+    else if (dataSource === "industries") basePath = "/industries";
+    else if (dataSource === "blogs") basePath = "/resources/blog";
+    else if (dataSource === "assessments") basePath = "/assessments";
+    else if (dataSource === "case-studies") basePath = "/case-studies";
+    
+    if (items.length > 0) {
+      return (
+        <div key={item.name || item.label} className="space-y-1">
+          <div className="px-4 py-2 text-sm font-semibold text-primary/80 uppercase tracking-wider">
+            {item.name || item.label}
+          </div>
+          <div className="pl-4 space-y-1 border-l-2 border-primary/10 ml-4">
+            {items.map((child: any) => (
+              <Link
+                key={child.slug || child.path}
+                to={child.path || `${basePath}/${child.slug}`}
+                className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug}`)}
+              >
+                {child.name || child.title}
+              </Link>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const menuItems = config?.menu_items || [];
 
   return (
     <nav
@@ -109,7 +248,7 @@ const Navbar = () => {
             {config?.logo_url ? (
               <img src={config.logo_url} alt="KretruTosh Consulting" className="h-16 w-auto" />
             ) : (
-               <span className="text-red-500 font-mono text-sm border border-red-500 p-1">NULL: LOGO</span>
+              <span className="text-red-500 font-mono text-sm border border-red-500 p-1">NULL: LOGO</span>
             )}
           </Link>
 
@@ -117,102 +256,15 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-1">
             <NavigationMenu>
               <NavigationMenuList>
-                {/* Home */}
-                <NavigationMenuItem>
-                  <Link to="/" onClick={() => handleLinkClick("/")}>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground")}>
-                      Home
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                
-                {/* Services (Dynamic) */}
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">Services</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                        <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", services.length > 5 ? "md:grid-cols-2" : "")}>
-                            {services.map((item) => (
-                                <li key={item.slug}>
-                                <NavigationMenuLink asChild>
-                                    <Link
-                                    to={`/services/${item.slug}`}
-                                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                                    onClick={() => handleLinkClick(`/services/${item.slug}`)}
-                                    >
-                                    <div className="text-sm font-medium leading-none">{item.title}</div>
-                                    </Link>
-                                </NavigationMenuLink>
-                                </li>
-                            ))}
-                            {services.length === 0 && <li className="text-sm text-muted-foreground p-2">No services found (DB Empty/RLS Blocked).</li>}
-                        </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                {/* Industries (Dynamic) */}
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">Industries</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                        <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", industries.length > 5 ? "md:grid-cols-2" : "")}>
-                            {industries.map((item) => (
-                                <li key={item.slug}>
-                                <NavigationMenuLink asChild>
-                                    <Link
-                                    to={`/industries/${item.slug}`}
-                                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                                    onClick={() => handleLinkClick(`/industries/${item.slug}`)}
-                                    >
-                                    <div className="text-sm font-medium leading-none">{item.title}</div>
-                                    </Link>
-                                </NavigationMenuLink>
-                                </li>
-                            ))}
-                            {industries.length === 0 && <li className="text-sm text-muted-foreground p-2">No industries found (DB Empty).</li>}
-                        </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                {/* Frameworks (Dynamic) */}
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">Frameworks</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                        <ul className={cn("grid gap-3 p-4 w-[400px]", frameworks.length > 5 ? "md:grid-cols-2" : "")}>
-                            {frameworks.map((item) => (
-                                <li key={item.slug}>
-                                <NavigationMenuLink asChild>
-                                    <Link
-                                    to={`/frameworks/${item.slug}`}
-                                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                                    onClick={() => handleLinkClick(`/frameworks/${item.slug}`)}
-                                    >
-                                    <div className="text-sm font-medium leading-none">{item.title}</div>
-                                    </Link>
-                                </NavigationMenuLink>
-                                </li>
-                            ))}
-                           {frameworks.length === 0 && <li className="text-sm text-muted-foreground p-2">No frameworks found (DB Empty).</li>}
-                        </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                {/* Impact (Case Studies) */}
-                <NavigationMenuItem>
-                   <Link to="/case-studies" onClick={() => handleLinkClick("/case-studies")}>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground")}>
-                      Impact
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-
-                {/* About (Static) */}
-                <NavigationMenuItem>
-                   <Link to="/about" onClick={() => handleLinkClick("/about")}>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground")}>
-                      About
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-
+                {menuItems.map((item: any) => {
+                  const hasChildren = item.children?.length > 0 || item.dataSource || item.data_source;
+                  
+                  if (hasChildren) {
+                    return renderDropdown(item);
+                  } else {
+                    return renderLink(item);
+                  }
+                })}
               </NavigationMenuList>
               <NavigationMenuViewport className="left-0" />
             </NavigationMenu>
@@ -243,55 +295,24 @@ const Navbar = () => {
         {isOpen && (
           <div className="lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border shadow-lg animate-fade-in-up max-h-[80vh] overflow-y-auto">
             <div className="flex flex-col p-4 space-y-2">
-              <Link
-                to="/"
-                className="px-4 py-3 text-base font-medium rounded-md hover:bg-primary/5 text-muted-foreground hover:text-primary"
-                onClick={() => handleLinkClick("/")}
-              >
-                Home
-              </Link>
-              
-              {/* Dynamic Sections Mobile */}
-              {[
-                { name: 'Services', items: services, pathPrefix: '/services' },
-                { name: 'Industries', items: industries, pathPrefix: '/industries' },
-                { name: 'Frameworks', items: frameworks, pathPrefix: '/frameworks' }
-              ].map((section) => (
-                 <div key={section.name} className="space-y-1">
-                  <div className="px-4 py-2 text-sm font-semibold text-primary/80 uppercase tracking-wider">
-                    {section.name}
-                  </div>
-                  <div className="pl-4 space-y-1 border-l-2 border-primary/10 ml-4">
-                     {section.items.length > 0 ? section.items.map((item) => (
-                        <Link
-                          key={item.slug}
-                          to={`${section.pathPrefix}/${item.slug}`}
-                          className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-                          onClick={() => handleLinkClick(`${section.pathPrefix}/${item.slug}`)}
-                        >
-                          {item.title}
-                        </Link>
-                     )) : (
-                        <div className="px-4 py-2 text-sm text-muted-foreground">None available</div>
-                     )}
-                  </div>
-                </div>
-              ))}
-
-              <Link
-                to="/case-studies"
-                className="px-4 py-3 text-base font-medium rounded-md hover:bg-primary/5 text-muted-foreground hover:text-primary"
-                onClick={() => handleLinkClick("/case-studies")}
-              >
-                Impact
-              </Link>
-               <Link
-                to="/about"
-                className="px-4 py-3 text-base font-medium rounded-md hover:bg-primary/5 text-muted-foreground hover:text-primary"
-                onClick={() => handleLinkClick("/about")}
-              >
-                About
-              </Link>
+              {menuItems.map((item: any) => {
+                const hasChildren = item.children?.length > 0 || item.dataSource || item.data_source;
+                
+                if (hasChildren) {
+                  return renderMobileSection(item);
+                } else {
+                  return (
+                    <Link
+                      key={item.name || item.label}
+                      to={item.path}
+                      className="px-4 py-3 text-base font-medium rounded-md hover:bg-primary/5 text-muted-foreground hover:text-primary"
+                      onClick={() => handleLinkClick(item.path)}
+                    >
+                      {item.name || item.label}
+                    </Link>
+                  );
+                }
+              })}
 
               <div className="pt-4 mt-2 border-t border-border">
                 <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg" asChild>

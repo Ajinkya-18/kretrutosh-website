@@ -36,13 +36,13 @@ const Footer = () => {
         if (contactData) setContactInfo(contactData);
 
         // 3. Dynamic Lists (Limit 5)
-        const { data: servicesData } = await supabase.from('services').select('id, title, slug').limit(6).order('title');
+        const { data: servicesData } = await supabase.from('services').select('title, slug').limit(6).order('title');
         if (servicesData) setServices(servicesData);
 
-        const { data: industriesData } = await supabase.from('industries').select('id, title, slug').limit(6).order('title');
+        const { data: industriesData } = await supabase.from('industries').select('title, slug').limit(6).order('title');
         if (industriesData) setIndustries(industriesData);
         
-        const { data: frameworksData } = await supabase.from('frameworks').select('id, title, slug').limit(6).order('title');
+        const { data: frameworksData } = await supabase.from('frameworks').select('title, slug').limit(6).order('title');
         if (frameworksData) setFrameworks(frameworksData);
     };
     fetchData();
@@ -56,15 +56,15 @@ const Footer = () => {
           if (payload.new) setContactInfo(payload.new);
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'services' }, async () => {
-          const { data } = await supabase.from('services').select('id, title, slug').limit(6).order('title');
+          const { data } = await supabase.from('services').select('title, slug').limit(6).order('title');
           if (data) setServices(data);
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'industries' }, async () => {
-          const { data } = await supabase.from('industries').select('id, title, slug').limit(6).order('title');
+          const { data } = await supabase.from('industries').select('title, slug').limit(6).order('title');
           if (data) setIndustries(data);
       })
        .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, async () => {
-          const { data } = await supabase.from('frameworks').select('id, title, slug').limit(6).order('title');
+          const { data } = await supabase.from('frameworks').select('title, slug').limit(6).order('title');
           if (data) setFrameworks(data);
       })
       .subscribe();
@@ -152,7 +152,7 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-6 text-secondary">Services</h4>
             <ul className="space-y-3">
               {services.map((item) => (
-                <li key={item.id}>
+                <li key={item.slug}>
                   <Link to={`/services/${item.slug}`} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(`/services/${item.slug}`)}>
                     {item.title}
                   </Link>
@@ -167,7 +167,7 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-6 text-secondary">Industries</h4>
             <ul className="space-y-3">
               {industries.map((item) => (
-                <li key={item.id}>
+                <li key={item.slug}>
                   <Link to={`/industries/${item.slug}`} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(`/industries/${item.slug}`)}>
                     {item.title}
                   </Link>
@@ -182,7 +182,7 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-6 text-secondary">Frameworks</h4>
             <ul className="space-y-3">
               {frameworks.map((item) => (
-                <li key={item.id}>
+                <li key={item.slug}>
                   <Link to={`/frameworks/${item.slug}`} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors" onClick={() => handleLinkClick(`/frameworks/${item.slug}`)}>
                     {item.title}
                   </Link>
