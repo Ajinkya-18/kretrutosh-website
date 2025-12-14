@@ -39,7 +39,7 @@ const Navbar = () => {
         if (configData) setConfig(configData);
 
         // 2. Fetch Aggregates
-        const { data: servicesData, error: servicesError } = await supabase.from('services').select('id, title, slug').order('title');
+        const { data: servicesData, error: servicesError } = await supabase.from('services').select('title, slug').order('title');
         if (servicesError) {
              console.error("SUPABASE ERROR [Navbar Services]:", servicesError);
              alert("Data Load Failed [Navbar Services]: " + servicesError.message);
@@ -49,11 +49,11 @@ const Navbar = () => {
             setServices(servicesData);
         }
 
-        const { data: frameworksData, error: frameworksError } = await supabase.from('frameworks').select('id, title, slug').order('title');
+        const { data: frameworksData, error: frameworksError } = await supabase.from('frameworks').select('title, slug').order('title');
         if (frameworksError) console.error("Navbar Frameworks Error:", frameworksError);
         if (frameworksData) setFrameworks(frameworksData);
 
-        const { data: industriesData } = await supabase.from('industries').select('id, title, slug').order('title');
+        const { data: industriesData } = await supabase.from('industries').select('title, slug').order('title');
         if (industriesData) setIndustries(industriesData);
     };
     fetchData();
@@ -64,15 +64,15 @@ const Navbar = () => {
             if (payload.new) setConfig(payload.new);
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'services' }, async () => {
-             const { data } = await supabase.from('services').select('id, title, slug').order('title');
+             const { data } = await supabase.from('services').select('title, slug').order('title');
              if (data) setServices(data);
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, async () => {
-             const { data } = await supabase.from('frameworks').select('id, title, slug').order('title');
+             const { data } = await supabase.from('frameworks').select('title, slug').order('title');
              if (data) setFrameworks(data);
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'industries' }, async () => {
-             const { data } = await supabase.from('industries').select('id, title, slug').order('title');
+             const { data } = await supabase.from('industries').select('title, slug').order('title');
              if (data) setIndustries(data);
         })
         .subscribe();
@@ -132,7 +132,7 @@ const Navbar = () => {
                     <NavigationMenuContent>
                         <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", services.length > 5 ? "md:grid-cols-2" : "")}>
                             {services.map((item) => (
-                                <li key={item.id}>
+                                <li key={item.slug}>
                                 <NavigationMenuLink asChild>
                                     <Link
                                     to={`/services/${item.slug}`}
@@ -155,7 +155,7 @@ const Navbar = () => {
                     <NavigationMenuContent>
                         <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", industries.length > 5 ? "md:grid-cols-2" : "")}>
                             {industries.map((item) => (
-                                <li key={item.id}>
+                                <li key={item.slug}>
                                 <NavigationMenuLink asChild>
                                     <Link
                                     to={`/industries/${item.slug}`}
@@ -178,7 +178,7 @@ const Navbar = () => {
                     <NavigationMenuContent>
                         <ul className={cn("grid gap-3 p-4 w-[400px]", frameworks.length > 5 ? "md:grid-cols-2" : "")}>
                             {frameworks.map((item) => (
-                                <li key={item.id}>
+                                <li key={item.slug}>
                                 <NavigationMenuLink asChild>
                                     <Link
                                     to={`/frameworks/${item.slug}`}
@@ -264,7 +264,7 @@ const Navbar = () => {
                   <div className="pl-4 space-y-1 border-l-2 border-primary/10 ml-4">
                      {section.items.length > 0 ? section.items.map((item) => (
                         <Link
-                          key={item.id}
+                          key={item.slug}
                           to={`${section.pathPrefix}/${item.slug}`}
                           className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
                           onClick={() => handleLinkClick(`${section.pathPrefix}/${item.slug}`)}
