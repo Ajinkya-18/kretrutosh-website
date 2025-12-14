@@ -37,14 +37,14 @@ const GrowthEngine = ({ title, subtitle, gridClass }: GrowthEngineProps) => {
       try {
         const { data, error } = await supabase
           .from('services')
-          .select('slug, title, subtitle, icon_name')
+          .select('slug, title, subtitle')
           .order('id', { ascending: true }); // or display_order if added
 
         if (error) throw error;
 
         if (data) {
           const mappedMotions: Motion[] = data.map(item => ({
-            icon: item.icon_name || 'Target', 
+            icon: 'Target', // icon_name column doesn't exist in services table
             title: item.title,
             description: item.subtitle || '',
             link: `/services/${item.slug}`

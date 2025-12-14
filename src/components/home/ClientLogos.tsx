@@ -19,7 +19,7 @@ const ClientLogos = ({ title }: ClientLogosProps) => {
   useEffect(() => {
     const fetchLogos = async () => {
       const { data, error } = await supabase
-        .from('clients') // Changed to clients table per new schema
+        .from('client_logos') // Correct table name is client_logos
         .select('*')
         .order('display_order', { ascending: true });
 

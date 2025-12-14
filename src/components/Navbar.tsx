@@ -94,6 +94,9 @@ const Navbar = () => {
           });
           
           await Promise.all(dataPromises);
+          
+          // Debug logging to track dropdown data
+          console.log("NAVBAR DATA FETCHED:", dropdownData);
         }
     };
     
