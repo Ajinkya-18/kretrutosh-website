@@ -61,8 +61,19 @@ const Navbar = () => {
           const dataPromises: Promise<void>[] = [];
           
           menuItems.forEach((item: any) => {
-            // Check if item has children (dropdown) or a dataSource
-            const dataSource = item.dataSource || item.data_source;
+            // Check if item has explicit dataSource
+            let dataSource = item.dataSource || item.data_source;
+            
+            // If no explicit dataSource, infer from item name
+            if (!dataSource && item.name) {
+              const itemNameLower = item.name.toLowerCase();
+              if (itemNameLower.includes('service')) dataSource = 'services';
+              else if (itemNameLower.includes('framework')) dataSource = 'frameworks';
+              else if (itemNameLower.includes('industr')) dataSource = 'industries';
+              else if (itemNameLower.includes('blog') || itemNameLower.includes('leadership') || itemNameLower.includes('article')) dataSource = 'blogs';
+              else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
+              else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
+            }
             
             if (dataSource && DATA_SOURCE_MAP[dataSource]) {
               const { table, fields } = DATA_SOURCE_MAP[dataSource];
@@ -130,7 +141,17 @@ const Navbar = () => {
 
   // Render a dropdown menu item
   const renderDropdown = (item: any) => {
-    const dataSource = item.dataSource || item.data_source;
+    // Infer dataSource if not explicitly set
+    let dataSource = item.dataSource || item.data_source;
+    if (!dataSource && item.name) {
+      const itemNameLower = item.name.toLowerCase();
+      if (itemNameLower.includes('service')) dataSource = 'services';
+      else if (itemNameLower.includes('framework')) dataSource = 'frameworks';
+      else if (itemNameLower.includes('industr')) dataSource = 'industries';
+      else if (itemNameLower.includes('blog') || itemNameLower.includes('leadership') || itemNameLower.includes('article')) dataSource = 'blogs';
+      else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
+      else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
+    }
     const items = dataSource ? (dropdownData[dataSource] || []) : (item.children || []);
     
     // Determine base path for dropdown items
@@ -191,7 +212,17 @@ const Navbar = () => {
 
   // Render mobile menu section
   const renderMobileSection = (item: any) => {
-    const dataSource = item.dataSource || item.data_source;
+    // Infer dataSource if not explicitly set
+    let dataSource = item.dataSource || item.data_source;
+    if (!dataSource && item.name) {
+      const itemNameLower = item.name.toLowerCase();
+      if (itemNameLower.includes('service')) dataSource = 'services';
+      else if (itemNameLower.includes('framework')) dataSource = 'frameworks';
+      else if (itemNameLower.includes('industr')) dataSource = 'industries';
+      else if (itemNameLower.includes('blog') || itemNameLower.includes('leadership') || itemNameLower.includes('article')) dataSource = 'blogs';
+      else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
+      else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
+    }
     const items = dataSource ? (dropdownData[dataSource] || []) : (item.children || []);
     
     // Determine base path

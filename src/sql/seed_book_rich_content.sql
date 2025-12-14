@@ -47,7 +47,7 @@ VALUES (
     'Now FREE on Amazon',
     'Get Your Copy',
     'Download from Amazon',
-    'https://www.amazon.com/dp/placeholder', -- Replace with actual Amazon link when available
+    'https://www.amazon.com/dp/B0CNH611F7',
     
     -- Images
     'https://qxbdjyzwvwtfzsadwvs.supabase.co/storage/v1/object/public/assets/book-cover.jpg', -- Placeholder - replace with actual cover image
