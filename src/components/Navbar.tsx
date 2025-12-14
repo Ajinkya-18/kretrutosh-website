@@ -152,7 +152,11 @@ const Navbar = () => {
       else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
       else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
     }
-    const items = dataSource ? (dropdownData[dataSource] || []) : (item.children || []);
+    
+    // PREFER fetched data over hardcoded children for dynamic sources
+    const items = (dataSource && dropdownData[dataSource]?.length > 0)
+      ? dropdownData[dataSource]
+      : (item.children || []);
     
     // Determine base path for dropdown items
     let basePath = "";
@@ -223,7 +227,11 @@ const Navbar = () => {
       else if (itemNameLower.includes('assessment')) dataSource = 'assessments';
       else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
     }
-    const items = dataSource ? (dropdownData[dataSource] || []) : (item.children || []);
+    
+    // PREFER fetched data over hardcoded children for dynamic sources
+    const items = (dataSource && dropdownData[dataSource]?.length > 0)
+      ? dropdownData[dataSource]
+      : (item.children || []);
     
     // Determine base path
     let basePath = "";

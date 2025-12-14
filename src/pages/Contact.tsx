@@ -193,11 +193,11 @@ const Contact = () => {
 
                              {/* Right Column: Google Form Iframe */}
                              <div className="lg:pl-10">
-                                 <div className="bg-white/5 rounded-2xl shadow-2xl overflow-hidden min-h-[800px] border border-white/10 backdrop-blur-sm">
+                                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[800px]">
                                      {pageConfig?.google_form_url ? (
                                          <iframe 
                                             src={pageConfig.google_form_url} 
-                                            className="w-full h-[800px] border-0 bg-transparent invert-[.9] hue-rotate-180" 
+                                            className="w-full h-[800px] border-0" 
                                             title="Contact Form"
                                             sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-presentation"
                                          >
