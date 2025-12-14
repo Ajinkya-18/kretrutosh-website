@@ -4,9 +4,10 @@ import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
+import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 // Homepage Sections
@@ -15,6 +16,7 @@ import GrowthEngine from "@/components/home/GrowthEngine";
 import Frameworks from "@/components/home/Frameworks";
 import ClientLogos from "@/components/home/ClientLogos";
 import CaseStudies from "@/components/home/CaseStudies";
+import ThoughtLeadership from "@/components/home/ThoughtLeadership";
 // Other components might be deprecated or unused in new structure if not in page_home config, 
 // but we keep imports if we want to add them back later, or remove if unused.
 
@@ -133,15 +135,30 @@ const Index = () => {
         {/* Case Studies */}
         <CaseStudies />
 
-        <motion.div
-           id="contact"
-           initial={{ opacity: 0 }}
-           whileInView={{ opacity: 1 }}
-           viewport={{ once: true }}
-           transition={{ duration: 0.8 }}
-        >
-          <ContactForm />
-        </motion.div>
+        {/* Thought Leadership (includes Book reference and Whitepapers) */}
+        <ThoughtLeadership />
+
+        {/* Final CTA Section (replacing static Contact Form) */}
+        <div className="py-24 bg-primary text-center">
+            <div className="container mx-auto px-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                    Ready to Transform Your Growth Engine?
+                </h2>
+                <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+                    Let's discuss how we can help you achieve predictable, customer-led growth.
+                </p>
+                <Button 
+                    asChild 
+                    size="lg" 
+                    className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8 py-6 shadow-xl hover:scale-105 transition-all"
+                >
+                    <Link to="/contact">
+                       Schedule a Consultation
+                    </Link>
+                </Button>
+            </div>
+        </div>
+
       </main>
       <Footer />
     </div>

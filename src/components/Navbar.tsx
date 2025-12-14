@@ -11,6 +11,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  NavigationMenuViewport,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { supabase } from "@/lib/supabaseClient";
@@ -38,10 +39,15 @@ const Navbar = () => {
         if (configData) setConfig(configData);
 
         // 2. Fetch Aggregates
-        const { data: servicesData } = await supabase.from('services').select('id, title, slug').order('title');
-        if (servicesData) setServices(servicesData);
+        const { data: servicesData, error: servicesError } = await supabase.from('services').select('id, title, slug').order('title');
+        if (servicesError) console.error("Navbar Services Error:", servicesError);
+        if (servicesData) {
+            console.log("Navbar Services Data:", servicesData); // Debug log
+            setServices(servicesData);
+        }
 
-        const { data: frameworksData } = await supabase.from('frameworks').select('id, title, slug').order('title');
+        const { data: frameworksData, error: frameworksError } = await supabase.from('frameworks').select('id, title, slug').order('title');
+        if (frameworksError) console.error("Navbar Frameworks Error:", frameworksError);
         if (frameworksData) setFrameworks(frameworksData);
 
         const { data: industriesData } = await supabase.from('industries').select('id, title, slug').order('title');
@@ -201,6 +207,7 @@ const Navbar = () => {
                 </NavigationMenuItem>
 
               </NavigationMenuList>
+              <NavigationMenuViewport className="left-0" />
             </NavigationMenu>
 
             <div className="ml-4">

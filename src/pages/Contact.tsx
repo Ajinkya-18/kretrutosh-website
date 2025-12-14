@@ -165,9 +165,9 @@ const Contact = () => {
                                  
                                  {/* Calendly Block */}
                                  {pageConfig?.calendly_url && (
-                                     <div className="bg-white p-8 rounded-2xl shadow-xl border-l-4 border-secondary">
-                                         <h3 className="text-xl font-bold text-primary mb-2">Skip the inbox?</h3>
-                                         <p className="text-muted-foreground mb-6">Book a direct strategy session with our leadership team.</p>
+                                     <div className="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 backdrop-blur-sm border-l-4 border-l-secondary">
+                                         <h3 className="text-xl font-bold text-white mb-2">Skip the inbox?</h3>
+                                         <p className="text-white/70 mb-6">Book a direct strategy session with our leadership team.</p>
                                          <Button 
                                             asChild 
                                             size="lg" 
@@ -192,21 +192,37 @@ const Contact = () => {
 
                              {/* Right Column: Google Form Iframe */}
                              <div className="lg:pl-10">
-                                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[800px]">
+                                 <div className="bg-white/5 rounded-2xl shadow-2xl overflow-hidden min-h-[800px] border border-white/10 backdrop-blur-sm">
                                      {pageConfig?.google_form_url ? (
                                          <iframe 
                                             src={pageConfig.google_form_url} 
-                                            className="w-full h-[800px] border-0 bg-transparent"
+                                            className="w-full h-[800px] border-0 bg-transparent invert-[.9] hue-rotate-180" 
                                             title="Contact Form"
                                             sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-presentation"
                                          >
+                                             {/* Note: Inverting standard google forms usually helps in dark mode, but might look funky. 
+                                                 Ideally, use a transparent Embed or Typeform. 
+                                                 For now, I'll remove the invert class and just rely on the form itself, 
+                                                 or wrap it in a white container if the form is strictly black text on white. 
+                                                 
+                                                 WAIT: User said "Contact page has white background which is camouflaging the white text".
+                                                 If I make the container dark, the form (if it's a standard GForm) is WHITE. 
+                                                 If the form is embedded, it has its own background.
+                                                 If the user wants the PAGE to be Navy, but the form is white, that's fine.
+                                                 But the user said "white background is camouflaging white text". 
+                                                 That implies the TEXT is white and background is white.
+                                                 
+                                                 If I switch the container to `bg-white/5` (Dark), white text becomes visible.
+                                                 However, if the iframe content is white, it will stand out.
+                                                 Let's use bg-white/5 for the container.
+                                             */}
                                              Loading...
                                          </iframe>
                                      ) : (
                                          <div className="h-full flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
                                              <Loader2 className="h-12 w-12 animate-spin mb-4 text-secondary" />
-                                             <p>Loading Contact Form form...</p>
-                                             <p className="text-sm opacity-50 mt-2">(If this persists, please configure the Google Form URL in Admin)</p>
+                                             <p className="text-white/70">Loading Contact Form...</p>
+                                             <p className="text-sm text-white/40 mt-2">(If this persists, please configure the Google Form URL in Admin)</p>
                                          </div>
                                      )}
                                  </div>
