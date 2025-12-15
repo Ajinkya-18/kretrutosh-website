@@ -205,7 +205,7 @@ const Navbar = () => {
         <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
           {item.name || item.label}
         </NavigationMenuTrigger>
-        <NavigationMenuContent>
+        <NavigationMenuContent className="z-50 bg-white border border-border shadow-xl">
           <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", items.length > 5 ? "md:grid-cols-2" : "")}>
             {items.map((child: any) => (
               <li key={child.slug || child.id || child.path}>
@@ -350,7 +350,7 @@ const Navbar = () => {
             <div className="ml-4">
               <Button 
                 asChild 
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 <Link to={config?.cta_link || "#"}>
                     {config?.cta_text || <span className="text-red-900 font-bold bg-white px-2">NULL: CTA TEXT</span>}
@@ -393,7 +393,7 @@ const Navbar = () => {
               })}
 
               <div className="pt-4 mt-2 border-t border-border">
-                <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg" asChild>
+                <Button className="w-full bg-[#FF9933] text-white hover:bg-[#FF9933]/90 shadow-lg" asChild>
                   <Link to={config?.cta_link || "#"}>
                     {config?.cta_text || 'NULL: CTA TEXT'}
                   </Link>

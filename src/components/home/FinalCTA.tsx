@@ -24,7 +24,7 @@ const FinalCTA = ({ title, subtitle, primaryBtn, secondaryBtn }: FinalCTAProps) 
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6 shadow-glow">
+          <Button asChild size="lg" className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 text-lg px-8 py-6 shadow-glow">
             <Link to="/contact">
               {primaryBtn}
               <ArrowRight className="ml-2 h-5 w-5" />

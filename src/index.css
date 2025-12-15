@@ -11,6 +11,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Premium Navy & Gold Theme - Light Mode */
+    /* BRAND COLORS: Navy #0B1C3E = HSL(220, 70%, 14%) | Saffron #FF9933 = HSL(30, 100%, 60%) */
     --background: 210 40% 98%; /* Very light blue-grey tint */
     --foreground: 220 70% 14%; /* #0B1C3E - Brand Navy */
 
@@ -20,17 +21,20 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 70% 14%;
 
-    --primary: 220 70% 14%; /* #0B1C3E - Brand Navy */
+    /* PRIMARY = BRAND NAVY #0B1C3E */
+    --primary: 220 70% 14%; /* EXACT: #0B1C3E */
     --primary-foreground: 210 40% 98%;
     --primary-glow: 220 70% 25%;
 
-    --secondary: 30 100% 60%; /* #FF9933 - Brand Saffron */
+    /* SECONDARY = BRAND SAFFRON #FF9933 */
+    --secondary: 30 100% 60%; /* EXACT: #FF9933 */
     --secondary-foreground: 220 70% 14%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 30 100% 60%; /* #FF9933 - Brand Saffron */
+    /* ACCENT = BRAND SAFFRON #FF9933 */
+    --accent: 30 100% 60%; /* EXACT: #FF9933 */
     --accent-foreground: 220 70% 14%;
     --accent-hover: 30 100% 55%;
 

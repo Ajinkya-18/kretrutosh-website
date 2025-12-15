@@ -65,7 +65,7 @@ const ServiceBuilder = ({ slug }: ServicePageProps) => {
                 <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-8">
                   {section.subtitle}
                 </p>
-                <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 text-lg px-8 py-6">
+                <Button asChild size="lg" className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 text-lg px-8 py-6">
                   <Link to="/contact">
                     {section.primary_cta_text}
                     <ArrowRight className="ml-2 h-5 w-5" />

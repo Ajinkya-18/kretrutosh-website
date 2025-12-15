@@ -104,7 +104,7 @@ const ContactForm = () => {
               className="min-h-[120px] bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-secondary focus:ring-secondary/20 transition-all"
             />
           </div>
-          <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90 text-primary-foreground font-bold shadow-lg hover:shadow-xl transition-all h-12" disabled={isSubmitting}>
+          <Button type="submit" className="w-full bg-[#FF9933] hover:bg-[#FF9933]/90 text-white font-bold shadow-lg hover:shadow-xl transition-all h-12" disabled={isSubmitting}>
             {isSubmitting ? "Sending..." : getText('form.btn', 'Send Message')}
             <Send className="ml-2 h-4 w-4" />
           </Button>

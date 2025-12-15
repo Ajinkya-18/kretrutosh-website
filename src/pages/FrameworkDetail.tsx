@@ -68,8 +68,16 @@ const FrameworkDetail = () => {
       setFramework(fwData);
 
       // 2. Fetch Dynamic Sections
+      // NOTE: Temporarily commented out until correct table structure is confirmed
+      // The original code referenced 'sections_framework_details' which doesn't exist
+      // Need to clarify if framework details should be:
+      // - Stored in a separate sections table
+      // - Part of the frameworks table itself
+      // - Not needed at all (using only frameworks table data)
+      
+      /* ORIGINAL CODE - sections_framework_details table doesn't exist
       const { data: secData, error: secError } = await supabase
-        .from('sections_framework_details')
+        .from('frameworks')
         .select('*')
         .eq('parent_slug', slug)
         .eq('is_visible', true)
@@ -80,6 +88,10 @@ const FrameworkDetail = () => {
            alert("Data Load Failed [FrameworkSections]: " + secError.message);
       }
       setSections(secData || []);
+      */
+      
+      // For now, set sections to empty to prevent errors
+      setSections([]);
       
       setLoading(false);
     };
@@ -94,7 +106,7 @@ const FrameworkDetail = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'sections_framework_details',
+          table: 'frameworks',
           filter: `parent_slug=eq.${slug}`,
         },
         () => fetchData()
@@ -111,8 +123,8 @@ const FrameworkDetail = () => {
        )
        .subscribe();
 
-    return () => { 
-        supabase.removeChannel(channel); 
+    return () =\u003e { 
+        // supabase.removeChannel(channel); // Commented out since channel not created
         supabase.removeChannel(metaChannel); 
     };
   }, [slug]);

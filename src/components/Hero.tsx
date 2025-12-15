@@ -94,7 +94,7 @@ const Hero = ({
             <Button 
               asChild
               size="lg" 
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-lg px-8 py-6 shadow-glow transition-all hover:scale-105"
+              className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-white font-semibold text-lg px-8 py-6 shadow-glow transition-all hover:scale-105"
             >
               <Link to={primaryCtaLink}>
                 {primaryCta || 'Book a Growth Strategy Review'}
