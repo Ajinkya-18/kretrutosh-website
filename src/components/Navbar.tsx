@@ -350,7 +350,6 @@ const Navbar = () => {
                   }
                 })}
               </NavigationMenuList>
-              <NavigationMenuViewport className="left-0" />
             </NavigationMenu>
 
             <div className="ml-4">
