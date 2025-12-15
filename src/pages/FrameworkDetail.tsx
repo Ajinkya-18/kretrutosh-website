@@ -123,7 +123,7 @@ const FrameworkDetail = () => {
        )
        .subscribe();
 
-    return () =\u003e { 
+    return () => { 
         // supabase.removeChannel(channel); // Commented out since channel not created
         supabase.removeChannel(metaChannel); 
     };
