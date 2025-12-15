@@ -90,42 +90,115 @@ const ServiceDetail = () => {
         </div>
       </section>
 
-      {/* 2. Problem Section (Rich Text) */}
-      {service.problem_html && (
+      {/* 2. Problem Section - Tile Cards */}
+      {service.problem_html && (() => {
+        // Parse HTML to extract list items
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(service.problem_html, 'text/html');
+        const listItems = Array.from(doc.querySelectorAll('li')).map(li => li.textContent?.trim() || '');
+        
+        return (
           <section className="py-24 bg-background">
              <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
-                    <div className="inline-block px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-semibold uppercase tracking-wider mb-6">
-                        The Challenge
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-12">
+                        <div className="inline-block px-4 py-1.5 rounded-full border border-[#FF9933]/30 bg-[#FF9933]/10 backdrop-blur-sm mb-4">
+                            <span className="text-[#FF9933] font-bold text-sm tracking-wide uppercase">The Challenge</span>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-bold text-[#0B1C3E]">What We're Solving</h2>
                     </div>
-                    <div 
-                        className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-primary prose-a:text-secondary"
-                        dangerouslySetInnerHTML={{ __html: service.problem_html }} 
-                    />
+                    
+                    {listItems.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {listItems.map((item, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group"
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-2 h-2 bg-[#FF9933] rounded-full mt-2 shrink-0 group-hover:scale-150 transition-transform"></div>
+                                        <p className="text-gray-700 leading-relaxed">{item}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-primary prose-a:text-secondary"
+                             dangerouslySetInnerHTML={{ __html: service.problem_html }} 
+                        />
+                    )}
                 </div>
              </div>
           </section>
-      )}
+        );
+      })()}
 
-      {/* 3. Approach Section (Rich Text -> Cards) */}
-       {service.approach_html && (
+      {/* 3. Approach Section - Feature Tiles */}
+       {service.approach_html && (() => {
+        // Parse HTML to extract list items
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(service.approach_html, 'text/html');
+        const listItems = Array.from(doc.querySelectorAll('li')).map(li => {
+          const text = li.textContent?.trim() || '';
+          // Try to split title and description based on colon
+          const colonIndex = text.indexOf(':');
+          if (colonIndex > 0) {
+            return {
+              title: text.substring(0, colonIndex).trim(),
+              description: text.substring(colonIndex + 1).trim()
+            };
+          }
+          return { title: text, description: '' };
+        });
+        
+        return (
           <section className="py-24 bg-gray-50">
              <div className="container mx-auto px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-[#0B1C3E]">Our Approach</h2>
+                        <div className="inline-block px-4 py-1.5 rounded-full border border-[#0B1C3E]/20 bg-[#0B1C3E]/5 backdrop-blur-sm mb-4">
+                            <span className="text-[#0B1C3E] font-bold text-sm tracking-wide uppercase">Our Approach</span>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-bold text-[#0B1C3E] mb-4">How We Deliver Results</h2>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">Our proven methodology combines strategy, technology, and execution.</p>
                     </div>
-                    <div 
-                        className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-a:text-[#FF9933] prose-strong:text-[#0B1C3E] 
-                        prose-ul:grid prose-ul:grid-cols-1 prose-ul:md:grid-cols-2 prose-ul:gap-6 prose-ul:pl-0 
-                        prose-li:bg-white prose-li:p-8 prose-li:rounded-xl prose-li:shadow-sm prose-li:border prose-li:border-gray-100 prose-li:list-none prose-li:m-0 
-                        prose-li:transition-all prose-li:duration-300 prose-li:hover:shadow-md prose-li:hover:-translate-y-1"
-                        dangerouslySetInnerHTML={{ __html: service.approach_html }} 
-                    />
+                    
+                    {listItems.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {listItems.map((item, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 group relative overflow-hidden"
+                                >
+                                    {/* Accent bar */}
+                                    <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-[#FF9933] to-[#FF9933]/50 group-hover:w-2 transition-all"></div>
+                                    
+                                    {/* Number badge */}
+                                    <div className="absolute top-4 right-4 w-10 h-10 bg-[#FF9933]/10 rounded-full flex items-center justify-center">
+                                        <span className="text-[#FF9933] font-bold text-sm">{idx + 1}</span>
+                                    </div>
+                                    
+                                    <div className="pr-12">
+                                        <h3 className="text-xl font-bold text-[#0B1C3E] mb-3 group-hover:text-[#FF9933] transition-colors">
+                                            {item.title}
+                                        </h3>
+                                        {item.description && (
+                                            <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-a:text-[#FF9933]"
+                             dangerouslySetInnerHTML={{ __html: service.approach_html }} 
+                        />
+                    )}
                 </div>
              </div>
           </section>
-      )}
+        );
+      })()}
 
       {/* 4. Outcomes (List JSONB) */}
       {service.outcomes_list && service.outcomes_list.length > 0 && (
