@@ -205,19 +205,25 @@ const Navbar = () => {
         <NavigationMenuTrigger className="bg-transparent hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
           {item.name || item.label}
         </NavigationMenuTrigger>
-        <NavigationMenuContent className="z-50 bg-white border border-border shadow-xl">
-          <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px]", items.length > 5 ? "md:grid-cols-2" : "")}>
+        <NavigationMenuContent className="z-[10000] bg-white text-black border border-border shadow-xl">
+          <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px] bg-white text-black", items.length > 5 ? "md:grid-cols-2" : "")}>
+            {/* DEBUG RED BOX - Step 2 Test */}
+            {(item.name || item.label).toLowerCase().includes('solution') && (
+              <div className="p-4 bg-red-500 text-white font-bold z-[10000] col-span-full">
+                DEBUG: IF YOU SEE THIS, RENDER IS WORKING
+              </div>
+            )}
             {items.map((child: any) => (
               <li key={child.slug || child.id || child.path}>
                 <NavigationMenuLink asChild>
                   <Link
                     to={child.path || `${basePath}/${child.slug || child.id}`}
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-black"
                     onClick={() => handleLinkClick(child.path || `${basePath}/${child.slug || child.id}`)}
                   >
-                    <div className="text-sm font-medium leading-none">{child.name || child.title}</div>
+                    <div className="text-sm font-medium leading-none text-black">{child.name || child.title}</div>
                     {child.description && (
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      <p className="line-clamp-2 text-sm leading-snug text-gray-600">
                         {child.description}
                       </p>
                     )}
@@ -310,7 +316,7 @@ const Navbar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out border-b border-transparent",
+        "fixed top-0 left-0 right-0 z-[9999] relative transition-all duration-300 ease-in-out border-b border-transparent",
         scrolled
           ? "bg-background/80 backdrop-blur-md shadow-sm border-border/40 py-2"
           : "bg-transparent py-4"
