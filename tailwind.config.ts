@@ -14,18 +14,21 @@ export default {
     },
     extend: {
       colors: {
+        // BRAND IDENTITY: Strict color palette enforcement
+        // Navy #0B1C3E = HSL(220, 70%, 14%)
+        // Saffron #FF9933 = HSL(30, 100%, 60%)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "hsl(var(--primary))", // #0B1C3E Navy
           foreground: "hsl(var(--primary-foreground))",
           glow: "hsl(var(--primary-glow))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "hsl(var(--secondary))", // #FF9933 Saffron
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -37,7 +40,7 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
+          DEFAULT: "hsl(var(--accent))", // #FF9933 Saffron (alias for secondary)
           foreground: "hsl(var(--accent-foreground))",
           hover: "hsl(var(--accent-hover))",
         },

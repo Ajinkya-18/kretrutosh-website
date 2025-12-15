@@ -9,7 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg",
+        default: "bg-secondary text-white hover:bg-secondary/90 shadow-md hover:shadow-lg", // Saffron for high visibility CTAs
+        primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg", // Navy variant
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-md hover:shadow-lg",
         outline: "border-2 border-input bg-background hover:bg-accent/5 hover:text-accent hover:border-accent/40 hover:shadow-sm",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md",

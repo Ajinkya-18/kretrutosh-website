@@ -143,7 +143,8 @@ All colors MUST be HSL.
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply text-gray-900 font-bold tracking-tight;
+    @apply font-bold tracking-tight;
+    color: #0B1C3E; /* Strict Navy - never pure black for premium appearance */
   }
   
   /* Smooth scroll behavior */
