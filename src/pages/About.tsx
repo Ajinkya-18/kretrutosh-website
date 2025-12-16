@@ -56,32 +56,29 @@ const About = () => {
     };
   }, []);
 
-  if (loading) {
-     return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-     );
-  }
-
-  return (
-    <div className="min-h-screen bg-background font-sans">
-      <Navbar />
-      <main>
-        <Hero 
-           mediaType={pageConfig?.media_type}
-           videoUrl={pageConfig?.hero_video_url}
-           backgroundImage={pageConfig?.hero_image_url}
-           overlayOpacity={pageConfig?.overlay_opacity}
-           title={pageConfig?.title || aboutData?.hero_title}
-           subtitle={pageConfig?.subtitle}
-        />
-
-        <ClientLogos />
-
-        {/* Story Section */}
-        {aboutData?.story_html && (
-          <section className="py-20 bg-background">
+  // Render individual sections based on section key
+  const renderSection = (sectionKey: string) => {
+    switch (sectionKey) {
+      case 'hero':
+        return (
+          <Hero 
+            key="hero"
+            mediaType={pageConfig?.media_type}
+            videoUrl={pageConfig?.hero_video_url}
+            backgroundImage={pageConfig?.hero_image_url}
+            overlayOpacity={pageConfig?.overlay_opacity}
+            title={aboutData?.hero_title || pageConfig?.title}
+            subtitle={pageConfig?.subtitle}
+          />
+        );
+      
+      case 'clients':
+        return <ClientLogos key="clients" />;
+      
+      case 'story':
+        if (!aboutData?.story_html) return null;
+        return (
+          <section key="story" className="py-20 bg-background">
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -115,7 +112,42 @@ const About = () => {
               </div>
             </div>
           </section>
-        )}
+        );
+      
+      case 'team':
+        // Placeholder for team section - can be implemented later
+        return null;
+      
+      default:
+        return null;
+    }
+  };
+
+  if (loading) {
+     return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+     );
+  }
+
+  // Get layout order and section visibility from aboutData
+  const layoutOrder = aboutData?.layout_order || ["hero", "story", "clients"];
+  const sectionVisibility = aboutData?.section_visibility || {
+    hero: true,
+    story: true,
+    clients: true,
+    team: true
+  };
+
+  // Filter sections based on visibility
+  const visibleSections = layoutOrder.filter((section: string) => sectionVisibility[section]);
+
+  return (
+    <div className="min-h-screen bg-background font-sans">
+      <Navbar />
+      <main>
+        {visibleSections.map((sectionKey: string) => renderSection(sectionKey))}
       </main>
       <Footer />
     </div>
