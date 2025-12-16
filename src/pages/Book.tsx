@@ -103,6 +103,11 @@ const Book = () => {
                       src={bookData.cover_image_url || bookCoverDefault} 
                       alt="Book Cover" 
                       className="relative rounded-lg shadow-2xl w-full max-w-md transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        console.error('Book cover failed to load:', bookData.cover_image_url);
+                        e.currentTarget.src = bookCoverDefault;
+                      }}
+                      onLoad={() => console.log('Book cover loaded:', bookData.cover_image_url)}
                     />
                   </div>
                 </div>
@@ -162,6 +167,11 @@ const Book = () => {
                             src={bookData.qr_image_url || qrBookDefault} 
                             alt="QR Code" 
                             className="w-32 h-32 rounded-lg border border-border"
+                            onError={(e) => {
+                              console.error('QR image failed to load:', bookData.qr_image_url);
+                              e.currentTarget.src = qrBookDefault;
+                            }}
+                            onLoad={() => console.log('QR image loaded:', bookData.qr_image_url)}
                           />
                         </div>
                         <div className="flex-1">

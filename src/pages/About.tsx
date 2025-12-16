@@ -106,6 +106,11 @@ const About = () => {
                   src={image_url} 
                   alt={title || 'Section image'} 
                   className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
+                  onError={(e) => {
+                    console.error('Image failed to load:', image_url);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                  onLoad={() => console.log('Image loaded successfully:', image_url)}
                 />
               </div>
             )}
@@ -116,11 +121,11 @@ const About = () => {
               </h2>
             )}
             {subtitle && (
-              <p className={`text-xl font-medium mb-8 ${bg_theme === 'navy' ? 'text-secondary' : 'text-secondary'}`}>
+              <p className={`text-xl font-medium mb-8 ${bg_theme === 'navy' ? 'text-white' : 'text-secondary'}`}>
                 {subtitle}
               </p>
             )}
-            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert' : 'prose-headings:text-[#0B1C3E] prose-p:text-[#0B1C3E]/80'}`}>
+            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert prose-headings:text-white prose-p:text-white/90' : 'prose-headings:text-[#0B1C3E] prose-p:text-[#0B1C3E]/80'}`}>
                {renderContent(content_body)}
             </div>
           </div>
