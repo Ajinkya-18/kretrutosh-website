@@ -71,13 +71,17 @@ const About = () => {
 
   const renderContent = (content?: string) => {
     if (!content) return null;
-    return content.split('\n').map((line, i) => (
-      line.trim() ? <p key={i} className="mb-4 text-lg leading-relaxed">{line}</p> : <br key={i} />
-    ));
+    // Render HTML content using dangerouslySetInnerHTML
+    return (
+      <div 
+        className="prose prose-lg max-w-none" 
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+    );
   };
 
   const renderSection = (section: Section) => {
-    const { section_key, title, subtitle, content_body, bg_theme, alignment } = section;
+    const { section_key, title, subtitle, content_body, image_url, bg_theme, alignment } = section;
     
     // Theme Classes
     const themeClasses = {
@@ -95,6 +99,17 @@ const About = () => {
       <section key={section.id} className={containerClass}>
         <div className="container mx-auto px-4">
           <div className={`max-w-4xl ${alignClass} animate-on-scroll`}>
+            {/* Image */}
+            {image_url && (
+              <div className="mb-8">
+                <img 
+                  src={image_url} 
+                  alt={title || 'Section image'} 
+                  className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
+                />
+              </div>
+            )}
+            
             {title && (
               <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${bg_theme === 'navy' ? 'text-white' : 'text-primary'}`}>
                 {title}
@@ -105,7 +120,7 @@ const About = () => {
                 {subtitle}
               </p>
             )}
-            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert' : 'text-muted-foreground'}`}>
+            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert' : 'prose-headings:text-[#0B1C3E] prose-p:text-[#0B1C3E]/80'}`}>
                {renderContent(content_body)}
             </div>
           </div>

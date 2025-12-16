@@ -111,12 +111,13 @@ const Book = () => {
                 <div className="space-y-6 animate-fade-in-up">
                   {bookData.about_title && bookData.about_description && (
                     <div>
-                      <h2 className="text-3xl font-bold mb-4">
+                      <h2 className="text-3xl font-bold mb-4 text-[#0B1C3E]">
                         {bookData.about_title}
                       </h2>
-                      <p className="text-lg text-muted-foreground mb-6 whitespace-pre-line">
-                        {bookData.about_description}
-                      </p>
+                      <div 
+                        className="text-lg text-[#0B1C3E]/80 mb-6 prose prose-lg max-w-none prose-headings:text-[#0B1C3E]" 
+                        dangerouslySetInnerHTML={{ __html: bookData.about_description }}
+                      />
                     </div>
                   )}
 
@@ -131,7 +132,7 @@ const Book = () => {
                   {bookData.amazon_url && (
                     <div className="space-y-4">
                       {bookData.cta_title && (
-                        <h3 className="text-2xl font-bold">
+                        <h3 className="text-2xl font-bold text-[#0B1C3E]">
                           {bookData.cta_title}
                         </h3>
                       )}
@@ -183,12 +184,13 @@ const Book = () => {
               {/* Author Section */}
               {bookData.author_bio && (
                 <div className="mt-16 p-8 bg-muted/50 rounded-lg border border-border">
-                  <h3 className="text-2xl font-bold mb-4 text-center">
+                  <h3 className="text-2xl font-bold mb-4 text-center text-[#0B1C3E]">
                     {bookData.author_title || "About the Author"}
                   </h3>
-                  <p className="text-lg text-center max-w-3xl mx-auto whitespace-pre-line">
-                    {bookData.author_bio}
-                  </p>
+                  <div 
+                    className="text-lg text-center max-w-3xl mx-auto prose prose-lg prose-headings:text-[#0B1C3E] prose-p:text-[#0B1C3E]/80" 
+                    dangerouslySetInnerHTML={{ __html: bookData.author_bio }}
+                  />
                 </div>
               )}
             </div>
