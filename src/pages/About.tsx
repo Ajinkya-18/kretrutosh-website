@@ -3,25 +3,11 @@ import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 import Hero from "@/components/Hero";
 import ClientLogos from "@/components/home/ClientLogos";
 
-interface Section {
-  id: string;
-  section_key: string; // 'hero', 'philosophy', 'who_we_are', 'founder_story'
-  title: string;
-  subtitle?: string;
-  content_body?: string;
-  image_url?: string;
-  grid_columns: number;
-  alignment: 'left' | 'center' | 'right';
-  bg_theme: 'light' | 'navy' | 'gray';
-  admin_instruction?: string;
-}
-
 const About = () => {
-  const [sections, setSections] = useState<Section[]>([]);
+  const [aboutData, setAboutData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [pageConfig, setPageConfig] = useState<any>(null);
 
@@ -29,22 +15,23 @@ const About = () => {
     const fetchPage = async () => {
       try {
         setLoading(true);
-        // 1. Fetch Master Page
+        // 1. Fetch Master Page config for hero video/image
         const { data: pageData } = await supabase.from('pages').select('*').eq('slug', 'about').single();
         if (pageData) setPageConfig(pageData);
 
-        // 2. Fetch Sections
-        const { data: sectionData, error } = await supabase
+        // 2. Fetch About page data from page_about table
+        const { data: aboutPageData, error } = await supabase
           .from('page_about')
           .select('*')
-          .eq('is_visible', true)
-          .neq('section_key', 'hero')
-          .order('display_order', { ascending: true });
+          .single();
 
-        if (error) throw error;
-        setSections(sectionData || []);
+        if (error) {
+          console.error("Error fetching page_about:", error);
+        } else {
+          setAboutData(aboutPageData);
+        }
       } catch (error) {
-        console.error("Error fetching about sections:", error);
+        console.error("Error fetching about page:", error);
       } finally {
         setLoading(false);
       }
@@ -55,103 +42,19 @@ const About = () => {
     // Real-time Subscriptions
     const pageChannel = supabase
         .channel('about-page-changes')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'pages', 
-          filter: "slug=eq.about" 
-        }, (payload) => {
-          console.log('Page update received:', payload);
-          fetchPage();
-        })
-        .subscribe((status) => {
-          console.log('Page channel subscription status:', status);
-        });
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'about'" }, () => fetchPage())
+        .subscribe();
 
-    const sectionsChannel = supabase
-        .channel('about-sections-changes')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'page_about' 
-        }, (payload) => {
-          console.log('Sections update received:', payload);
-          fetchPage();
-        })
-        .subscribe((status) => {
-          console.log('Sections channel subscription status:', status);
-        });
+    const aboutDataChannel = supabase
+        .channel('about-data-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'page_about' }, () => fetchPage())
+        .subscribe();
 
     return () => {
         supabase.removeChannel(pageChannel);
-        supabase.removeChannel(sectionsChannel);
+        supabase.removeChannel(aboutDataChannel);
     };
   }, []);
-
-  const renderContent = (content?: string) => {
-    if (!content) return null;
-    // Render HTML content using dangerouslySetInnerHTML
-    return (
-      <div 
-        className="prose prose-lg max-w-none" 
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-    );
-  };
-
-  const renderSection = (section: Section) => {
-    const { section_key, title, subtitle, content_body, image_url, bg_theme, alignment } = section;
-    
-    // Theme Classes
-    const themeClasses = {
-      light: "bg-background text-foreground",
-      navy: "bg-[#0A192F] text-white",
-      gray: "bg-muted/30 text-foreground"
-    };
-
-    const alignClass = alignment === 'center' ? 'text-center mx-auto' : 'text-left';
-    const containerClass = `py-20 ${themeClasses[bg_theme] || themeClasses.light}`;
-    
-    // Hero case removed (handled by component)
-
-    return (
-      <section key={section.id} className={containerClass}>
-        <div className="container mx-auto px-4">
-          <div className={`max-w-4xl ${alignClass} animate-on-scroll`}>
-            {/* Image */}
-            {image_url && (
-              <div className="mb-8">
-                <img 
-                  src={image_url} 
-                  alt={title || 'Section image'} 
-                  className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
-                  onError={(e) => {
-                    console.error('Image failed to load:', image_url);
-                    e.currentTarget.style.display = 'none';
-                  }}
-                  onLoad={() => console.log('Image loaded successfully:', image_url)}
-                />
-              </div>
-            )}
-            
-            {title && (
-              <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${bg_theme === 'navy' ? 'text-white' : 'text-primary'}`}>
-                {title}
-              </h2>
-            )}
-            {subtitle && (
-              <p className={`text-xl font-medium mb-8 ${bg_theme === 'navy' ? 'text-white' : 'text-secondary'}`}>
-                {subtitle}
-              </p>
-            )}
-            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert prose-headings:text-white prose-p:text-white/90' : 'prose-headings:text-primary prose-p:text-gray-700'}`}>
-               {renderContent(content_body)}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  };
 
   if (loading) {
      return (
@@ -170,23 +73,48 @@ const About = () => {
            videoUrl={pageConfig?.hero_video_url}
            backgroundImage={pageConfig?.hero_image_url}
            overlayOpacity={pageConfig?.overlay_opacity}
-           title={pageConfig?.title}
+           title={pageConfig?.title || aboutData?.hero_title}
            subtitle={pageConfig?.subtitle}
-           // Use title/subtitle only, About might not have CTAs.
         />
 
         <ClientLogos />
 
-        {sections.length > 0 ? (
-          sections.map(section => (
-               <div key={section.id}>
-                    {renderSection(section)}
-               </div>
-          ))
-        ) : (
-          <div className="container mx-auto py-32 text-center text-muted-foreground">
-             {/* If DB empty, just show loading or empty state. */}
-          </div>
+        {/* Story Section */}
+        {aboutData?.story_html && (
+          <section className="py-20 bg-background">
+            <div className="container mx-auto px-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                  {/* Founder Image */}
+                  {aboutData.founder_image_url && (
+                    <div className="flex justify-center animate-fade-in">
+                      <div className="relative group">
+                        <div className="absolute -inset-4 bg-gradient-to-r from-accent to-accent-hover opacity-20 blur-xl group-hover:opacity-30 transition-all duration-300 rounded-lg" />
+                        <img 
+                          src={aboutData.founder_image_url} 
+                          alt="Founder" 
+                          className="relative rounded-lg shadow-2xl w-full max-w-md transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            console.error('Founder image failed to load:', aboutData.founder_image_url);
+                            e.currentTarget.style.display = 'none';
+                          }}
+                          onLoad={() => console.log('Founder image loaded:', aboutData.founder_image_url)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Story Content */}
+                  <div className="space-y-6 animate-fade-in-up">
+                    <div 
+                      className="prose prose-lg max-w-none prose-headings:text-primary prose-p:text-gray-300 prose-p:leading-relaxed" 
+                      dangerouslySetInnerHTML={{ __html: aboutData.story_html }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         )}
       </main>
       <Footer />
