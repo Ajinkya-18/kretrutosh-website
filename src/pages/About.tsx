@@ -35,7 +35,7 @@ const About = () => {
 
         // 2. Fetch Sections
         const { data: sectionData, error } = await supabase
-          .from('sections_about')
+          .from('page_about')
           .select('*')
           .eq('is_visible', true)
           .neq('section_key', 'hero')
@@ -60,7 +60,7 @@ const About = () => {
 
     const sectionsChannel = supabase
         .channel('about-sections-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'sections_about' }, () => fetchPage())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'page_about' }, () => fetchPage())
         .subscribe();
 
     return () => {

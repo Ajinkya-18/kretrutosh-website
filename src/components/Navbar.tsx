@@ -85,7 +85,7 @@ const Navbar = () => {
                 console.log(`📊 Fetching ${dataSource} from table: ${table}`);
                 
                 // Use display_order for orderable collections, title for others
-                const orderableCollections = ['services', 'frameworks', 'industries', 'case-studies'];
+                const orderableCollections = ['services', 'frameworks', 'industries', 'case-studies', 'videos'];
                 const orderBy = orderableCollections.includes(dataSource) ? 'display_order' : 'title';
                 
                 const { data, error } = await supabase
@@ -144,7 +144,7 @@ const Navbar = () => {
             if (data) setDropdownData(prev => ({ ...prev, assessments: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, async () => {
-            const { data } = await supabase.from('videos').select('title, id').order('title');
+            const { data } = await supabase.from('videos').select('title, id').order('display_order', { ascending: true });
             if (data) setDropdownData(prev => ({ ...prev, videos: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'whitepapers' }, async () => {

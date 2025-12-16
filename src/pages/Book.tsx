@@ -116,7 +116,7 @@ const Book = () => {
                 <div className="space-y-6 animate-fade-in-up">
                   {bookData.about_title && bookData.about_description && (
                     <div>
-                      <h2 className="text-3xl font-bold mb-4 text-[#0B1C3E]">
+                      <h2 className="text-3xl font-bold mb-4 text-white">
                         {bookData.about_title}
                       </h2>
                       <div 
@@ -137,7 +137,7 @@ const Book = () => {
                   {bookData.amazon_url && (
                     <div className="space-y-4">
                       {bookData.cta_title && (
-                        <h3 className="text-2xl font-bold text-[#0B1C3E]">
+                        <h3 className="text-2xl font-bold text-white">
                           {bookData.cta_title}
                         </h3>
                       )}
@@ -177,10 +177,10 @@ const Book = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <QrCode className="h-5 w-5 text-accent" />
-                            <h4 className="font-semibold">{bookData.qr_title}</h4>
+                            <h4 className="font-semibold text-white">{bookData.qr_title}</h4>
                           </div>
                           {bookData.qr_description && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-gray-300">
                               {bookData.qr_description}
                             </p>
                           )}
@@ -194,11 +194,11 @@ const Book = () => {
               {/* Author Section */}
               {bookData.author_bio && (
                 <div className="mt-16 p-8 bg-muted/50 rounded-lg border border-border">
-                  <h3 className="text-2xl font-bold mb-4 text-center text-[#0B1C3E]">
+                  <h3 className="text-2xl font-bold mb-4 text-center text-white">
                     {bookData.author_title || "About the Author"}
                   </h3>
                   <div 
-                    className="text-lg text-center max-w-3xl mx-auto prose prose-lg prose-headings:text-[#0B1C3E] prose-p:text-[#0B1C3E]/80" 
+                    className="text-lg text-center max-w-3xl mx-auto prose prose-lg prose-headings:text-white prose-p:text-gray-300" 
                     dangerouslySetInnerHTML={{ __html: bookData.author_bio }}
                   />
                 </div>
