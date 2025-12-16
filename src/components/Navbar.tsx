@@ -351,8 +351,8 @@ const Navbar = () => {
                 asChild 
                 className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
-                <Link to={config?.cta_link || "#"}>
-                    {config?.cta_text || <span className="text-red-900 font-bold bg-white px-2">NULL: CTA TEXT</span>}
+                <Link to={config?.cta_link || "/contact"}>
+                    {config?.cta_text || "Book Strategy Call"}
                 </Link>
               </Button>
             </div>
@@ -393,8 +393,8 @@ const Navbar = () => {
 
               <div className="pt-4 mt-2 border-t border-border">
                 <Button className="w-full bg-[#FF9933] text-white hover:bg-[#FF9933]/90 shadow-lg" asChild>
-                  <Link to={config?.cta_link || "#"}>
-                    {config?.cta_text || 'NULL: CTA TEXT'}
+                  <Link to={config?.cta_link || "/contact"}>
+                    {config?.cta_text || "Book Strategy Call"}
                   </Link>
                 </Button>
               </div>
