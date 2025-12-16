@@ -14,6 +14,8 @@ interface PageContactConfig {
     google_form_url?: string;
     calendly_url?: string;
     calendly_cta_text?: string;
+    layout_order?: string[];
+    section_visibility?: Record<string, boolean>;
 }
 
 const Contact = () => {
@@ -66,12 +68,9 @@ const Contact = () => {
     const renderMap = (embedCode: string) => {
         if (!embedCode) return null;
         
-        // Robust check for iframe tag
         const isIframe = /<iframe/i.test(embedCode);
         
         if (isIframe) {
-            // Render the provided iframe HTML
-            // Note: Content is trusted from Admin Panel.
             return (
                 <div 
                     dangerouslySetInnerHTML={{ __html: embedCode }} 
@@ -80,7 +79,6 @@ const Contact = () => {
             );
         }
         
-        // Fallback: Assume it's a direct URL and wrap it
         return (
             <iframe 
                 src={embedCode} 
@@ -91,6 +89,79 @@ const Contact = () => {
                 title="Google Map"
             />
         );
+    };
+
+    // Render individual sections based on section key
+    const renderSection = (sectionKey: string) => {
+        switch (sectionKey) {
+            case 'hero':
+                return (
+                    <Hero
+                        key="hero"
+                        mediaType="image"
+                        title={pageConfig?.hero_title}
+                        subtitle="We are ready to listen."
+                        backgroundImage={pageConfig?.hero_image_url} 
+                    />
+                );
+
+            case 'form':
+                if (!pageConfig?.google_form_url) return null;
+                return (
+                    <div key="form" className="lg:pl-10">
+                        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[800px]">
+                            <iframe 
+                                src={pageConfig.google_form_url} 
+                                className="w-full h-[800px] border-0" 
+                                title="Contact Form"
+                                sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-presentation"
+                            >
+                                Loading...
+                            </iframe>
+                        </div>
+                    </div>
+                );
+
+            case 'calendly':
+                if (!pageConfig?.calendly_url) return null;
+                return (
+                    <div key="calendly" className="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 backdrop-blur-sm border-l-4 border-l-secondary">
+                        <h3 className="text-xl font-bold text-white mb-2">Skip the inbox?</h3>
+                        <p className="text-white/70 mb-6">Book a direct strategy session with our leadership team.</p>
+                        <Button 
+                            asChild 
+                            size="lg" 
+                            className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 w-full md:w-auto shadow-md text-lg"
+                        >
+                            <a href={pageConfig.calendly_url} target="_blank" rel="noopener noreferrer">
+                                <Calendar className="mr-2 h-5 w-5" />
+                                {pageConfig.calendly_cta_text}
+                            </a>
+                        </Button>
+                    </div>
+                );
+
+            case 'address':
+                if (!pageConfig?.address_html) return null;
+                return (
+                    <div key="address" className="bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm">
+                        <div className="prose prose-lg prose-invert text-white/80 prose-headings:text-white prose-strong:text-secondary prose-a:text-secondary">
+                            <div dangerouslySetInnerHTML={{ __html: pageConfig.address_html }} />
+                        </div>
+                    </div>
+                );
+
+            case 'map':
+                if (!pageConfig?.map_embed) return null;
+                return (
+                    <div key="map" className="h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                        {renderMap(pageConfig.map_embed)}
+                    </div>
+                );
+
+            default:
+                return null;
+        }
     };
 
     if (loading) {
@@ -117,17 +188,33 @@ const Contact = () => {
         );
     }
 
+    // Get layout order and section visibility
+    const layoutOrder = pageConfig?.layout_order || ["hero", "form", "calendly", "address", "map"];
+    const sectionVisibility = pageConfig?.section_visibility || {
+        hero: true,
+        form: true,
+        calendly: true,
+        address: true,
+        map: true
+    };
+
+    // Split sections into hero and content sections
+    const visibleSections = layoutOrder.filter((section: string) => sectionVisibility[section]);
+    const heroSection = visibleSections.find((s: string) => s === 'hero');
+    const contentSections = visibleSections.filter((s: string) => s !== 'hero');
+
+    // Split content sections into left column (address, calendly, map) and right column (form)
+    const leftColumnSections = contentSections.filter((s: string) => s !== 'form');
+    const formSection = contentSections.find((s: string) => s === 'form');
+
     return (
         <div className="min-h-screen w-full !bg-[#0B1C3E] text-white" style={{ backgroundColor: '#0B1C3E' }}>
             <Navbar />
             <main>
-                <Hero
-                    mediaType="image"
-                    title={pageConfig?.hero_title}
-                    subtitle="We are ready to listen."
-                    backgroundImage={pageConfig?.hero_image_url} 
-                />
+                {/* Hero Section */}
+                {heroSection && renderSection(heroSection)}
 
+                {/* Main Content Section */}
                 <section className="py-24 !bg-[#0B1C3E] relative overflow-hidden" style={{ backgroundColor: '#0B1C3E' }}>
                      {/* Decorative Background */}
                      <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 -skew-x-12 pointer-events-none" />
@@ -150,84 +237,12 @@ const Contact = () => {
                                     </p>
                                  </div>
 
-                                 {/* Dynamic Address / Contact Info Block */}
-                                 <div className="bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm">
-                                     {pageConfig?.address_html ? (
-                                         <div className="prose prose-lg prose-invert text-white/80 prose-headings:text-white prose-strong:text-secondary prose-a:text-secondary">
-                                             {/* Trusted HTML from Admin Panel */}
-                                             <div dangerouslySetInnerHTML={{ __html: pageConfig.address_html }} />
-                                         </div>
-                                     ) : (
-                                        <div className="text-white/70">
-                                            <p>No contact details configured. Please update in Admin Panel.</p>
-                                        </div>
-                                     )}
-                                 </div>
-                                 
-                                 {/* Calendly Block */}
-                                 {pageConfig?.calendly_url && (
-                                     <div className="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 backdrop-blur-sm border-l-4 border-l-secondary">
-                                         <h3 className="text-xl font-bold text-white mb-2">Skip the inbox?</h3>
-                                         <p className="text-white/70 mb-6">Book a direct strategy session with our leadership team.</p>
-                                         <Button 
-                                            asChild 
-                                            size="lg" 
-                                            className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 w-full md:w-auto shadow-md text-lg"
-                                         >
-                                             <a href={pageConfig.calendly_url} target="_blank" rel="noopener noreferrer">
-                                                 <Calendar className="mr-2 h-5 w-5" />
-                                                 {pageConfig.calendly_cta_text}
-                                             </a>
-                                         </Button>
-                                     </div>
-                                 )}
-
-                                 {/* Map Section */}
-                                 {pageConfig?.map_embed && (
-                                     <div className="h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                                         {renderMap(pageConfig.map_embed)}
-                                     </div>
-                                 )}
-
+                                 {/* Render left column sections in order */}
+                                 {leftColumnSections.map((sectionKey: string) => renderSection(sectionKey))}
                              </div>
 
                              {/* Right Column: Google Form Iframe */}
-                             <div className="lg:pl-10">
-                                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[800px]">
-                                     {pageConfig?.google_form_url ? (
-                                         <iframe 
-                                            src={pageConfig.google_form_url} 
-                                            className="w-full h-[800px] border-0" 
-                                            title="Contact Form"
-                                            sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-presentation"
-                                         >
-                                             {/* Note: Inverting standard google forms usually helps in dark mode, but might look funky. 
-                                                 Ideally, use a transparent Embed or Typeform. 
-                                                 For now, I'll remove the invert class and just rely on the form itself, 
-                                                 or wrap it in a white container if the form is strictly black text on white. 
-                                                 
-                                                 WAIT: User said "Contact page has white background which is camouflaging the white text".
-                                                 If I make the container dark, the form (if it's a standard GForm) is WHITE. 
-                                                 If the form is embedded, it has its own background.
-                                                 If the user wants the PAGE to be Navy, but the form is white, that's fine.
-                                                 But the user said "white background is camouflaging white text". 
-                                                 That implies the TEXT is white and background is white.
-                                                 
-                                                 If I switch the container to `bg-white/5` (Dark), white text becomes visible.
-                                                 However, if the iframe content is white, it will stand out.
-                                                 Let's use bg-white/5 for the container.
-                                             */}
-                                             Loading...
-                                         </iframe>
-                                     ) : (
-                                         <div className="h-full flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
-                                             <Loader2 className="h-12 w-12 animate-spin mb-4 text-secondary" />
-                                             <p className="text-white/70">Loading Contact Form...</p>
-                                             <p className="text-sm text-white/40 mt-2">(If this persists, please configure the Google Form URL in Admin)</p>
-                                         </div>
-                                     )}
-                                 </div>
-                             </div>
+                             {formSection && renderSection(formSection)}
                         </div>
                      </div>
                 </section>

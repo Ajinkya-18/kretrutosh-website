@@ -180,10 +180,27 @@ const Navbar = () => {
       else if (itemNameLower.includes('case') || itemNameLower.includes('impact')) dataSource = 'case-studies';
     }
     
-    // PREFER fetched data over hardcoded children for dynamic sources
-    const items = (dataSource && dropdownData[dataSource]?.length > 0)
+    // Static menu items for Thought Leadership
+    let staticItems: any[] = [];
+    if (item.name && item.name.toLowerCase().includes('leadership')) {
+      staticItems = [
+        { name: 'Book', path: '/book' },
+        { name: 'Podcast', path: '/resources/podcast' },
+        { name: 'Articles', path: '/resources/articles' },
+        { name: 'Whitepapers', path: '/resources/whitepapers' }
+      ];
+    }
+    
+    // PREFER fetched data over hardcoded children for dynamic sources, but merge with static items
+    let items = (dataSource && dropdownData[dataSource]?.length > 0)
       ? dropdownData[dataSource]
       : (item.children || []);
+    
+    // If we have static items (Thought Leadership), use them instead
+    if (staticItems.length > 0) {
+      items = staticItems;
+    }
+
     
     // Debug log for desktop rendering
     console.log(`🎨 Rendering dropdown for "${item.name}":`, {
@@ -270,10 +287,27 @@ const Navbar = () => {
       else if (itemNameLower.includes('whitepaper')) dataSource = 'whitepapers';
     }
     
+    // Static menu items for Thought Leadership
+    let staticItems: any[] = [];
+    if (item.name && item.name.toLowerCase().includes('leadership')) {
+      staticItems = [
+        { name: 'Book', path: '/book' },
+        { name: 'Podcast', path: '/resources/podcast' },
+        { name: 'Articles', path: '/resources/articles' },
+        { name: 'Whitepapers', path: '/resources/whitepapers' }
+      ];
+    }
+    
     // PREFER fetched data over hardcoded children for dynamic sources
-    const items = (dataSource && dropdownData[dataSource]?.length > 0)
+    let items = (dataSource && dropdownData[dataSource]?.length > 0)
       ? dropdownData[dataSource]
       : (item.children || []);
+    
+    // If we have static items (Thought Leadership), use them instead
+    if (staticItems.length > 0) {
+      items = staticItems;
+    }
+
     
     // Determine base path
     let basePath = "";
