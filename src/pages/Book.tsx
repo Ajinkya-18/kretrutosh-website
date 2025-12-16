@@ -120,7 +120,7 @@ const Book = () => {
                         {bookData.about_title}
                       </h2>
                       <div 
-                        className="text-lg text-[#0B1C3E]/80 mb-6 prose prose-lg max-w-none prose-headings:text-[#0B1C3E]" 
+                        className="text-lg text-gray-300 mb-6 prose prose-lg max-w-none prose-headings:text-white" 
                         dangerouslySetInnerHTML={{ __html: bookData.about_description }}
                       />
                     </div>
@@ -193,14 +193,20 @@ const Book = () => {
 
               {/* Author Section */}
               {bookData.author_bio && (
-                <div className="mt-16 p-8 bg-muted/50 rounded-lg border border-border">
-                  <h3 className="text-2xl font-bold mb-4 text-center text-white">
-                    {bookData.author_title || "About the Author"}
-                  </h3>
-                  <div 
-                    className="text-lg text-center max-w-3xl mx-auto prose prose-lg prose-headings:text-white prose-p:text-gray-300" 
-                    dangerouslySetInnerHTML={{ __html: bookData.author_bio }}
-                  />
+                <div className="mt-20 p-10 md:p-12 bg-gradient-to-br from-muted/60 via-muted/40 to-background/20 rounded-2xl border border-border/50 shadow-xl backdrop-blur-sm">
+                  <div className="max-w-4xl mx-auto">
+                    <div className="text-center mb-8">
+                      <div className="inline-block px-6 py-2 bg-accent/10 rounded-full border border-accent/20 mb-4">
+                        <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent">
+                          {bookData.author_title || "About the Author"}
+                        </h3>
+                      </div>
+                    </div>
+                    <div 
+                      className="text-lg leading-relaxed prose prose-lg max-w-none prose-headings:text-white prose-p:text-gray-300 prose-p:leading-relaxed [&>p]:mb-4 text-center" 
+                      dangerouslySetInnerHTML={{ __html: bookData.author_bio }}
+                    />
+                  </div>
                 </div>
               )}
             </div>

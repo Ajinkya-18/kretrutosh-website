@@ -55,13 +55,32 @@ const About = () => {
     // Real-time Subscriptions
     const pageChannel = supabase
         .channel('about-page-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'pages', filter: "slug=eq.'about'" }, () => fetchPage())
-        .subscribe();
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'pages', 
+          filter: "slug=eq.about" 
+        }, (payload) => {
+          console.log('Page update received:', payload);
+          fetchPage();
+        })
+        .subscribe((status) => {
+          console.log('Page channel subscription status:', status);
+        });
 
     const sectionsChannel = supabase
         .channel('about-sections-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'page_about' }, () => fetchPage())
-        .subscribe();
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'page_about' 
+        }, (payload) => {
+          console.log('Sections update received:', payload);
+          fetchPage();
+        })
+        .subscribe((status) => {
+          console.log('Sections channel subscription status:', status);
+        });
 
     return () => {
         supabase.removeChannel(pageChannel);
@@ -125,7 +144,7 @@ const About = () => {
                 {subtitle}
               </p>
             )}
-            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert prose-headings:text-white prose-p:text-white/90' : 'prose-headings:text-[#0B1C3E] prose-p:text-[#0B1C3E]/80'}`}>
+            <div className={`prose prose-lg max-w-none ${bg_theme === 'navy' ? 'prose-invert prose-headings:text-white prose-p:text-white/90' : 'prose-headings:text-primary prose-p:text-gray-700'}`}>
                {renderContent(content_body)}
             </div>
           </div>
