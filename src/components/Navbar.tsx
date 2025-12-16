@@ -135,8 +135,8 @@ const Navbar = () => {
             const { data } = await supabase.from('industries').select('title, slug').order('display_order', { ascending: true });
             if (data) setDropdownData(prev => ({ ...prev, industries: data }));
         })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'blogs' }, async () => {
-            const { data } = await supabase.from('blogs').select('title, slug').order('title');
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'articles' }, async () => {
+            const { data } = await supabase.from('articles').select('title, slug').order('title');
             if (data) setDropdownData(prev => ({ ...prev, blogs: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'assessments' }, async () => {
