@@ -83,10 +83,15 @@ const Navbar = () => {
               const { table, fields } = DATA_SOURCE_MAP[dataSource];
               const promise = (async () => {
                 console.log(`📊 Fetching ${dataSource} from table: ${table}`);
+                
+                // Use display_order for orderable collections, title for others
+                const orderableCollections = ['services', 'frameworks', 'industries', 'case-studies'];
+                const orderBy = orderableCollections.includes(dataSource) ? 'display_order' : 'title';
+                
                 const { data, error } = await supabase
                   .from(table)
                   .select(fields)
-                  .order('title');
+                  .order(orderBy, { ascending: true });
                   
                 if (error) {
                   console.error(`❌ Error fetching ${dataSource} from ${table}:`, error);
@@ -119,15 +124,15 @@ const Navbar = () => {
             fetchData();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'services' }, async () => {
-            const { data } = await supabase.from('services').select('title, slug').order('title');
+            const { data } = await supabase.from('services').select('title, slug').order('display_order', { ascending: true });
             if (data) setDropdownData(prev => ({ ...prev, services: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'frameworks' }, async () => {
-            const { data } = await supabase.from('frameworks').select('title, slug').order('title');
+            const { data } = await supabase.from('frameworks').select('title, slug').order('display_order', { ascending: true });
             if (data) setDropdownData(prev => ({ ...prev, frameworks: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'industries' }, async () => {
-            const { data } = await supabase.from('industries').select('title, slug').order('title');
+            const { data } = await supabase.from('industries').select('title, slug').order('display_order', { ascending: true });
             if (data) setDropdownData(prev => ({ ...prev, industries: data }));
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'blogs' }, async () => {
