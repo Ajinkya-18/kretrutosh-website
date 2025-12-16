@@ -207,12 +207,6 @@ const Navbar = () => {
         </NavigationMenuTrigger>
         <NavigationMenuContent className="z-[10000] bg-white text-black border border-border shadow-xl">
           <ul className={cn("grid gap-3 p-4 w-[400px] md:w-[500px] bg-white text-black", items.length > 5 ? "md:grid-cols-2" : "")}>
-            {/* DEBUG RED BOX - Step 2 Test */}
-            {(item.name || item.label).toLowerCase().includes('solution') && (
-              <div className="p-4 bg-red-500 text-white font-bold z-[10000] col-span-full">
-                DEBUG: IF YOU SEE THIS, RENDER IS WORKING
-              </div>
-            )}
             {items.map((child: any) => (
               <li key={child.slug || child.id || child.path}>
                 <NavigationMenuLink asChild>

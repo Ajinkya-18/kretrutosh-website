@@ -119,11 +119,6 @@ const Contact = () => {
 
     return (
         <div className="min-h-screen w-full !bg-[#0B1C3E] text-white" style={{ backgroundColor: '#0B1C3E' }}>
-            {/* Debug Banner - Remove after verification */}
-            <div className="fixed top-20 left-0 z-50 bg-red-500 text-white px-4 py-2 text-xs font-mono">
-                DEBUG: CONTACT PAGE LOADED (Navy BG: #0B1C3E)
-            </div>
-            
             <Navbar />
             <main>
                 <Hero
