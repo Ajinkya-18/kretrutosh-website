@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Loader2 } from "lucide-react";
 import NotFound from "./NotFound";
 import SEO from "@/components/SEO";
+import RichText from "@/components/ui/RichText";
 
 const ServiceDetail = () => {
   const { slug } = useParams();
@@ -123,9 +124,7 @@ const ServiceDetail = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-primary prose-a:text-secondary"
-                             dangerouslySetInnerHTML={{ __html: service.problem_html }} 
-                        />
+                        <RichText content={service.problem_html} />
                     )}
                 </div>
              </div>
@@ -190,9 +189,7 @@ const ServiceDetail = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-a:text-[#FF9933]"
-                             dangerouslySetInnerHTML={{ __html: service.approach_html }} 
-                        />
+                        <RichText content={service.approach_html} />
                     )}
                 </div>
              </div>
