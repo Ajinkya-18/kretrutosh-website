@@ -20,6 +20,7 @@ const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [pageConfig, setPageConfig] = useState<any>(null);
+  const [outcomes, setOutcomes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Scroll handling
@@ -70,6 +71,34 @@ const Index = () => {
     };
   }, []);
 
+  // Fetch Outcomes from outcomes table
+  useEffect(() => {
+    const fetchOutcomes = async () => {
+      const { data, error } = await supabase
+        .from('outcomes')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error("SUPABASE ERROR [Outcomes]:", error);
+      } else {
+        setOutcomes(data || []);
+      }
+    };
+
+    fetchOutcomes();
+
+    // Subscribe to outcomes changes
+    const outcomesChannel = supabase
+      .channel('outcomes-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'outcomes' }, () => fetchOutcomes())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(outcomesChannel);
+    };
+  }, []);
+
   // =====================================================
   // DYNAMIC SECTION MAP
   // =====================================================
@@ -105,7 +134,7 @@ const Index = () => {
         key="outcomes" 
         title={pageConfig.outcomes_title || "Measurable Outcomes"}
         description={pageConfig.outcomes_description || "Results-driven approach to customer-led growth"}
-        items={pageConfig.outcomes_items || []}
+        outcomes={outcomes}
       />
     ) : null,
     clients: <ClientLogos key="clients" />,
