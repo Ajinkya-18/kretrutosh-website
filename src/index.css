@@ -10,10 +10,10 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Premium Navy & Gold Theme - Light Mode */
+    /* Premium Navy & Gold Theme - DARK MODE FIRST */
     /* BRAND COLORS: Navy #0B1C3E = HSL(220, 70%, 14%) | Saffron #FF9933 = HSL(30, 100%, 60%) */
-    --background: 210 40% 98%; /* Very light blue-grey tint */
-    --foreground: 220 70% 14%; /* #0B1C3E - Brand Navy */
+    --background: 220 70% 14%; /* #0B1C3E - Deep Navy (Dark Mode First) */
+    --foreground: 0 0% 100%; /* White text on navy */
 
     --card: 0 0% 100%;
     --card-foreground: 220 70% 14%;
@@ -144,7 +144,29 @@ All colors MUST be HSL.
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
-    color: #0B1C3E; /* Strict Navy - never pure black for premium appearance */
+    color: #FFFFFF; /* White headings on dark background */
+  }
+  
+  /* Global Saffron highlights */
+  strong, 
+  .text-highlight,
+  h2.text-accent,
+  h3.text-accent {
+    color: #FF9933 !important;
+  }
+
+  /* Readable body text on dark backgrounds */
+  p {
+    color: #E5E7EB; /* Gray-200 */
+  }
+  
+  li {
+    color: #E5E7EB; /* Gray-200 */
+  }
+
+  /* Ensure Saffron bullets */
+  ul li::marker {
+    color: #FF9933;
   }
   
   /* Smooth scroll behavior */

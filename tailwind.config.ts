@@ -17,6 +17,11 @@ export default {
         // BRAND IDENTITY: Strict color palette enforcement
         // Navy #0B1C3E = HSL(220, 70%, 14%)
         // Saffron #FF9933 = HSL(30, 100%, 60%)
+        
+        // Strict hex colors (no drift)
+        'brand-navy': '#0B1C3E',
+        'brand-saffron': '#FF9933',
+        
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

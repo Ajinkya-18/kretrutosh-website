@@ -133,7 +133,7 @@ const IndustryDetail = () => {
   // Use updated color scheme: Navy (#0B1C3E) and Saffron (#FF9933)
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-[#0B1C3E] font-sans">
       <SEO 
         title={`${industryMeta.meta_title || industryMeta.title} Consulting | KretruTosh`}
         description={industryMeta.meta_description || industryMeta.description}
@@ -178,15 +178,15 @@ const IndustryDetail = () => {
 
       {/* Challenges Section */}
       {industryMeta.challenges_html && (
-        <section className="py-20 bg-gray-50">
+        <section className="py-20 bg-[#0B1C3E]/95">
              <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <span className="text-[#0B1C3E] font-bold tracking-widest uppercase text-sm mb-2 block">The Context</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-[#0B1C3E] mb-6">Key Challenges</h2>
+                        <span className="text-[#FF9933] font-bold tracking-widest uppercase text-sm mb-2 block">The Context</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Key Challenges</h2>
                     </div>
-                    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
-                        <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-strong:text-[#0B1C3E] prose-li:marker:text-[#FF9933]">
+                    <div className="bg-white/10 backdrop-blur-sm p-8 md:p-12 rounded-2xl shadow-sm border border-white/20">
+                        <div className="prose prose-lg max-w-none text-gray-200 prose-headings:text-white prose-strong:text-[#FF9933] prose-li:marker:text-[#FF9933]">
                             <RichText content={industryMeta.challenges_html} />
                         </div>
                     </div>
@@ -197,13 +197,13 @@ const IndustryDetail = () => {
 
       {/* Approach Section */}
       {industryMeta.approach_html && (
-         <section className="py-20 bg-white">
+         <section className="py-20 bg-[#0B1C3E]">
              <div className="container mx-auto px-4">
                 <div className="max-w-5xl mx-auto">
                    <div className="flex flex-col md:flex-row gap-12 items-start">
                        <div className="md:w-1/3 sticky top-24">
-                            <h2 className="text-3xl md:text-4xl font-bold text-[#0B1C3E] mb-6">Our Approach</h2>
-                            <p className="text-lg text-muted-foreground mb-6">
+                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Our Approach</h2>
+                            <p className="text-lg text-gray-300 mb-6">
                                 We don't just solve problems; we build systems for sustainable growth.
                             </p>
                             <Button asChild size="lg" className="bg-[#FF9933] text-white hover:bg-[#FF9933]/90 w-full md:w-auto shadow-md">
@@ -211,8 +211,8 @@ const IndustryDetail = () => {
                             </Button>
                        </div>
                        <div className="md:w-2/3">
-                            <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-[#0B1C3E] prose-strong:text-[#0B1C3E] 
-                                prose-ul:space-y-4 prose-li:bg-gray-50 prose-li:p-6 prose-li:rounded-xl prose-li:border prose-li:border-gray-100 prose-li:list-none prose-li:m-0"
+                            <div className="prose prose-lg max-w-none text-gray-200 prose-headings:text-white prose-strong:text-[#FF9933] 
+                                prose-ul:space-y-4 prose-li:bg-white/10 prose-li:backdrop-blur-sm prose-li:p-6 prose-li:rounded-xl prose-li:border prose-li:border-white/20 prose-li:list-none prose-li:m-0"
                             >
                                 <RichText content={industryMeta.approach_html} />
                             </div>

@@ -129,7 +129,7 @@ const FrameworkDetail = () => {
     };
   }, [slug]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#0B1C3E]"><Skeleton className="h-10 w-10 rounded-full bg-white/10" /></div>;
   
   if (!framework) return <NotFound />;
 
@@ -174,7 +174,7 @@ const FrameworkDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-[#0B1C3E] font-sans">
       <SEO 
         title={`${framework.meta_title || framework.title} | KretruTosh`}
         description={framework.meta_description || framework.short_description}
@@ -228,7 +228,7 @@ const FrameworkDetail = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-background">
+      <section className="py-24 bg-[#0B1C3E]">
         <div className="container mx-auto px-4">
             
             {/* Top Section: Ideal For + Measurable Outcomes */}

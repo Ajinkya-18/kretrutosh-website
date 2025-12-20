@@ -90,7 +90,7 @@ const AssessmentDetail = () => {
     };
   }, [slug]);
 
-  if (loading) return <div className="h-screen flex items-center justify-center"><Skeleton className="h-12 w-12 rounded-full" /></div>;
+  if (loading) return <div className="h-screen flex items-center justify-center bg-[#0B1C3E]"><Skeleton className="h-12 w-12 rounded-full bg-white/10" /></div>;
   if (!assessment) return <NotFound />;
 
   const renderSection = (section: any) => {
@@ -114,7 +114,7 @@ const AssessmentDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-[#0B1C3E] font-sans">
       <SEO title={assessment.title} description={assessment.description} />
       <Navbar />
 
