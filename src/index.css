@@ -1,181 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Optional: Add the premium font stack from your design brief */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #ffffff;
+  color: #000e2b; /* Primary Dark Blue */
+}
 
-@layer base {
-  :root {
-    /* Premium Navy & Gold Theme - DARK MODE FIRST */
-    /* BRAND COLORS: Navy #0B1C3E = HSL(220, 70%, 14%) | Saffron #FF9933 = HSL(30, 100%, 60%) */
-    --background: 220 70% 14%; /* #0B1C3E - Deep Navy (Dark Mode First) */
-    --foreground: 0 0% 100%; /* White text on navy */
+/* Add this to the bottom of src/index.css */
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 70% 14%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 70% 14%;
-
-    /* PRIMARY = BRAND NAVY #0B1C3E */
-    --primary: 220 70% 14%; /* EXACT: #0B1C3E */
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 220 70% 25%;
-
-    /* SECONDARY = BRAND SAFFRON #FF9933 */
-    --secondary: 30 100% 60%; /* EXACT: #FF9933 */
-    --secondary-foreground: 220 70% 14%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    /* ACCENT = BRAND SAFFRON #FF9933 */
-    --accent: 30 100% 60%; /* EXACT: #FF9933 */
-    --accent-foreground: 220 70% 14%;
-    --accent-hover: 30 100% 55%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 220 70% 14%;
-
-    --radius: 0.5rem;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(220 70% 14%) 0%, hsl(220 60% 20%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(220 70% 14%) 0%, hsl(220 60% 20%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
-    --gradient-subtle: linear-gradient(135deg, hsl(210 40% 98%) 0%, hsl(0 0% 100%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(30 100% 60%) 0%, hsl(30 100% 65%) 100%);
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(222 47% 11% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -1px hsl(222 47% 11% / 0.06);
-    --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.1), 0 4px 6px -2px hsl(222 47% 11% / 0.05);
-    --shadow-xl: 0 20px 25px -5px hsl(222 47% 11% / 0.1), 0 10px 10px -5px hsl(222 47% 11% / 0.04);
-    --shadow-elegant: 0 20px 40px -10px hsl(222 47% 11% / 0.15);
-    --shadow-glow: 0 0 20px hsl(25 95% 50% / 0.3);
-    --shadow-hover: 0 20px 40px -10px hsl(222 47% 11% / 0.2);
-
-    /* Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
   }
-
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 13%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --primary-glow: 210 40% 98%;
-
-    --secondary: 25 95% 50%;
-    --secondary-foreground: 222 47% 11%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 25 95% 50%;
-    --accent-foreground: 222 47% 11%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(215 32% 17%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(222 47% 8%) 0%, hsl(222 47% 12%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(222 47% 13%) 0%, hsl(222 47% 11%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(25 95% 50%) 0%, hsl(30 100% 60%) 100%);
-
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -1px hsl(0 0% 0% / 0.3);
-    --shadow-elegant: 0 20px 40px -10px hsl(0 0% 0% / 0.5);
-    --shadow-glow: 0 0 30px hsl(25 95% 50% / 0.2);
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  100% {
+    transform: translateX(-50%);
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
 
-  body {
-    @apply bg-background text-gray-600 antialiased;
-    font-feature-settings: 'cv11', 'ss01';
-    font-optical-sizing: auto;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
-    color: #FFFFFF; /* White headings on dark background */
-  }
-  
-  /* Global Saffron highlights */
-  strong, 
-  .text-highlight,
-  h2.text-accent,
-  h3.text-accent {
-    color: #FF9933 !important;
-  }
-
-  /* Readable body text on dark backgrounds */
-  p {
-    color: #E5E7EB; /* Gray-200 */
-  }
-  
-  li {
-    color: #E5E7EB; /* Gray-200 */
-  }
-
-  /* Ensure Saffron bullets */
-  ul li::marker {
-    color: #FF9933;
-  }
-  
-  /* Smooth scroll behavior */
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  /* Enhanced focus states */
-  *:focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
-  }
+/* Pause animation on hover for better UX */
+.animate-scroll:hover {
+  animation-play-state: paused;
 }

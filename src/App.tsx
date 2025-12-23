@@ -1,104 +1,84 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
-import ScrollToTop from "@/components/ScrollToTop";
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { Refine, Authenticated } from '@refinedev/core';
+import { ThemedLayoutV2, ThemedSiderV2, AuthPage, ErrorComponent } from '@refinedev/antd';
+import { dataProvider, liveProvider } from '@refinedev/supabase';
+import routerBindings, { NavigateToResource, CatchAllNavigate, UnsavedChangesNotifier } from "@refinedev/react-router-v6";
+import { supabase } from './lib/supabaseClient';
+import { ConfigProvider, theme } from 'antd';
+import '@refinedev/antd/dist/reset.css';
+import { authProvider } from "./authProvider";
 
-// --- Main Pages ---
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Book from "./pages/Book";
-import Videos from "./pages/Videos";
-import Blogs from "./pages/Blogs2"; // Using Blogs2 as the main Blogs page
-import Contact from "./pages/Contact";
+// Admin Pages
+import { PageList } from './pages/admin/pages/list';
+import { PageEdit } from './pages/admin/pages/edit';
+import { PageCreate } from './pages/admin/pages/create';
 
-// --- Framework & Industry Pages ---
-import Frameworks from "./pages/Frameworks";
-import FrameworkDetail from "./pages/FrameworkDetail";
-import IndustryDetail from "./pages/IndustryDetail";
-import AssessmentDetail from "./pages/AssessmentDetail";
-import Assessments from "./pages/Assessments";
-import ServiceDetail from "./pages/ServiceDetail"; // New Dynamic Page
+// Public Pages
+import DynamicPage from './pages/DynamicPage';
 
-// --- Resources & Legal ---
-import Resources from "./pages/Resources";
-import Whitepapers from "./pages/resources/Whitepapers";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import ComingSoon from "./pages/ComingSoon";
-import NotFound from "./pages/NotFound";
-
-// --- Legacy Pages (Keeping only if strictly needed, but prefer new architecture) ---
-import CaseStudiesPage from "./pages/CaseStudiesPage";
-
-// --- Admin Pages ---
-import NavbarConfig from "./pages/admin/NavbarConfig";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <HelmetProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
+function App() {
+  return (
+    <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}>
+      <BrowserRouter>
+        <Refine
+          dataProvider={dataProvider(supabase)}
+          liveProvider={liveProvider(supabase)}
+          authProvider={authProvider}
+          routerProvider={routerBindings}
+          resources={[
+            {
+              name: "pages",
+              list: "/admin/pages",
+              create: "/admin/pages/create",
+              edit: "/admin/pages/edit/:id",
+              meta: { label: "Website Pages" }
+            }
+          ]}
+        >
           <Routes>
-            {/* --- Main Pages --- */}
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/book" element={<Book />} />
-            <Route path="/videos" element={<Videos />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/contact" element={<Contact />} />
+            {/* --- PUBLIC WEBSITE ROUTES --- */}
+            <Route index element={<DynamicPage />} />
+            <Route path="/:slug" element={<DynamicPage />} />
 
-            {/* --- Frameworks Routes --- */}
-            <Route path="/frameworks" element={<Frameworks />} />
-            <Route path="/frameworks/:id" element={<FrameworkDetail />} />
-
-            {/* --- Services Routes (Dynamic Page Builder) --- */}
-            <Route path="/services" element={<ComingSoon />} />
-            <Route path="/services/:slug" element={<ServiceDetail />} />
-
-            {/* --- Industries Routes --- */}
-            <Route path="/industries" element={<ComingSoon />} />
-            <Route path="/industries/:id" element={<IndustryDetail />} />
+            {/* --- ADMIN PANEL ROUTES --- */}
+            <Route path="/login" element={
+              <AuthPage 
+              type="login" 
+              providers={[
+                {
+                  name: "google",
+                  label: "Sign in with Google",
+                }, 
+                {
+                  name: "github",
+                  label: "Sign in with GitHub",
+                },
+              ]}
+            />
+          } 
+        />
             
-            {/* --- Assessments Routes --- */}
-            <Route path="/assessments" element={<Assessments />} />
-            <Route path="/assessments/:id" element={<AssessmentDetail />} />
-
-            {/* --- Resources Routes --- */}
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/resources/whitepapers" element={<Whitepapers />} />
-            <Route path="/resources/podcast" element={<Videos />} />
-            <Route path="/resources/articles" element={<Blogs />} />
-            <Route path="/resources/book" element={<Book />} />
-
-            {/* --- About Sub-Routes --- */}
-            <Route path="/about/founder" element={<About />} />
-            <Route path="/about/clients" element={<ComingSoon />} />
-
-            {/* --- Legal --- */}
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-
-            {/* --- Admin Panel --- */}
-            <Route path="/admin/navbar-config" element={<NavbarConfig />} />
-
-            {/* --- Legacy/Other --- */}
-            <Route path="/case-studies" element={<CaseStudiesPage />} />
-
-            {/* --- 404 Not Found Page --- */}
-            <Route path="*" element={<NotFound />} />
+            <Route path="/admin" element={
+                <Authenticated key="protected" fallback={<CatchAllNavigate to="/login" />}>
+                  <ThemedLayoutV2 Sider={(props) => <ThemedSiderV2 {...props} fixed />}>
+                    <Outlet />
+                  </ThemedLayoutV2>
+                </Authenticated>
+            }>
+                <Route index element={<NavigateToResource resource="pages" />} />
+                <Route path="pages">
+                    <Route index element={<PageList />} />
+                    <Route path="create" element={<PageCreate />} />
+                    <Route path="edit/:id" element={<PageEdit />} />
+                </Route>
+            </Route>
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </HelmetProvider>
-  </QueryClientProvider>
-);
+          
+          <UnsavedChangesNotifier />
+        </Refine>
+      </BrowserRouter>
+    </ConfigProvider>
+  );
+}
 
 export default App;
