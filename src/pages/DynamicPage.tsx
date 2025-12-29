@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { BlockRenderer } from '../components/BlockRenderer';
 import { PageBlock } from '../types/blocks';
+import { Helmet } from 'react-helmet-async'; // <--- Import
 
 interface PageData {
   id: string;
@@ -13,7 +14,7 @@ interface PageData {
 }
 
 const DynamicPage = () => {
-  const { slug } = useParams(); // Get URL segment (e.g. 'about')
+  const { slug } = useParams();
   const [page, setPage] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -22,16 +23,14 @@ const DynamicPage = () => {
     const fetchPage = async () => {
       setLoading(true);
       setError(false);
-      
-      // Default to 'home' if no slug provided
       const currentSlug = slug || 'home';
 
       const { data, error } = await supabase
         .from('pages')
         .select('*')
         .eq('slug', currentSlug)
-        .eq('status', 'published') // Only fetch published pages
-        .single();
+        .eq('status', 'published')
+        .maybeSingle(); // Use maybeSingle to avoid 406 errors on 0 rows
 
       if (error || !data) {
         console.error('Page fetch error:', error);
@@ -56,9 +55,12 @@ const DynamicPage = () => {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Here you would add a <SEO /> component using page.meta_title 
-         For now, we just render the blocks
-      */}
+      {/* Dynamic SEO Meta Tags */}
+      <Helmet>
+        <title>{page.meta_title || `${page.title} | KretruTosh Consulting`}</title>
+        <meta name="description" content={page.meta_description || "Driving Predictable, Scalable Growth Through GTM Velocity."} />
+      </Helmet>
+
       <BlockRenderer blocks={page.blocks} />
     </main>
   );

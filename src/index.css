@@ -21,7 +21,7 @@ body {
 }
 
 .animate-scroll {
-  animation: scroll 40s linear infinite;
+  animation: scroll 45s linear infinite;
 }
 
 /* Pause animation on hover for better UX */

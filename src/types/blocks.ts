@@ -7,17 +7,59 @@ export interface PageBlock {
 
 // The Registry of all available blocks
 export type BlockType = 
-  | 'hero_simple'       // Standard Title + Subtitle + Image
-  | 'hero_complex'      // The "Home" hero with abstract visuals & 2 CTAs
-  | 'rich_text'         // HTML content
-  | 'stats_grid'        // 3x3 Grid of outcomes (NRR, ROI, etc)
-  | 'framework_carousel'// Rotating list of frameworks
-  | 'logo_strip'        // Client logos
-  | 'cta_banner'        // "Ready to build...?" strip
-  | 'cards_grid'        // Generic grid for features/services
-  | 'accordion_list'    // FAQ or "Problem/Solution" toggles
-  | 'resource_feed'    // Dynamic list of recent podcasts/articles
-  | 'features_grid';    // Generic grid for features/services
+  // --- Core Layouts ---
+  | 'hero_simple'       // Standard Hero (Internal Pages)
+  | 'hero_home'         // Homepage Hero (Fold 1)
+  | 'rich_text'         // HTML Content
+  | 'content_split'     // Image + Text (Book/Philosophy)
+
+  // --- Lists & Grids ---
+  | 'stats_grid'        // 3x3 Outcomes Grid
+  | 'features_grid'     // Manual Feature Cards
+  | 'logo_strip'        // Client Logos (Smart)
+  
+  // --- Frameworks ---
+  | 'framework_carousel' // Homepage Horizontal Slider
+  | 'framework_grid'     // Full Grid Page
+
+  // --- Programs ---
+  | 'programs_home'      // Complex Engine Layout (3 Vert + 2 Horiz)
+  | 'program_grid'       // Simple Card List
+
+  // --- Resources & Cases ---
+  | 'case_study_strip'   // (Building Next)
+  | 'resource_hub'       // (Building Next)
+  | 'industry_grid'      // (Building Next)
+    
+  // --- Global ---
+  | 'cta_banner'        // (Simple "Ready to start?" strip)
+  | 'articles_grid'     // (Latest Articles Grid)
+  | 'case_studies_grid' // (Case Studies Grid)
+  | 'philosophy_block';
+
+export interface HeroHomeProps{
+  headline: string;
+  subheadline: string;
+  primaryCtaText: string;
+  primaryCtaLink: string;
+  secondaryCtaText: string;
+  secondaryCtaLink: string;  
+}
+
+export interface ContentSplitProps{
+  label?: string;
+  title: string;
+  content: string;
+  image_url: string;
+  image_position: 'left' | 'right';
+  cta_text?: string;
+  cta_link?: string;
+  background: 'white' | 'light' | 'navy';
+}
+
+export interface ResourceHubProps{
+  title: string;
+}
 
 // Example Data Structure for a Hero Block
 export interface HeroBlockProps {

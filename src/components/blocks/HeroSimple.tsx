@@ -22,7 +22,8 @@ export const HeroSimple = ({
   backgroundImage
 }: HeroSimpleProps) => {
   return (
-    <section className="relative w-full py-24 md:py-32 overflow-hidden bg-[#0B1C3E] text-white">
+    <section className="relative w-full pt-48 pb-24 overflow-hidden bg-[#0B1C3E] text-white">
+      
       {/* Background Image Layer */}
       {backgroundImage && (
         <div 
