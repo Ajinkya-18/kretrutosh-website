@@ -84,6 +84,12 @@ export const Footer = () => {
 
       <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-gray-500">
         <p>&copy; {currentYear} KretruTosh Consulting. All Rights Reserved.</p>
+        <Link 
+          to="/admin" 
+          className="text-gray-700 hover:text-gray-500 text-xs transition-colors"
+        >
+          Admin Login
+        </Link>
       </div>
     </footer>
   );
