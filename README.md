@@ -1,52 +1,49 @@
-Here is a professional, comprehensive README.md file for your project. You can save this in the root directory of your repository.
-
-KretruTosh Consulting - Headless CMS & Website
+# KretruTosh Consulting - Headless CMS & Website
 A bespoke, high-performance consulting website features a fully integrated Headless CMS admin panel. Built to enable "GTM Velocity" through a dynamic, block-based page builder and structured content management.
 
-🚀 Key Features
+## 🚀 Key Features
 Dynamic Block-Based Page Builder: Admins can construct pages (Home, About, etc.) by stacking and reordering custom components (Heroes, Grids, Sliders, CTAs).
 
-Structured Resource Management: Dedicated Admin CRUD interfaces for complex data types:
+### Structured Resource Management: Dedicated Admin CRUD interfaces for complex data types:
 
-Transformation Programs (5-Pillar Model)
+* Transformation Programs (5-Pillar Model)
 
-Proprietary Frameworks (Rich content with custom icons)
+* Proprietary Frameworks (Rich content with custom icons)
 
-Industries (Sector-specific deep dives)
+* Industries (Sector-specific deep dives)
 
-Impact & Case Studies (Filterable outcomes)
+* Impact & Case Studies (Filterable outcomes)
 
-Thought Leadership Hub: Centralized management for Books, Podcasts (YouTube integration), Whitepapers, Articles, and Assessments.
+* Thought Leadership Hub: Centralized management for Books, Podcasts (YouTube integration), Whitepapers, Articles, and Assessments.
 
-Global Layout Control: Dynamic Header/Footer management, including logos, social links, and navigation dropdowns managed via the Admin Panel.
+* Global Layout Control: Dynamic Header/Footer management, including logos, social links, and navigation dropdowns managed via the Admin Panel.
 
-Performance & SEO: Built on Vite for speed, with react-helmet-async for dynamic meta tags and Open Graph data per page.
+* Performance & SEO: Built on Vite for speed, with react-helmet-async for dynamic meta tags and Open Graph data per page.
 
-Visual Polish:
+### Visual Polish:
 
-Scroll-reveal animations (framer-motion)
+* Scroll-reveal animations (framer-motion)
 
-Live number counters (react-countup)
+* Live number counters (react-countup)
 
-Responsive, premium consulting aesthetic (Tailwind CSS + Ant Design).
+* Responsive, premium consulting aesthetic (Tailwind CSS + Ant Design).
 
-🛠 Tech Stack
-Frontend Framework: React 18 + TypeScript + Vite
+## 🛠 Tech Stack
+* Frontend Framework: React 18 + TypeScript + Vite
 
-Admin Framework: Refine (Ant Design Adapter)
+* Admin Framework: Refine (Ant Design Adapter)
 
-Styling: Tailwind CSS (Public Site) + Ant Design (Admin Panel)
+* Styling: Tailwind CSS (Public Site) + Ant Design (Admin Panel)
 
-Backend / Database: Supabase (PostgreSQL)
+* Backend / Database: Supabase (PostgreSQL)
 
-Authentication: Supabase Auth
+* Authentication: Supabase Auth
 
-Storage: Supabase Storage (for images and assets)
+* Storage: Supabase Storage (for images and assets)
 
-Icons: Lucide React
+* Icons: Lucide React
 
-📦 Project Structure
-Bash
+## 📦 Project Structure
 
 src/
 ├── components/
@@ -67,7 +64,8 @@ src/
 ├── types/              # TypeScript interfaces for DB and Blocks
 ├── App.tsx             # Main Router and Layout configuration
 └── BlockRenderer.tsx   # Maps JSON block data to React components
-🚀 Getting Started
+
+## 🚀 Getting Started
 1. Prerequisites
 Node.js (v18+)
 
@@ -87,54 +85,54 @@ npm install
 3. Environment Setup
 Create a .env file in the root directory:
 
-Code snippet
-
+```
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 4. Database Setup (Supabase)
 Run the SQL scripts provided in the sql/ folder (or from the project documentation) to create the necessary tables:
 
-pages (Stores JSON layout for dynamic pages)
+* pages (Stores JSON layout for dynamic pages)
 
-programs, frameworks, industries (Rich content tables)
+* programs, frameworks, industries (Rich content tables)
 
-case_studies, videos, articles, book, whitepapers, assessments
+* case_studies, videos, articles, book, whitepapers, assessments
 
-page_contact (Global settings, logo, social links)
+* page_contact (Global settings, logo, social links)
 
-Storage: Create a Public Bucket named images in Supabase Storage.
+* Storage: Create a Public Bucket named images in Supabase Storage.
 
 5. Run Local Server
-Bash
-
+```
 npm run dev
+```
 The app will launch at http://localhost:5173.
 
-Website: /
+Website: https://kretrutosh-website.vercel.app
 
-Admin Panel: /admin (Requires login)
+Admin Panel: https://kretrutosh-website.vercel.app/admin (Requires login)
 
-🌐 Deployment (Vercel)
+## 🌐 Deployment (Vercel)
 This project is optimized for Vercel deployment.
 
-Push to GitHub.
+* Push to GitHub.
 
-Import to Vercel: Select the repository.
+* Import to Vercel: Select the repository.
 
-Build Settings:
+* Build Settings:
 
-Framework Preset: Vite
+* Framework Preset: Vite
 
-Output Directory: dist
+* Output Directory: dist
 
-Environment Variables: Add your VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel settings.
+* Environment Variables: Add your VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel settings.
 
-SPA Routing: The project includes a vercel.json file to handle client-side routing (fixing 404 errors on refresh).
+* SPA Routing: The project includes a vercel.json file to handle client-side routing (fixing 404 errors on refresh).
 
-vercel.json content:
+* vercel.json content:
 
+```
 JSON
-
 {
   "rewrites": [
     {
@@ -143,18 +141,19 @@ JSON
     }
   ]
 }
-📝 Admin Panel Guide
+```
+## 📝 Admin Panel Guide
 To access the CMS:
 
 Go to https://your-domain.com/admin
 
 Log in with your authenticated Supabase credentials.
 
-Website Pages: Edit the Home page layout using the drag-and-drop builder.
+* Website Pages: Edit the Home page layout using the drag-and-drop builder.
 
-Resources: Use the sidebar to manage Programs, Frameworks, Industries, etc.
+* Resources: Use the sidebar to manage Programs, Frameworks, Industries, etc.
 
 Note: Complex sections (like Frameworks) use a tabbed interface to manage rich data (Hero, Process, Outcomes).
 
-📄 License
+## 📄 License
 Proprietary software developed for KretruTosh Consulting. All rights reserved.
