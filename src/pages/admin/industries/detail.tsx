@@ -5,6 +5,25 @@ import { ArrowRight, CheckCircle2, AlertTriangle, Layers, TrendingUp } from "luc
 import { Helmet } from "react-helmet-async"; // <--- Import
 import { CtaBanner } from "../../../components/blocks/CtaBanner"; // <--- Import
 
+const renderAsList = (text: string, icon: any) => {
+  if (!text) return null;
+  
+  // Split by New Line OR Comma (handling both styles of input)
+  // This regex splits on \n or ,
+  const items = text.split(/\r?\n|,/).map(t => t.trim()).filter(Boolean);
+
+  return (
+    <ul className="space-y-2 mt-2">
+      {items.map((item, i) => (
+        <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+           {/* Render the passed icon (like a checkmark) */}
+           <span className="shrink-0 mt-0.5 text-[#FF9933]">{icon}</span>
+           <span>{item.replace(/^-|\•/, '').trim()}</span> {/* Removes existing bullet chars if user typed them */}
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 export const IndustryDetail = () => {
   const { slug } = useParams();
@@ -63,7 +82,9 @@ export const IndustryDetail = () => {
                             <AlertTriangle className="text-red-500 shrink-0" size={24} />
                             <h3 className="font-bold text-lg text-[#0B1C3E]">{gap.title}</h3>
                         </div>
-                        <p className="text-gray-600 text-sm leading-relaxed pl-9">{gap.description}</p>
+                        <p className="text-gray-600 text-sm leading-relaxed pl-9 whitespace-pre-wrap">
+                            {gap.description}
+                        </p>
                     </div>
                 ))}
             </div>
@@ -86,7 +107,7 @@ export const IndustryDetail = () => {
                         </div>
                         <div>
                             <h3 className="text-xl font-bold text-[#0B1C3E] mb-2">{step.title}</h3>
-                            <p className="text-gray-700 leading-relaxed">{step.description}</p>
+                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{step.description}</p>
                         </div>
                     </div>
                 ))}
@@ -122,7 +143,10 @@ export const IndustryDetail = () => {
                         {content.real_cases?.map((c: any, idx: number) => (
                             <div key={idx} className="border-l-4 border-[#FF9933] pl-4">
                                 <div className="font-bold text-lg mb-1">{c.client}</div>
-                                <p className="text-gray-400 text-sm">{c.outcomes}</p>
+                                {/* <p className="text-gray-400 text-sm">{c.outcomes}</p> */}
+                                <div className="mt-2">
+                                    {renderAsList(c.outcomes, <CheckCircle2 size={16} />)}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -137,15 +161,15 @@ export const IndustryDetail = () => {
                     <div className="grid md:grid-cols-3 gap-8">
                         <div>
                             <div className="font-bold text-red-600 mb-2">The Problem</div>
-                            <p className="text-sm text-gray-600">{content.feature_case.problem}</p>
+                            <p className="text-sm text-gray-600 whitespace-pre-wrap">{content.feature_case.problem}</p>
                         </div>
                         <div>
                             <div className="font-bold text-blue-600 mb-2">Our Approach</div>
-                            <p className="text-sm text-gray-600">{content.feature_case.approach}</p>
+                            <p className="text-sm text-gray-600 whitespace-pre-wrap">{content.feature_case.approach}</p>
                         </div>
                         <div>
                             <div className="font-bold text-green-600 mb-2">The Outcome</div>
-                            <p className="text-sm text-gray-600">{content.feature_case.outcome}</p>
+                            <p className="text-sm text-gray-600 whitespace-pre-wrap">{content.feature_case.outcome}</p>
                         </div>
                     </div>
                 </div>
