@@ -44,7 +44,7 @@ Dynamic Block-Based Page Builder: Admins can construct pages (Home, About, etc.)
 * Icons: Lucide React
 
 ## 📦 Project Structure
-
+```
 src/
 ├── components/
 │   ├── admin/          # Admin-specific components (PageBuilder, ImageUpload)
@@ -64,7 +64,7 @@ src/
 ├── types/              # TypeScript interfaces for DB and Blocks
 ├── App.tsx             # Main Router and Layout configuration
 └── BlockRenderer.tsx   # Maps JSON block data to React components
-
+```
 ## 🚀 Getting Started
 1. Prerequisites
 Node.js (v18+)
@@ -145,7 +145,7 @@ JSON
 ## 📝 Admin Panel Guide
 To access the CMS:
 
-Go to https://your-domain.com/admin
+Go to https://kretrutosh-website.vercel.app/admin
 
 Log in with your authenticated Supabase credentials.
 
