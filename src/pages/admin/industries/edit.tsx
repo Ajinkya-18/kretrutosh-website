@@ -67,33 +67,69 @@ export const IndustryEdit = () => {
           feature_case_title, feature_case_problem, feature_case_approach, feature_case_outcome
       } = values;
 
-      const page_content = {
-          hero: { title: hero_title, subhead: hero_subhead, cta_text: cta_text, cta_link: cta_link },
-          challenges: { intro: challenges_intro, list: challenges_list || [] },
-          approach: { intro: approach_intro, list: approach_steps || [] },
-          frameworks: frameworks_list || [],
-          real_cases: real_cases_list || [],
-          feature_case: { 
-              title: feature_case_title, 
-              problem: feature_case_problem, 
-              approach: feature_case_approach, 
-              outcome: feature_case_outcome 
-          }
-      };
+      const { data: currentData, error: fetchError } = await supabase
+        .from('industries')
+        .select('page_content')
+        .eq('id', id)
+        .single();
+
+    if (fetchError) {
+        message.error("Error fetching original data. Save cancelled.");
+        setSaving(false);
+        return;
+    }
+
+    const existingContent = currentData?.page_content || {};
+
+    const merged_page_content = {
+        ...existingContent, // Keeps any top-level keys not in the form (e.g. meta_tags)
+        
+        hero: { 
+            ...existingContent.hero, 
+            title: hero_title, 
+            subhead: hero_subhead, 
+            cta_text: cta_text, 
+            cta_link: cta_link 
+        },
+        
+        challenges: { 
+            ...existingContent.challenges, 
+            intro: challenges_intro, 
+            list: challenges_list || [] 
+        },
+        
+        approach: { 
+            ...existingContent.approach, 
+            intro: approach_intro, 
+            list: approach_steps || [] 
+        },
+        
+        // Lists are usually replaced entirely by the form state, which is correct
+        frameworks: frameworks_list || [],
+        real_cases: real_cases_list || [],
+        
+        feature_case: { 
+            ...existingContent.feature_case, // Safe deep merge
+            title: feature_case_title, 
+            problem: feature_case_problem, 
+            approach: feature_case_approach, 
+            outcome: feature_case_outcome 
+        }
+    };
 
       const { error } = await supabase
-          .from('industries')
-          .update({
-              title, slug, short_description, icon_name, display_order,
-              page_content 
-          })
-          .eq('id', id);
+        .from('industries')
+        .update({
+            title, slug, short_description, icon_name, display_order,
+            page_content: merged_page_content // <--- Send the merged object
+        })
+        .eq('id', id);
 
-      setSaving(false);
+    setSaving(false);
 
-      if (error) message.error("Error: " + error.message);
-      else message.success("Industry updated!");
-  };
+    if (error) message.error("Error: " + error.message);
+    else message.success("Industry updated!");
+};
 
   if (errorMsg) return <Alert message="Error" description={errorMsg} type="error" />;
 
