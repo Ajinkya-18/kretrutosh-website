@@ -7,8 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#0B1C3E', // Deep Navy
-        secondary: '#FF9933', // Saffron
+        saffron: {
+          DEFAULT: '#ff8d1aff', // <--- Set your desired Saffron Hex here
+          dark: '#ff9900ff',    // <--- Set your desired Hover Hex here
+        }
       }
     },
   },

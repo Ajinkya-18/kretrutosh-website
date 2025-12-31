@@ -72,7 +72,7 @@ import { CaseStudyList } from './pages/admin/case_studies/list';
 import { CaseStudyCreate } from './pages/admin/case_studies/create';
 import { CaseStudyEdit } from './pages/admin/case_studies/edit';
 import { ImpactPage } from './pages/impact/index';
-
+import { ScrollToTop } from './components/ScrollToTop';
 
 const PublicLayout = () => {
   return (
@@ -91,6 +91,7 @@ function App() {
     <HelmetProvider>
       <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}>
         <BrowserRouter>
+        <ScrollToTop />
           <Refine
             dataProvider={dataProvider(supabase)}
             liveProvider={liveProvider(supabase)}

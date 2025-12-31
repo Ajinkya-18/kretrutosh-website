@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+    /* Target: bg-[#FF9933] */
+    .bg-\[\#FF9933\] {
+        background-color: theme('colors.saffron.DEFAULT') !important;
+    }
+
+    .bg-\[\#ff9933\] {
+        background-color: theme('colors.saffron.DEFAULT') !important;
+    }
+
+    /* Target: text-[#FF9933] */
+    .text-\[\#FF9933\] {
+        color: theme('colors.saffron.DEFAULT') !important;
+    }
+
+    /* Target: border-[#FF9933] */
+    .border-\[\#FF9933\] {
+        border-color: theme('colors.saffron.DEFAULT') !important;
+    }
+
+    /* Target: hover:bg-[#E68A00] */
+    .hover\:bg-\[\#E68A00\]:hover {
+        background-color: theme('colors.saffron.dark') !important;
+    }
+    
+    /* Target: hover:text-[#E68A00] */
+    .hover\:text-\[\#E68A00\]:hover {
+        color: theme('colors.saffron.dark') !important;
+    }
+}
+
 /* Optional: Add the premium font stack from your design brief */
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
